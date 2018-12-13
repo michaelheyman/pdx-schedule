@@ -9,7 +9,7 @@ from model import engine
 from model import Instructor
 from model import Course
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+# logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)
 
 
@@ -27,15 +27,14 @@ class ScheduleScraper:
             name, crn, number = ScheduleScraper.get_course(elem)
             instructor = ScheduleScraper.get_instructor(elem)
 
-            course = Course(name=name, crn=crn, number=number)
-            DBSession.add(course)
-
             if instructor is None:
+                course = Course(name=name, crn=crn, number=number)
+                DBSession.add(course)
                 continue
 
             instructor_record = (
                 DBSession.query(Instructor)
-                .filter(Instructor.name == instructor)
+                .filter(Instructor.full_name == instructor)
                 .first()
             )
 
@@ -45,18 +44,25 @@ class ScheduleScraper:
                         instructor
                     )
                 except ValueError:
-                    inst = Instructor(name=instructor)
+                    LOG.debug(f"{instructor} not found")
+                    inst = Instructor(full_name=instructor)
                 else:
                     inst = Instructor(
-                        name=instructor,
+                        full_name=instructor,
+                        first_name=first_name,
+                        last_name=last_name,
                         rating=rating,
                         url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
                     )
                     LOG.debug(f"{instructor} new")
-                finally:
-                    DBSession.add(inst)
+
+                DBSession.add(inst)
+                DBSession.flush()
             else:
                 LOG.debug(f"{instructor} was already in db!")
+
+            course = Course(name=name, crn=crn, number=number, instructor_id=inst.id)
+            DBSession.add(course)
 
         DBSession.commit()
 
@@ -97,7 +103,14 @@ class ScheduleScraper:
 
 
 class RateMyProfessorsParser:
-    url = "http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&q={0}+AND+schoolid_s%3A775&qf=teacherfirstname_t+teacherlastname_t+teacherfullname_t&siteName=rmp&fl=pk_id+teacherfirstname_t+teacherlastname_t+averageratingscore_rf&fq="
+    # url = "http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&q={0}+AND+schoolid_s%3A775&qf=teacherfirstname_t+teacherlastname_t+teacherfullname_t&siteName=rmp&fl=pk_id+teacherfirstname_t+teacherlastname_t+averageratingscore_rf&fq="
+    url = (
+        "http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&"
+        "q={0}+AND+schoolid_s%3A775&"
+        "qf=teacherfirstname_t+teacherlastname_t+teacherfullname_t&"
+        "siteName=rmp&"
+        "fl=pk_id+teacherfirstname_t+teacherlastname_t+averageratingscore_rf&fq="
+    )
 
     @staticmethod
     def get_instructor_json(instructor_name):
@@ -107,6 +120,12 @@ class RateMyProfessorsParser:
 
     @staticmethod
     def get_instructor(instructor_name):
+        if len(instructor_name.split()) == 3:
+            split = instructor_name.split()
+            del split[1]
+            instructor_name = " ".join(split)
+
+        # return "foo", "bar", 1.0, 123
         json = RateMyProfessorsParser.get_instructor_json(instructor_name)
         first_name, last_name, rating, rmp_id = RateMyProfessorsParser.parse_instructor_json(
             json
@@ -116,13 +135,14 @@ class RateMyProfessorsParser:
 
     @staticmethod
     def parse_instructor_json(data):
-        if data["response"]["numFound"] is not 1:
+        if data["response"]["numFound"] is 0:
             raise ValueError("RateMyProfessors could not find professor.")
 
-        rating = data["response"]["docs"][0]["averageratingscore_rf"]
-        first_name = data["response"]["docs"][0]["teacherfirstname_t"]
-        last_name = data["response"]["docs"][0]["teacherlastname_t"]
-        rmp_id = data["response"]["docs"][0]["pk_id"]
+        instructor_data = data["response"]["docs"][0]
+        rating = instructor_data["averageratingscore_rf"]
+        first_name = instructor_data["teacherfirstname_t"]
+        last_name = instructor_data["teacherlastname_t"]
+        rmp_id = instructor_data["pk_id"]
 
         return first_name, last_name, rating, rmp_id
 
