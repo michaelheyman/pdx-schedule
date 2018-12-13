@@ -1,69 +1,125 @@
 from bs4 import BeautifulSoup
 import requests
-import course
-import instructor
-import pprint
+import re
+import logging
 
-pp = pprint.PrettyPrinter(indent=4)
+from model import DBSession
+from model import Base
+from model import engine
+from model import Instructor
+from model import Course
 
-TITLE_CLASS   = 'ddtitle'
-DEFAULT_CLASS = 'dddefault'
-rmp_url = 'http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&rows=20&q={0}+AND+schoolid_s%3A775&defType=edismax&qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t%5E2000+autosuggest&bf=pow(total_number_of_ratings_i%2C2.1)&sort=total_number_of_ratings_i+desc&siteName=rmp&rows=20&start=0&fl=pk_id+teacherfirstname_t+teacherlastname_t+total_number_of_ratings_i+averageratingscore_rf+schoolid_s&fq='
+from sqlalchemy import exists
 
-courses = list()
-instructors = list()
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+LOG = logging.getLogger(__name__)
 
-def get_paired_sibling(header):
-    return header.parent.next_sibling.next_sibling
+class ScheduleScraper:
+    TITLE_CLASS = "ddtitle"
+    DEFAULT_CLASS = "dddefault"
+    soup = ""
 
-def get_instructor(course_info_table):
-    return course_info_table.find_all('td', DEFAULT_CLASS)[-1].get_text()[0:-3]
+    @staticmethod
+    def run():
+        with open("index.html") as fp:
+            ScheduleScraper.soup = BeautifulSoup(fp, "html.parser")
 
-def get_course_info(full_title):
-    first_delimiter = full_title.index(' - ')
-    second_delimiter = full_title.index(' - ', first_delimiter + 1)
-    third_delimiter = full_title.index(' - ', second_delimiter + 1)
+        for elem in ScheduleScraper.soup.find_all("th", ScheduleScraper.TITLE_CLASS):
+            name, crn, number = ScheduleScraper.get_course_info(elem.string)
+            instructor = ScheduleScraper.get_instructor(elem)
 
-    name = full_title[0: first_delimiter]
-    crn = full_title[first_delimiter + 3: second_delimiter]
-    number = full_title[second_delimiter + 3: third_delimiter]
+            course = Course(name=name, crn=crn, number=number)
+            DBSession.add(course)
 
-    return name, crn, number
+            if instructor is None:
+                continue
 
-def get_rmp_json(instructor_name):
-    url = rmp_url.format(instructor_name.replace(' ', '+'))
-    r = requests.get(url)
-    return r.json()
+            instructor_record = DBSession.query(Instructor).\
+                    filter(Instructor.name == instructor).first()
 
-def parse_rmp_json(data):
-    if data['response']['numFound'] == 1:
-        rmp_id = data['response']['docs'][0]['pk_id']
-        rating = data['response']['docs'][0]['averageratingscore_rf']
-        first_name = data['response']['docs'][0]['teacherfirstname_t']
-        last_name = data['response']['docs'][0]['teacherlastname_t']
+            if instructor_record is None:
+                inst = Instructor(name=instructor, rating=5.0, url="www.google.com")
+                DBSession.add(inst)
+                LOG.debug(f"{instructor} new")
+            else:
+                LOG.debug(f"{instructor} was already in db!")
+
+        DBSession.commit()
+
+    @staticmethod
+    def get_instructor(header):
+        course_table = header.parent.next_sibling.next_sibling
+        if not course_table:
+            return None
+
+        cells = course_table.find_all("td", ScheduleScraper.DEFAULT_CLASS)
+        if not cells:
+            return None
+
+        last_cell = cells[-1]
+        instructor_name = last_cell.get_text()[0:-3].strip()
+        if not instructor_name:
+            return None
+
+        return instructor_name
+
+    @staticmethod
+    def get_course_info(full_title):
+        name = re.search("(?<=^)(.*?)(?=\ -)", full_title)
+        matches = re.findall("(?<=\- )(.*?)(?=\ -)", full_title)
+
+        if not name or not matches:
+            return None
+        if len(name.groups()) is not 1:
+            return None
+        if len(matches) is not 2:
+            return None
+
+        crn = matches[0]
+        number = matches[1]
+
+        return name.group(1), crn, number
+
+
+class RateMyProfessorsParser:
+    url = "http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&q={0}+AND+schoolid_s%3A775&qf=teacherfirstname_t+teacherlastname_t+teacherfullname_t&siteName=rmp&fl=pk_id+teacherfirstname_t+teacherlastname_t+averageratingscore_rf&fq="
+
+    @staticmethod
+    def get_instructor_json(self, instructor_name):
+        url = RateMyProfessorsParser.url.format(instructor_name.replace(" ", "+"))
+        response = requests.get(url)
+        print(f"{instructor_name} {response}")
+        return response.json()
+
+    @staticmethod
+    def get_instructor_rating(self, instructor_name):
+        json = RateMyProfessorsParser.get_instructor_json(instructor_name)
+        try:
+            name, rating = RateMyProfessorsParser.parse_instructor_json(json)
+        except ValueError:
+            print(f"No data found for {instructor_name}")
+            return (None, None)
+
+        return name, rating
+
+    @staticmethod
+    def parse_instructor_json(self, data):
+        if data["response"]["numFound"] is not 1:
+            # return (None, None)
+            raise ValueError("RateMyProfessors could not find professor.")
+
+        rating = data["response"]["docs"][0]["averageratingscore_rf"]
+        first_name = data["response"]["docs"][0]["teacherfirstname_t"]
+        last_name = data["response"]["docs"][0]["teacherlastname_t"]
         name = f"{first_name} {last_name}"
-        return rmp_id, rating, name
 
-    return None
-    
+        return name, rating
 
-with open('index.html') as fp:
-    soup = BeautifulSoup(fp, 'html.parser')
 
-test_title = soup.find('th', TITLE_CLASS)
-test_course = get_paired_sibling(soup.find('th', TITLE_CLASS))
+def main():
+    Base.metadata.create_all(engine)
+    scraper = ScheduleScraper.run()
 
-#print(get_course_info(test_title.string))
 
-#c1 = course.Course('CS', 123, 'person', 'www.google.com')
-#print(c1)
-
-for elem in soup.find_all('th', TITLE_CLASS):
-    name, crn, number = get_course_info(elem.string)
-    instructor = get_instructor(get_paired_sibling(elem))
-    courses.append(course.Course(name, number, crn, instructor, ''))
-
-for course in courses:
-    print(course)
-
-print(len(courses))
+if __name__ == "__main__":
+    main()
