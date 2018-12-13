@@ -12,12 +12,55 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
+from parser import RateMyProfessors
 
-engine = create_engine("sqlite:///:memory:", echo=False)
-# engine = create_engine("sqlite:///foo.db", echo=False)
+import logging
+
+# logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+LOG = logging.getLogger(__name__)
+
+# engine = create_engine("sqlite:///:memory:", echo=False)
+engine = create_engine("sqlite:///foo.db", echo=False)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 DBSession = Session()
+
+
+class InstructorMgr:
+    @staticmethod
+    def add_instructor(instructor):
+        instructor_record = (
+            DBSession.query(Instructor)
+            .filter(Instructor.full_name == instructor)
+            .first()
+        )
+
+        if instructor_record is None:
+            try:
+                first_name, last_name, rating, rmp_id = RateMyProfessors.get_instructor(
+                    instructor
+                )
+            except ValueError:
+                LOG.debug(f"{instructor} not found")
+                instructor_record = Instructor(full_name=instructor)
+            else:
+                instructor_record = Instructor(
+                    full_name=instructor,
+                    first_name=first_name,
+                    last_name=last_name,
+                    rating=rating,
+                    url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
+                )
+                LOG.debug(f"{instructor} new")
+
+            DBSession.add(instructor_record)
+            DBSession.flush()
+        else:
+            LOG.debug(f"{instructor} was already in db!")
+
+        DBSession.commit()
+
+        return instructor_record
 
 
 class Instructor(Base):
@@ -39,6 +82,14 @@ class Instructor(Base):
             "url={self.url}, "
             "timestamp={self.timestamp})>"
         )
+
+
+class CourseMgr:
+    @staticmethod
+    def add_course(name, crn, number, instructor_id=None):
+        course = Course(name=name, crn=crn, number=number, instructor_id=instructor_id)
+        DBSession.add(course)
+        DBSession.commit()
 
 
 class Course(Base):
