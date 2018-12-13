@@ -9,10 +9,9 @@ from model import engine
 from model import Instructor
 from model import Course
 
-from sqlalchemy import exists
-
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)
+
 
 class ScheduleScraper:
     TITLE_CLASS = "ddtitle"
@@ -25,7 +24,7 @@ class ScheduleScraper:
             ScheduleScraper.soup = BeautifulSoup(fp, "html.parser")
 
         for elem in ScheduleScraper.soup.find_all("th", ScheduleScraper.TITLE_CLASS):
-            name, crn, number = ScheduleScraper.get_course_info(elem.string)
+            name, crn, number = ScheduleScraper.get_course(elem)
             instructor = ScheduleScraper.get_instructor(elem)
 
             course = Course(name=name, crn=crn, number=number)
@@ -34,13 +33,28 @@ class ScheduleScraper:
             if instructor is None:
                 continue
 
-            instructor_record = DBSession.query(Instructor).\
-                    filter(Instructor.name == instructor).first()
+            instructor_record = (
+                DBSession.query(Instructor)
+                .filter(Instructor.name == instructor)
+                .first()
+            )
 
             if instructor_record is None:
-                inst = Instructor(name=instructor, rating=5.0, url="www.google.com")
-                DBSession.add(inst)
-                LOG.debug(f"{instructor} new")
+                try:
+                    first_name, last_name, rating, rmp_id = RateMyProfessorsParser.get_instructor(
+                        instructor
+                    )
+                except ValueError:
+                    inst = Instructor(name=instructor)
+                else:
+                    inst = Instructor(
+                        name=instructor,
+                        rating=rating,
+                        url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
+                    )
+                    LOG.debug(f"{instructor} new")
+                finally:
+                    DBSession.add(inst)
             else:
                 LOG.debug(f"{instructor} was already in db!")
 
@@ -64,9 +78,10 @@ class ScheduleScraper:
         return instructor_name
 
     @staticmethod
-    def get_course_info(full_title):
-        name = re.search("(?<=^)(.*?)(?=\ -)", full_title)
-        matches = re.findall("(?<=\- )(.*?)(?=\ -)", full_title)
+    def get_course(header):
+        title = header.string
+        name = re.search(r"(?<=^)(.*?)(?=\ -)", title)
+        matches = re.findall(r"(?<=\- )(.*?)(?=\ -)", title)
 
         if not name or not matches:
             return None
@@ -85,40 +100,36 @@ class RateMyProfessorsParser:
     url = "http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&q={0}+AND+schoolid_s%3A775&qf=teacherfirstname_t+teacherlastname_t+teacherfullname_t&siteName=rmp&fl=pk_id+teacherfirstname_t+teacherlastname_t+averageratingscore_rf&fq="
 
     @staticmethod
-    def get_instructor_json(self, instructor_name):
+    def get_instructor_json(instructor_name):
         url = RateMyProfessorsParser.url.format(instructor_name.replace(" ", "+"))
         response = requests.get(url)
-        print(f"{instructor_name} {response}")
         return response.json()
 
     @staticmethod
-    def get_instructor_rating(self, instructor_name):
+    def get_instructor(instructor_name):
         json = RateMyProfessorsParser.get_instructor_json(instructor_name)
-        try:
-            name, rating = RateMyProfessorsParser.parse_instructor_json(json)
-        except ValueError:
-            print(f"No data found for {instructor_name}")
-            return (None, None)
+        first_name, last_name, rating, rmp_id = RateMyProfessorsParser.parse_instructor_json(
+            json
+        )
 
-        return name, rating
+        return first_name, last_name, rating, rmp_id
 
     @staticmethod
-    def parse_instructor_json(self, data):
+    def parse_instructor_json(data):
         if data["response"]["numFound"] is not 1:
-            # return (None, None)
             raise ValueError("RateMyProfessors could not find professor.")
 
         rating = data["response"]["docs"][0]["averageratingscore_rf"]
         first_name = data["response"]["docs"][0]["teacherfirstname_t"]
         last_name = data["response"]["docs"][0]["teacherlastname_t"]
-        name = f"{first_name} {last_name}"
+        rmp_id = data["response"]["docs"][0]["pk_id"]
 
-        return name, rating
+        return first_name, last_name, rating, rmp_id
 
 
 def main():
     Base.metadata.create_all(engine)
-    scraper = ScheduleScraper.run()
+    ScheduleScraper.run()
 
 
 if __name__ == "__main__":
