@@ -1,6 +1,6 @@
 {
   "type": "sqlite",
-  "database": "foo.db",
+  "database": "scraper/foo.db",
   "synchronize": true,
   "entities": [
     "src/entity/*.js"
