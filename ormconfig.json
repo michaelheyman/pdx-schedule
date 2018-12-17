@@ -3,13 +3,13 @@
   "database": "foo.db",
   "synchronize": true,
   "entities": [
-    "src/entity/*.ts"
+    "src/entity/*.js"
   ],
   "subscribers": [
-    "src/subscriber/*.ts"
+    "src/subscriber/*.js"
   ],
   "migrations": [
-    "src/migration/*.ts"
+    "src/migration/*.js"
   ],
   "cli": {
     "entitiesDir": "src/entity",
