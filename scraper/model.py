@@ -20,7 +20,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 # engine = create_engine("sqlite:///:memory:", echo=False)
-engine = create_engine("sqlite:///foo.db", echo=False)
+engine = create_engine("sqlite:///app.db", echo=False)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 DBSession = Session()
