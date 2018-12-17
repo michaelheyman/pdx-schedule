@@ -1,24 +1,24 @@
-import {postGetAllAction} from "./controller/PostGetAllAction";
-import {postGetByIdAction} from "./controller/PostGetByIdAction";
-import {postSaveAction} from "./controller/PostSaveAction";
+import { instructorGetAllAction } from "./controller/InstructorGetAllAction";
+import { instructorGetByIdAction } from "./controller/InstructorGetByIdAction";
+import { instructorSaveAction } from "./controller/InstructorSaveAction";
 
 /**
  * All application routes.
  */
 export const AppRoutes = [
     {
-        path: "/posts",
+        path: "/instructors",
         method: "get",
-        action: postGetAllAction
+        action: instructorGetAllAction
     },
     {
-        path: "/posts/:id",
+        path: "/instructors/:id",
         method: "get",
-        action: postGetByIdAction
+        action: instructorGetByIdAction
     },
     {
-        path: "/posts",
+        path: "/instructors",
         method: "post",
-        action: postSaveAction
+        action: instructorSaveAction
     }
 ];
