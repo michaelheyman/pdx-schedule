@@ -1,0 +1,37 @@
+module Model exposing (..)
+
+import Http
+
+
+type Response
+    = Failure Http.Error
+    | Loading
+    | Success String
+
+
+type alias Model =
+    { response : Response
+    , course : Maybe Course
+    }
+
+
+type alias Course =
+    { id : Int
+    , name : String
+    , number : String
+    , crn : Int
+    , url : Maybe String
+    , instructor_id : Maybe Int
+    , timestamp : String
+    }
+
+
+type alias Instructor =
+    { id : Int
+    , fullName : String
+    , firstName : Maybe String
+    , lastName : Maybe String
+    , rating : Maybe Float
+    , url : Maybe String
+    , timestamp : String
+    }
