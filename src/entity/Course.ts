@@ -47,11 +47,8 @@ export class Course {
     })
     url: string | null;
 
-    //@ManyToOne(type => Instructor, Instructor => Instructor.courses, {})
-    //@JoinColumn({ name: "instructor_id" })
-    @Column("integer", {
-        nullable: true
-    })
+    @ManyToOne(type => Instructor, Instructor => Instructor.courses, {})
+    @JoinColumn({ name: "InstructorId" })
     instructor_id: Instructor | null;
 
     @Column("datetime", {
