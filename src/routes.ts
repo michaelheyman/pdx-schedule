@@ -1,6 +1,7 @@
 import { instructorGetAllAction } from "./controller/InstructorGetAllAction";
 import { instructorGetByIdAction } from "./controller/InstructorGetByIdAction";
-import { instructorSaveAction } from "./controller/InstructorSaveAction";
+import { courseGetAllAction } from "./controller/CourseGetAllAction";
+import { courseGetByIdAction } from "./controller/CourseGetByIdAction";
 
 /**
  * All application routes.
@@ -17,8 +18,13 @@ export const AppRoutes = [
         action: instructorGetByIdAction
     },
     {
-        path: "/instructors",
-        method: "post",
-        action: instructorSaveAction
+        path: "/courses",
+        method: "get",
+        action: courseGetAllAction
+    },
+    {
+        path: "/course/:id",
+        method: "get",
+        action: courseGetByIdAction
     }
 ];
