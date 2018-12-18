@@ -100,7 +100,7 @@ class Course(Base):
     number = Column("Number", String, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
     url = Column("URL", String)
-    instructor_id = Column(Integer, ForeignKey("Instructor.Id"))
+    instructor_id = Column("InstructorId", Integer, ForeignKey("Instructor.Id"))
     instructor = relationship("Instructor")
     timestamp = Column("Timestamp", DateTime, default=datetime.utcnow)
 
