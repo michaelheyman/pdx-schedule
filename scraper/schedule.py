@@ -1,10 +1,14 @@
 from bs4 import BeautifulSoup
 import re
+import logging
 
 from model import Base
 from model import engine
 from model import InstructorMgr
 from model import CourseMgr
+from crawler import crawl
+
+LOG = logging.getLogger(__name__)
 
 
 class ScheduleScraper:
@@ -14,8 +18,13 @@ class ScheduleScraper:
 
     @staticmethod
     def run():
-        with open("index.html") as fp:
-            ScheduleScraper.soup = BeautifulSoup(fp, "html.parser")
+        content = crawl()
+
+        if content is None:
+            LOG.error("No content found to scrape. Exiting.")
+            return
+
+        ScheduleScraper.soup = BeautifulSoup(content, "html.parser")
 
         for elem in ScheduleScraper.soup.find_all("th", ScheduleScraper.TITLE_CLASS):
             name, crn, number = ScheduleScraper.get_course(elem)

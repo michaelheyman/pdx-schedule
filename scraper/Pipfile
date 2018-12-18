@@ -11,6 +11,7 @@ sqlalchemy = "*"
 beautifulsoup4 = "*"
 flake8 = "*"
 pre-commit = "*"
+black = "*"
 
 [requires]
 python_version = "3.7"

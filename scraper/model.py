@@ -64,7 +64,7 @@ class InstructorMgr:
 
 
 class Instructor(Base):
-    __tablename__ = "Instructors"
+    __tablename__ = "Instructor"
 
     id = Column("Id", Integer, primary_key=True)
     full_name = Column("FullName", String, nullable=False)
@@ -93,14 +93,14 @@ class CourseMgr:
 
 
 class Course(Base):
-    __tablename__ = "Courses"
+    __tablename__ = "Course"
 
     id = Column("Id", Integer, primary_key=True)
     name = Column("Name", String, nullable=False)
     number = Column("Number", String, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
     url = Column("URL", String)
-    instructor_id = Column(Integer, ForeignKey("Instructors.Id"))
+    instructor_id = Column(Integer, ForeignKey("Instructor.Id"))
     instructor = relationship("Instructor")
     timestamp = Column("Timestamp", DateTime, default=datetime.utcnow)
 
