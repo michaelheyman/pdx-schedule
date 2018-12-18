@@ -21,6 +21,8 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { response = Loading
       , course = Nothing
+      , courses = []
       }
-    , getCourse
+      --, getCourse
+    , getCourseList
     )

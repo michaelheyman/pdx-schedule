@@ -12,12 +12,14 @@ type Response
 type alias Model =
     { response : Response
     , course : Maybe Course
+    , courses : List Course
     }
 
 
 type Msg
     = GotInstructor (Result Http.Error Instructor)
     | GotCourse (Result Http.Error Course)
+    | GotCourseList (Result Http.Error (List Course))
 
 
 type alias Course =

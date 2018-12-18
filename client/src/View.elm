@@ -1,6 +1,6 @@
 module View exposing (..)
 
-import Html exposing (Html, div, pre, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, div, li, pre, table, tbody, td, text, th, thead, tr, ul)
 import Html.Attributes exposing (class)
 import Http
 import Model exposing (..)
@@ -21,12 +21,29 @@ viewTest model =
             text "Loading..."
 
         Success fullText ->
-            case model.course of
-                Just course ->
-                    text course.name
+            showCourses model
 
-                Nothing ->
-                    text "nothing"
+
+showCourse : Model -> Html Msg
+showCourse model =
+    case model.course of
+        Just course ->
+            text course.name
+
+        Nothing ->
+            text "showCourse: nothing"
+
+
+showCourses : Model -> Html Msg
+showCourses model =
+    case model.courses of
+        [] ->
+            text "showCourses: no courses found"
+
+        otherwise ->
+            model.courses
+                |> List.map (\course -> div [] [ text (toString course) ])
+                |> div []
 
 
 viewTable : Html Msg
@@ -55,3 +72,8 @@ viewTable =
                 ]
             ]
         ]
+
+
+toString : Course -> String
+toString course =
+    course.number ++ "\t" ++ course.name

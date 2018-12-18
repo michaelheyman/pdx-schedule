@@ -5001,8 +5001,10 @@ var author$project$Decode$courseDecoder = A8(
 	elm$json$Json$Decode$maybe(
 		A2(elm$json$Json$Decode$field, 'instructor_id', elm$json$Json$Decode$int)),
 	A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$string));
-var author$project$Model$GotCourse = function (a) {
-	return {$: 'GotCourse', a: a};
+var elm$json$Json$Decode$list = _Json_decodeList;
+var author$project$Decode$courseListDecoder = elm$json$Json$Decode$list(author$project$Decode$courseDecoder);
+var author$project$Model$GotCourseList = function (a) {
+	return {$: 'GotCourseList', a: a};
 };
 var elm$core$Result$mapError = F2(
 	function (f, result) {
@@ -5885,16 +5887,16 @@ var elm$http$Http$get = function (r) {
 	return elm$http$Http$request(
 		{body: elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
 };
-var author$project$Decode$getCourse = elm$http$Http$get(
+var author$project$Decode$getCourseList = elm$http$Http$get(
 	{
-		expect: A2(elm$http$Http$expectJson, author$project$Model$GotCourse, author$project$Decode$courseDecoder),
-		url: 'http://localhost:3000/course/1'
+		expect: A2(elm$http$Http$expectJson, author$project$Model$GotCourseList, author$project$Decode$courseListDecoder),
+		url: 'http://localhost:3000/courses/'
 	});
 var author$project$Model$Loading = {$: 'Loading'};
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{course: elm$core$Maybe$Nothing, response: author$project$Model$Loading},
-		author$project$Decode$getCourse);
+		{course: elm$core$Maybe$Nothing, courses: _List_Nil, response: author$project$Model$Loading},
+		author$project$Decode$getCourseList);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
@@ -5907,51 +5909,101 @@ var author$project$Model$Failure = function (a) {
 var author$project$Model$Success = function (a) {
 	return {$: 'Success', a: a};
 };
+var elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
+		}
+	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Update$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'GotInstructor') {
-			var result = msg.a;
-			if (result.$ === 'Ok') {
-				var value = result.a;
-				return _Utils_Tuple2(
-					{
-						course: elm$core$Maybe$Nothing,
-						response: author$project$Model$Success('instructor found!')
-					},
-					elm$core$Platform$Cmd$none);
-			} else {
-				var error = result.a;
-				return _Utils_Tuple2(
-					{
-						course: elm$core$Maybe$Nothing,
-						response: author$project$Model$Failure(error)
-					},
-					elm$core$Platform$Cmd$none);
-			}
-		} else {
-			var result = msg.a;
-			if (result.$ === 'Ok') {
-				var value = result.a;
-				return _Utils_Tuple2(
-					{
-						course: elm$core$Maybe$Just(value),
-						response: author$project$Model$Success('course found!')
-					},
-					elm$core$Platform$Cmd$none);
-			} else {
-				var error = result.a;
-				return _Utils_Tuple2(
-					{
-						course: elm$core$Maybe$Nothing,
-						response: author$project$Model$Failure(error)
-					},
-					elm$core$Platform$Cmd$none);
-			}
+		switch (msg.$) {
+			case 'GotInstructor':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var value = result.a;
+					return _Utils_Tuple2(
+						{
+							course: elm$core$Maybe$Nothing,
+							courses: _List_Nil,
+							response: author$project$Model$Success('instructor found!')
+						},
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						{
+							course: elm$core$Maybe$Nothing,
+							courses: _List_Nil,
+							response: author$project$Model$Failure(error)
+						},
+						elm$core$Platform$Cmd$none);
+				}
+			case 'GotCourse':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var value = result.a;
+					return _Utils_Tuple2(
+						{
+							course: elm$core$Maybe$Just(value),
+							courses: _List_Nil,
+							response: author$project$Model$Success('course found!')
+						},
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						{
+							course: elm$core$Maybe$Nothing,
+							courses: _List_Nil,
+							response: author$project$Model$Failure(error)
+						},
+						elm$core$Platform$Cmd$none);
+				}
+			default:
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var value = result.a;
+					return _Utils_Tuple2(
+						{
+							course: elm$core$Maybe$Nothing,
+							courses: A2(elm$core$List$append, model.courses, value),
+							response: author$project$Model$Success('courses found!')
+						},
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						{
+							course: elm$core$Maybe$Nothing,
+							courses: model.courses,
+							response: author$project$Model$Failure(error)
+						},
+						elm$core$Platform$Cmd$none);
+				}
 		}
 	});
-var elm$core$Debug$toString = _Debug_toString;
+var author$project$View$toString = function (course) {
+	return course.number + ('\t' + course.name);
+};
+var elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
@@ -5965,8 +6017,34 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$View$showCourses = function (model) {
+	var _n0 = model.courses;
+	if (!_n0.b) {
+		return elm$html$Html$text('showCourses: no courses found');
+	} else {
+		var otherwise = _n0;
+		return A2(
+			elm$html$Html$div,
+			_List_Nil,
+			A2(
+				elm$core$List$map,
+				function (course) {
+					return A2(
+						elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								author$project$View$toString(course))
+							]));
+				},
+				model.courses));
+	}
+};
+var elm$core$Debug$toString = _Debug_toString;
 var author$project$View$viewTest = function (model) {
 	var _n0 = model.response;
 	switch (_n0.$) {
@@ -5978,13 +6056,7 @@ var author$project$View$viewTest = function (model) {
 			return elm$html$Html$text('Loading...');
 		default:
 			var fullText = _n0.a;
-			var _n1 = model.course;
-			if (_n1.$ === 'Just') {
-				var course = _n1.a;
-				return elm$html$Html$text(course.name);
-			} else {
-				return elm$html$Html$text('nothing');
-			}
+			return author$project$View$showCourses(model);
 	}
 };
 var author$project$View$view = function (model) {
@@ -6012,20 +6084,6 @@ var elm$core$Task$Perform = function (a) {
 	return {$: 'Perform', a: a};
 };
 var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
-var elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
 var elm$core$Task$map = F2(
 	function (func, taskA) {
 		return A2(
