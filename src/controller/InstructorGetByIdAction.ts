@@ -1,12 +1,14 @@
-import {Request, Response} from "express";
-import {getManager} from "typeorm";
-import {Instructor} from "../entity/Instructor";
+import { Request, Response } from "express";
+import { getManager } from "typeorm";
+import { Instructor } from "../entity/Instructor";
 
 /**
  * Loads instructor by a given id.
  */
-export async function instructorGetByIdAction(request: Request, response: Response) {
-
+export async function instructorGetByIdAction(
+    request: Request,
+    response: Response
+) {
     // get a instructor repository to perform operations with instructor
     const instructorRepository = getManager().getRepository(Instructor);
 

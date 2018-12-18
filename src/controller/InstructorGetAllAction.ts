@@ -5,8 +5,10 @@ import { Instructor } from "../entity/Instructor";
 /**
  * Loads all instructors from the database.
  */
-export async function instructorGetAllAction(request: Request, response: Response) {
-
+export async function instructorGetAllAction(
+    request: Request,
+    response: Response
+) {
     // get a instructor repository to perform operations with instructor
     const instructorRepository = getManager().getRepository(Instructor);
 

@@ -6,7 +6,6 @@ import { Course } from "../entity/Course";
  * Loads all courses from the database.
  */
 export async function courseGetAllAction(request: Request, response: Response) {
-
     // get a course repository to perform operations with course
     const courseRepository = getManager().getRepository(Course);
 
