@@ -27,7 +27,7 @@ def crawl():
     options = soup.find_all("option")
 
     if len(options) < 2:
-        Log.error(f"Not enough options ({len(options)} on initial page")
+        LOG.error(f"Not enough options ({len(options)} on initial page")
         return None
 
     latest_term = options[1]
