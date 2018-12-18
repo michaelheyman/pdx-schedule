@@ -59,6 +59,7 @@ export class Instructor {
     })
     timestamp: Date | null;
 
-    @OneToMany(type => Course, Course => Course.instructor_)
+    //@OneToMany(type => Course, Course => Course.instructor_)
+    @OneToMany(type => Course, Course => Course.instructor_id)
     courses: Course[];
 }
