@@ -1,6 +1,6 @@
 module View exposing (..)
 
-import Html exposing (Html, div, li, pre, table, tbody, td, text, th, thead, tr, ul)
+import Html exposing (Html, div, li, p, pre, table, tbody, td, text, th, thead, tr, ul)
 import Html.Attributes exposing (class)
 import Http
 import Model exposing (..)
@@ -8,7 +8,7 @@ import Model exposing (..)
 
 view : Model -> Html Msg
 view model =
-    viewTest model
+    viewCourseTable model
 
 
 viewTest : Model -> Html Msg
@@ -42,35 +42,32 @@ showCourses model =
 
         otherwise ->
             model.courses
-                |> List.map (\course -> div [] [ text (toString course) ])
+                |> List.map (\c -> div [] [ text (toString c) ])
                 |> div []
 
 
-viewTable : Html Msg
-viewTable =
-    div [ class "col-md-4" ]
-        [ table [ class "table table-striped" ]
-            [ thead []
-                [ tr []
-                    [ th [] [ text "Column 1" ]
-                    , th [] [ text "Column 2" ]
+viewCourseTable : Model -> Html Msg
+viewCourseTable model =
+    table []
+        (List.concat
+            [ [ thead []
+                    [ th [] [ text "Class" ]
+                    , th [] [ text "Name" ]
                     ]
-                ]
-            , tbody []
-                [ tr []
-                    [ td [] [ text "Value 1" ]
-                    , td [] [ text "Value 2" ]
-                    ]
-                , tr []
-                    [ td [] [ text "Value 3" ]
-                    , td [] [ text "Value 4" ]
-                    ]
-                , tr []
-                    [ td [] [ text "Value 5" ]
-                    , td [] [ text "Value 6" ]
-                    ]
-                ]
+              ]
+            , [ model.courses
+                    |> List.map toTableRow
+                    |> tbody []
+              ]
             ]
+        )
+
+
+toTableRow : Course -> Html Msg
+toTableRow course =
+    tr []
+        [ td [] [ text course.number ]
+        , td [] [ text course.name ]
         ]
 
 

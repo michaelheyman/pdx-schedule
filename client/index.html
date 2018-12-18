@@ -5987,8 +5987,47 @@ var author$project$Update$update = F2(
 				}
 		}
 	});
-var author$project$View$toString = function (course) {
-	return course.number + ('\t' + course.name);
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$html$Html$td = _VirtualDom_node('td');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var elm$html$Html$tr = _VirtualDom_node('tr');
+var author$project$View$toTableRow = function (course) {
+	return A2(
+		elm$html$Html$tr,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(course.number)
+					])),
+				A2(
+				elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(course.name)
+					]))
+			]));
+};
+var elm$core$List$concat = function (lists) {
+	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
 };
 var elm$core$List$map = F2(
 	function (f, xs) {
@@ -6004,63 +6043,51 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
-};
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$View$showCourses = function (model) {
-	var _n0 = model.courses;
-	if (!_n0.b) {
-		return elm$html$Html$text('showCourses: no courses found');
-	} else {
-		var otherwise = _n0;
-		return A2(
-			elm$html$Html$div,
-			_List_Nil,
-			A2(
-				elm$core$List$map,
-				function (course) {
-					return A2(
-						elm$html$Html$div,
+var elm$html$Html$table = _VirtualDom_node('table');
+var elm$html$Html$tbody = _VirtualDom_node('tbody');
+var elm$html$Html$th = _VirtualDom_node('th');
+var elm$html$Html$thead = _VirtualDom_node('thead');
+var author$project$View$viewCourseTable = function (model) {
+	return A2(
+		elm$html$Html$table,
+		_List_Nil,
+		elm$core$List$concat(
+			_List_fromArray(
+				[
+					_List_fromArray(
+					[
+						A2(
+						elm$html$Html$thead,
 						_List_Nil,
 						_List_fromArray(
 							[
-								elm$html$Html$text(
-								author$project$View$toString(course))
-							]));
-				},
-				model.courses));
-	}
-};
-var elm$core$Debug$toString = _Debug_toString;
-var author$project$View$viewTest = function (model) {
-	var _n0 = model.response;
-	switch (_n0.$) {
-		case 'Failure':
-			var error = _n0.a;
-			return elm$html$Html$text(
-				elm$core$Debug$toString(error));
-		case 'Loading':
-			return elm$html$Html$text('Loading...');
-		default:
-			var fullText = _n0.a;
-			return author$project$View$showCourses(model);
-	}
+								A2(
+								elm$html$Html$th,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Class')
+									])),
+								A2(
+								elm$html$Html$th,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Name')
+									]))
+							]))
+					]),
+					_List_fromArray(
+					[
+						A2(
+						elm$html$Html$tbody,
+						_List_Nil,
+						A2(elm$core$List$map, author$project$View$toTableRow, model.courses))
+					])
+				])));
 };
 var author$project$View$view = function (model) {
-	return author$project$View$viewTest(model);
+	return author$project$View$viewCourseTable(model);
 };
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
