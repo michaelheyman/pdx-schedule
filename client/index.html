@@ -4496,12 +4496,12 @@ function _Browser_load(url)
 	}));
 }
 var author$project$Main$Loading = {$: 'Loading'};
-var author$project$Main$GotInstructor = function (a) {
-	return {$: 'GotInstructor', a: a};
+var author$project$Main$GotCourse = function (a) {
+	return {$: 'GotCourse', a: a};
 };
-var author$project$Main$Instructor = F7(
-	function (id, fullName, firstName, lastName, rating, url, timestamp) {
-		return {firstName: firstName, fullName: fullName, id: id, lastName: lastName, rating: rating, timestamp: timestamp, url: url};
+var author$project$Main$Course = F7(
+	function (id, name, number, crn, url, instructor_id, timestamp) {
+		return {crn: crn, id: id, instructor_id: instructor_id, name: name, number: number, timestamp: timestamp, url: url};
 	});
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
@@ -4979,7 +4979,6 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 		}
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
-var elm$json$Json$Decode$float = _Json_decodeFloat;
 var elm$json$Json$Decode$int = _Json_decodeInt;
 var elm$json$Json$Decode$map7 = _Json_map7;
 var elm$json$Json$Decode$map = _Json_map1;
@@ -4994,20 +4993,37 @@ var elm$json$Json$Decode$maybe = function (decoder) {
 			]));
 };
 var elm$json$Json$Decode$string = _Json_decodeString;
-var author$project$Main$instructorDecoder = A8(
+var author$project$Main$courseDecoder = A8(
 	elm$json$Json$Decode$map7,
-	author$project$Main$Instructor,
+	author$project$Main$Course,
 	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'fullName', elm$json$Json$Decode$string),
-	elm$json$Json$Decode$maybe(
-		A2(elm$json$Json$Decode$field, 'firstName', elm$json$Json$Decode$string)),
-	elm$json$Json$Decode$maybe(
-		A2(elm$json$Json$Decode$field, 'lastName', elm$json$Json$Decode$string)),
-	elm$json$Json$Decode$maybe(
-		A2(elm$json$Json$Decode$field, 'rating', elm$json$Json$Decode$float)),
+	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'number', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'crn', elm$json$Json$Decode$int),
 	elm$json$Json$Decode$maybe(
 		A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string)),
+	elm$json$Json$Decode$maybe(
+		A2(elm$json$Json$Decode$field, 'instructor_id', elm$json$Json$Decode$int)),
 	A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$string));
+var elm$core$Result$mapError = F2(
+	function (f, result) {
+		if (result.$ === 'Ok') {
+			var v = result.a;
+			return elm$core$Result$Ok(v);
+		} else {
+			var e = result.a;
+			return elm$core$Result$Err(
+				f(e));
+		}
+	});
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Basics$compare = _Utils_compare;
@@ -5562,26 +5578,6 @@ var elm$http$Http$Sending = function (a) {
 	return {$: 'Sending', a: a};
 };
 var elm$http$Http$Timeout_ = {$: 'Timeout_'};
-var elm$http$Http$emptyBody = _Http_emptyBody;
-var elm$core$Result$mapError = F2(
-	function (f, result) {
-		if (result.$ === 'Ok') {
-			var v = result.a;
-			return elm$core$Result$Ok(v);
-		} else {
-			var e = result.a;
-			return elm$core$Result$Err(
-				f(e));
-		}
-	});
-var elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
@@ -5638,6 +5634,7 @@ var elm$http$Http$expectJson = F2(
 						A2(elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
+var elm$http$Http$emptyBody = _Http_emptyBody;
 var elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -5885,18 +5882,17 @@ var elm$http$Http$request = function (r) {
 		elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var author$project$Main$requestInstructor = elm$http$Http$request(
+var elm$http$Http$get = function (r) {
+	return elm$http$Http$request(
+		{body: elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
+};
+var author$project$Main$getCourse = elm$http$Http$get(
 	{
-		body: elm$http$Http$emptyBody,
-		expect: A2(elm$http$Http$expectJson, author$project$Main$GotInstructor, author$project$Main$instructorDecoder),
-		headers: _List_Nil,
-		method: 'GET',
-		timeout: elm$core$Maybe$Nothing,
-		tracker: elm$core$Maybe$Nothing,
-		url: 'http://localhost:3000/instructor/1'
+		expect: A2(elm$http$Http$expectJson, author$project$Main$GotCourse, author$project$Main$courseDecoder),
+		url: 'http://localhost:3000/course/1'
 	});
 var author$project$Main$init = function (_n0) {
-	return _Utils_Tuple2(author$project$Main$Loading, author$project$Main$requestInstructor);
+	return _Utils_Tuple2(author$project$Main$Loading, author$project$Main$getCourse);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
@@ -5913,32 +5909,46 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'GotTest') {
-			var result = msg.a;
-			if (result.$ === 'Ok') {
-				var value = result.a;
-				return _Utils_Tuple2(
-					author$project$Main$Success(value),
-					elm$core$Platform$Cmd$none);
-			} else {
-				var error = result.a;
-				return _Utils_Tuple2(
-					author$project$Main$Failure(error),
-					elm$core$Platform$Cmd$none);
-			}
-		} else {
-			var result = msg.a;
-			if (result.$ === 'Ok') {
-				var value = result.a;
-				return _Utils_Tuple2(
-					author$project$Main$Success('instructor found!'),
-					elm$core$Platform$Cmd$none);
-			} else {
-				var error = result.a;
-				return _Utils_Tuple2(
-					author$project$Main$Failure(error),
-					elm$core$Platform$Cmd$none);
-			}
+		switch (msg.$) {
+			case 'GotTest':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var value = result.a;
+					return _Utils_Tuple2(
+						author$project$Main$Success(value),
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						author$project$Main$Failure(error),
+						elm$core$Platform$Cmd$none);
+				}
+			case 'GotInstructor':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var value = result.a;
+					return _Utils_Tuple2(
+						author$project$Main$Success('instructor found!'),
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						author$project$Main$Failure(error),
+						elm$core$Platform$Cmd$none);
+				}
+			default:
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var value = result.a;
+					return _Utils_Tuple2(
+						author$project$Main$Success('course found!'),
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						author$project$Main$Failure(error),
+						elm$core$Platform$Cmd$none);
+				}
 		}
 	});
 var elm$core$Debug$toString = _Debug_toString;
@@ -5958,7 +5968,7 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 var elm$html$Html$pre = _VirtualDom_node('pre');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Main$view = function (model) {
+var author$project$Main$viewTest = function (model) {
 	switch (model.$) {
 		case 'Failure':
 			var error = model.a;
@@ -5976,6 +5986,9 @@ var author$project$Main$view = function (model) {
 						elm$html$Html$text(fullText)
 					]));
 	}
+};
+var author$project$Main$view = function (model) {
+	return author$project$Main$viewTest(model);
 };
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
