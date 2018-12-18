@@ -1,10 +1,16 @@
 repos:
--   repo: https://github.com/ambv/black
-    rev: stable
-    hooks:
-    - id: black
-      language_version: python3.7
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v1.2.3
-    hooks:
-    - id: flake8
+    - repo: https://github.com/ambv/black
+      rev: stable
+      hooks:
+          - id: black
+            language_version: python3.7
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v1.2.3
+      hooks:
+          - id: flake8
+    - repo: https://github.com/prettier/prettier
+      rev: 1.15.3
+      hooks:
+          - id: prettier
+            args: [--tab-width=4]
+            exclude_types: [javascript, json, html]
