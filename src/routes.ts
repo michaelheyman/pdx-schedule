@@ -12,7 +12,7 @@ export const AppRoutes = [
         action: instructorGetAllAction
     },
     {
-        path: "/instructors/:id",
+        path: "/instructor/:id",
         method: "get",
         action: instructorGetByIdAction
     },

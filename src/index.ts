@@ -23,6 +23,7 @@ createConnection().then(async connection => {
         });
     });
 
+    app.use('/', express.static('./client'));
     // run app
     app.listen(3000);
 
