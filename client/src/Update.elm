@@ -4,11 +4,6 @@ import Http
 import Model exposing (..)
 
 
-type Msg
-    = GotInstructor (Result Http.Error Instructor)
-    | GotCourse (Result Http.Error Course)
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of

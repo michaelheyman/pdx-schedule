@@ -15,6 +15,11 @@ type alias Model =
     }
 
 
+type Msg
+    = GotInstructor (Result Http.Error Instructor)
+    | GotCourse (Result Http.Error Course)
+
+
 type alias Course =
     { id : Int
     , name : String

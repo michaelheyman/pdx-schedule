@@ -4,7 +4,6 @@ import Html exposing (Html, div, pre, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
 import Http
 import Model exposing (..)
-import Update exposing (Msg)
 
 
 view : Model -> Html Msg
