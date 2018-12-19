@@ -27,7 +27,7 @@ courseDecoder =
         (Decode.field "number" Decode.string)
         (Decode.field "crn" Decode.int)
         (Decode.maybe (Decode.field "url" Decode.string))
-        (Decode.maybe (Decode.field "instructor_id" Decode.int))
+        (Decode.maybe (Decode.field "instructor_id" instructorDecoder))
         (Decode.field "timestamp" Decode.string)
 
 
