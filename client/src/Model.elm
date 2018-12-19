@@ -28,7 +28,7 @@ type alias Course =
     , number : String
     , crn : Int
     , url : Maybe String
-    , instructor_id : Maybe Int
+    , instructorId : Maybe Int
     , timestamp : String
     }
 

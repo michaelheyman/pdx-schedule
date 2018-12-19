@@ -1,5 +1,8 @@
 module View exposing (..)
 
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
+import Bootstrap.Table as Table
 import Html exposing (Html, div, li, p, pre, table, tbody, td, text, th, thead, tr, ul)
 import Html.Attributes exposing (class)
 import Http
@@ -8,7 +11,42 @@ import Model exposing (..)
 
 view : Model -> Html Msg
 view model =
-    viewCourseTable model
+    Grid.container []
+        [ CDN.stylesheet
+        , Grid.row []
+            [ Grid.col []
+                [ courseTable model.courses ]
+            ]
+        ]
+
+
+courseTable : List Course -> Html Msg
+courseTable courses =
+    Table.table
+        { options = [ Table.hover, Table.responsive ]
+        , thead =
+            Table.thead [ Table.headAttr (class "thead-dark") ]
+                [ Table.tr []
+                    [ Table.th [] [ text "Class" ]
+                    , Table.th [] [ text "Name" ]
+                    , Table.th [] [ text "CRN" ]
+                    , Table.th [] [ text "Instructor" ]
+                    , Table.th [] [ text "Rating" ]
+                    ]
+                ]
+        , tbody = Table.tbody [] (List.map courseRow courses)
+        }
+
+
+courseRow : Course -> Table.Row msg
+courseRow course =
+    Table.tr []
+        [ Table.td [] [ text course.number ]
+        , Table.td [] [ text course.name ]
+        , Table.td [] [ text (Debug.toString course.crn) ]
+        , Table.td [] []
+        , Table.td [] []
+        ]
 
 
 viewTest : Model -> Html Msg
@@ -42,7 +80,7 @@ showCourses model =
 
         otherwise ->
             model.courses
-                |> List.map (\c -> div [] [ text (toString c) ])
+                |> List.map (\c -> div [] [ text (courseToString c) ])
                 |> div []
 
 
@@ -71,6 +109,6 @@ toTableRow course =
         ]
 
 
-toString : Course -> String
-toString course =
+courseToString : Course -> String
+courseToString course =
     course.number ++ "\t" ++ course.name
