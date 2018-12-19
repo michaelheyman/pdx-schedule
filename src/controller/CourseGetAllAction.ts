@@ -9,8 +9,11 @@ export async function courseGetAllAction(request: Request, response: Response) {
     // get a course repository to perform operations with course
     const courseRepository = getManager().getRepository(Course);
 
-    // load a course by a given course id
-    const courses = await courseRepository.find();
+    // load all courses with instructor information
+    let courses = await courseRepository
+        .createQueryBuilder("course")
+        .innerJoinAndSelect("course.instructor_id", "instructor")
+        .getMany();
 
     // return loaded courses
     response.send(courses);
