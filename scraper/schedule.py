@@ -29,15 +29,36 @@ class ScheduleScraper:
         for elem in ScheduleScraper.soup.find_all("th", ScheduleScraper.TITLE_CLASS):
             name, crn, number = ScheduleScraper.get_course(elem)
             instructor = ScheduleScraper.get_instructor(elem)
+            credits = ScheduleScraper.get_credits(elem)
 
             if instructor is None:
-                CourseMgr.add_course(name=name, crn=crn, number=number)
+                CourseMgr.add_course(name=name, crn=crn, number=number, credits=credits)
                 continue
 
             instructor_record = InstructorMgr.add_instructor(instructor)
             CourseMgr.add_course(
-                name=name, crn=crn, number=number, instructor_id=instructor_record.id
+                name=name,
+                crn=crn,
+                number=number,
+                credits=credits,
+                instructor_id=instructor_record.id,
             )
+
+    @staticmethod
+    def get_credits(header):
+        course_table = header.parent.next_sibling.next_sibling
+        credits_text = course_table.find_all(text=re.compile(r"\d\.\d{3} Credits"))
+
+        if not credits_text or len(credits_text) is not 1:
+            print(credits_text)
+            print(len(credits_text))
+            LOG.error("Invalid course credit information in page.")
+            return None
+
+        credits_trim = credits_text[0].strip()
+        credits = credits_trim.split()[0]
+
+        return int(float(credits))
 
     @staticmethod
     def get_instructor(header):
@@ -81,4 +102,5 @@ def main():
 
 
 if __name__ == "__main__":
+    pass
     main()

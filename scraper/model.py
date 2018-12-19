@@ -16,10 +16,9 @@ from parser import RateMyProfessors
 
 import logging
 
-# logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)
 
-# engine = create_engine("sqlite:///:memory:", echo=False)
 engine = create_engine("sqlite:///app.db", echo=False)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
@@ -86,8 +85,14 @@ class Instructor(Base):
 
 class CourseMgr:
     @staticmethod
-    def add_course(name, crn, number, instructor_id=None):
-        course = Course(name=name, crn=crn, number=number, instructor_id=instructor_id)
+    def add_course(name, crn, number, credits, instructor_id=None):
+        course = Course(
+            name=name,
+            crn=crn,
+            number=number,
+            credits=credits,
+            instructor_id=instructor_id,
+        )
         DBSession.add(course)
         DBSession.commit()
 
@@ -98,6 +103,7 @@ class Course(Base):
     id = Column("Id", Integer, primary_key=True)
     name = Column("Name", String, nullable=False)
     number = Column("Number", String, nullable=False)
+    credits = Column("Credits", Integer, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
     url = Column("URL", String)
     instructor_id = Column("InstructorId", Integer, ForeignKey("Instructor.Id"))
@@ -109,6 +115,7 @@ class Course(Base):
             f"<Course(id={self.id}, "
             "name={self.name}, "
             "number={self.number}, "
+            "credits={self.credits}, "
             "crn={self.crn}, "
             "url={self.url}, "
             "instructor_id={self.instructor_id}, "
