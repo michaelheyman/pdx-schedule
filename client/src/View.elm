@@ -48,7 +48,9 @@ courseRow course =
         , Table.td []
             [ case course.instructor of
                 Just instructor ->
-                    text instructor.fullName
+                    Maybe.withDefault
+                        (text instructor.fullName)
+                        (Maybe.map2 (\a b -> text <| a ++ " " ++ b) instructor.firstName instructor.lastName)
 
                 Nothing ->
                     text ""
@@ -58,12 +60,9 @@ courseRow course =
                 Just instructor ->
                     case instructor.rating of
                         Just rating ->
-                            case instructor.url of
-                                Just url ->
-                                    a [ href url ] [ text (round 1 rating) ]
-
-                                Nothing ->
-                                    text (round 1 rating)
+                            Maybe.withDefault
+                                (text <| round 1 rating)
+                                (Maybe.map (\url -> a [ href url ] [ text <| round 1 rating ]) instructor.url)
 
                         Nothing ->
                             text ""

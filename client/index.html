@@ -6044,6 +6044,40 @@ var author$project$Update$update = F2(
 		}
 	});
 var elm$core$Debug$toString = _Debug_toString;
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
@@ -6084,25 +6118,6 @@ var elm$core$Basics$abs = function (n) {
 };
 var elm$core$Basics$isInfinite = _Basics_isInfinite;
 var elm$core$Basics$isNaN = _Basics_isNaN;
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var elm$core$String$fromFloat = _String_fromNumber;
 var elm$core$String$length = _String_length;
 var elm$core$String$cons = _String_cons;
@@ -6423,7 +6438,17 @@ var author$project$View$courseRow = function (course) {
 						var _n0 = course.instructor;
 						if (_n0.$ === 'Just') {
 							var instructor = _n0.a;
-							return elm$html$Html$text(instructor.fullName);
+							return A2(
+								elm$core$Maybe$withDefault,
+								elm$html$Html$text(instructor.fullName),
+								A3(
+									elm$core$Maybe$map2,
+									F2(
+										function (a, b) {
+											return elm$html$Html$text(a + (' ' + b));
+										}),
+									instructor.firstName,
+									instructor.lastName));
 						} else {
 							return elm$html$Html$text('');
 						}
@@ -6441,24 +6466,26 @@ var author$project$View$courseRow = function (course) {
 							var _n2 = instructor.rating;
 							if (_n2.$ === 'Just') {
 								var rating = _n2.a;
-								var _n3 = instructor.url;
-								if (_n3.$ === 'Just') {
-									var url = _n3.a;
-									return A2(
-										elm$html$Html$a,
-										_List_fromArray(
-											[
-												elm$html$Html$Attributes$href(url)
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text(
-												A2(myrho$elm_round$Round$round, 1, rating))
-											]));
-								} else {
-									return elm$html$Html$text(
-										A2(myrho$elm_round$Round$round, 1, rating));
-								}
+								return A2(
+									elm$core$Maybe$withDefault,
+									elm$html$Html$text(
+										A2(myrho$elm_round$Round$round, 1, rating)),
+									A2(
+										elm$core$Maybe$map,
+										function (url) {
+											return A2(
+												elm$html$Html$a,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$href(url)
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text(
+														A2(myrho$elm_round$Round$round, 1, rating))
+													]));
+										},
+										instructor.url));
 							} else {
 								return elm$html$Html$text('');
 							}
