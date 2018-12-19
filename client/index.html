@@ -5041,16 +5041,18 @@ var author$project$Decode$instructorDecoder = A8(
 	elm$json$Json$Decode$maybe(
 		A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string)),
 	A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$string));
-var author$project$Model$Course = F7(
-	function (id, name, number, crn, url, instructor, timestamp) {
-		return {crn: crn, id: id, instructor: instructor, name: name, number: number, timestamp: timestamp, url: url};
+var author$project$Model$Course = F8(
+	function (id, name, number, credits, crn, url, instructor, timestamp) {
+		return {credits: credits, crn: crn, id: id, instructor: instructor, name: name, number: number, timestamp: timestamp, url: url};
 	});
-var author$project$Decode$courseDecoder = A8(
-	elm$json$Json$Decode$map7,
+var elm$json$Json$Decode$map8 = _Json_map8;
+var author$project$Decode$courseDecoder = A9(
+	elm$json$Json$Decode$map8,
 	author$project$Model$Course,
 	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'number', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'credits', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'crn', elm$json$Json$Decode$int),
 	elm$json$Json$Decode$maybe(
 		A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string)),
@@ -6043,6 +6045,34 @@ var author$project$Update$update = F2(
 				}
 		}
 	});
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var rundis$elm_bootstrap$Bootstrap$Table$CellAttr = function (a) {
+	return {$: 'CellAttr', a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Table$cellAttr = function (attr_) {
+	return rundis$elm_bootstrap$Bootstrap$Table$CellAttr(attr_);
+};
+var author$project$View$hiddenCell = _List_fromArray(
+	[
+		rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+		A2(elm$html$Html$Attributes$style, 'display', 'none')),
+		rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+		A2(elm$html$Html$Attributes$style, 'visibility', 'hidden'))
+	]);
 var elm$core$Debug$toString = _Debug_toString;
 var elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -6078,19 +6108,6 @@ var elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
-};
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
@@ -6409,6 +6426,14 @@ var author$project$View$courseRow = function (course) {
 			[
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
+				author$project$View$hiddenCell,
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						elm$core$Debug$toString(course.id))
+					])),
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Table$td,
 				_List_Nil,
 				_List_fromArray(
 					[
@@ -6424,6 +6449,14 @@ var author$project$View$courseRow = function (course) {
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
 				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						elm$core$Debug$toString(course.credits))
+					])),
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Table$td,
+				author$project$View$hiddenCell,
 				_List_fromArray(
 					[
 						elm$html$Html$text(
@@ -6763,12 +6796,6 @@ var elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
 };
 var elm$html$Html$Keyed$node = elm$virtual_dom$VirtualDom$keyedNode;
 var elm$html$Html$Attributes$scope = elm$html$Html$Attributes$stringProperty('scope');
-var rundis$elm_bootstrap$Bootstrap$Table$CellAttr = function (a) {
-	return {$: 'CellAttr', a: a};
-};
-var rundis$elm_bootstrap$Bootstrap$Table$cellAttr = function (attr_) {
-	return rundis$elm_bootstrap$Bootstrap$Table$CellAttr(attr_);
-};
 var rundis$elm_bootstrap$Bootstrap$Table$addScopeIfTh = function (cell) {
 	if (cell.$ === 'Th') {
 		var cellConfig = cell.a;
@@ -7110,6 +7137,13 @@ var author$project$View$courseTable = function (courses) {
 							[
 								A2(
 								rundis$elm_bootstrap$Bootstrap$Table$th,
+								author$project$View$hiddenCell,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Id')
+									])),
+								A2(
+								rundis$elm_bootstrap$Bootstrap$Table$th,
 								_List_Nil,
 								_List_fromArray(
 									[
@@ -7125,6 +7159,13 @@ var author$project$View$courseTable = function (courses) {
 								A2(
 								rundis$elm_bootstrap$Bootstrap$Table$th,
 								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Credits')
+									])),
+								A2(
+								rundis$elm_bootstrap$Bootstrap$Table$th,
+								author$project$View$hiddenCell,
 								_List_fromArray(
 									[
 										elm$html$Html$text('CRN')

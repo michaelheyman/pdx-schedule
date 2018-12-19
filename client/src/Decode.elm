@@ -20,11 +20,12 @@ instructorDecoder =
 
 courseDecoder : Decode.Decoder Course
 courseDecoder =
-    Decode.map7
+    Decode.map8
         Course
         (Decode.field "id" Decode.int)
         (Decode.field "name" Decode.string)
         (Decode.field "number" Decode.string)
+        (Decode.field "credits" Decode.int)
         (Decode.field "crn" Decode.int)
         (Decode.maybe (Decode.field "url" Decode.string))
         (Decode.maybe (Decode.field "instructor_id" instructorDecoder))

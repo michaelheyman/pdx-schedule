@@ -4,7 +4,7 @@ import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.Table as Table
 import Html exposing (Html, a, div, li, p, pre, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (class, href)
+import Html.Attributes exposing (class, href, style)
 import Http
 import Model exposing (..)
 import Round exposing (round)
@@ -28,9 +28,13 @@ courseTable courses =
         , thead =
             Table.thead [ Table.headAttr (class "thead-dark") ]
                 [ Table.tr []
-                    [ Table.th [] [ text "Class" ]
+                    [ Table.th hiddenCell [ text "Id" ]
+                    , Table.th [] [ text "Class" ]
                     , Table.th [] [ text "Name" ]
-                    , Table.th [] [ text "CRN" ]
+                    , Table.th [] [ text "Credits" ]
+                    , Table.th
+                        hiddenCell
+                        [ text "CRN" ]
                     , Table.th [] [ text "Instructor" ]
                     , Table.th [] [ text "Rating" ]
                     ]
@@ -42,9 +46,11 @@ courseTable courses =
 courseRow : Course -> Table.Row msg
 courseRow course =
     Table.tr []
-        [ Table.td [] [ text course.number ]
+        [ Table.td hiddenCell [ text (Debug.toString course.id) ]
+        , Table.td [] [ text course.number ]
         , Table.td [] [ text course.name ]
-        , Table.td [] [ text (Debug.toString course.crn) ]
+        , Table.td [] [ text (Debug.toString course.credits) ]
+        , Table.td hiddenCell [ text (Debug.toString course.crn) ]
         , Table.td []
             [ case course.instructor of
                 Just instructor ->
@@ -71,3 +77,10 @@ courseRow course =
                     text ""
             ]
         ]
+
+
+hiddenCell : List (Table.CellOption msg)
+hiddenCell =
+    [ Table.cellAttr (style "display" "none")
+    , Table.cellAttr (style "visibility" "hidden")
+    ]
