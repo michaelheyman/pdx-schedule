@@ -23,6 +23,5 @@ init _ =
       , course = Nothing
       , courses = []
       }
-      --, getCourse
     , getCourseList
     )

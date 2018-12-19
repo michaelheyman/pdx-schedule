@@ -36,23 +36,23 @@ courseListDecoder =
     Decode.list courseDecoder
 
 
-getResponse : String
-getResponse =
-    """{"id":1,"fullName":"David D. Ely","firstName":"David","lastName":"Ely","rating":3.8,"url":"http://www.ratemyprofessors.com/ShowRatings.jsp?tid=2290506","timestamp":"2018-12-16T18:36:38.733Z"}"""
+instructorListDecoder : Decode.Decoder (List Instructor)
+instructorListDecoder =
+    Decode.list instructorDecoder
 
 
-getInstructor : Cmd Msg
-getInstructor =
+getInstructor : Int -> Cmd Msg
+getInstructor id =
     Http.get
-        { url = "http://localhost:3000/instructor/1"
+        { url = "http://localhost:3000/instructor/" ++ String.fromInt id
         , expect = Http.expectJson GotInstructor instructorDecoder
         }
 
 
-getCourse : Cmd Msg
-getCourse =
+getCourse : Int -> Cmd Msg
+getCourse id =
     Http.get
-        { url = "http://localhost:3000/course/1"
+        { url = "http://localhost:3000/course/" ++ String.fromInt id
         , expect = Http.expectJson GotCourse courseDecoder
         }
 
@@ -62,21 +62,4 @@ getCourseList =
     Http.get
         { url = "http://localhost:3000/courses/"
         , expect = Http.expectJson GotCourseList courseListDecoder
-        }
-
-
-
-{- This is just a more complicated version of getInstructor, they work the same -}
-
-
-requestInstructor : Cmd Msg
-requestInstructor =
-    Http.request
-        { method = "GET"
-        , headers = []
-        , url = "http://localhost:3000/instructor/1"
-        , body = Http.emptyBody
-        , expect = Http.expectJson GotInstructor instructorDecoder
-        , timeout = Nothing
-        , tracker = Nothing
         }
