@@ -12,7 +12,7 @@ export async function courseGetAllAction(request: Request, response: Response) {
     // load all courses with instructor information
     let courses = await courseRepository
         .createQueryBuilder("course")
-        .innerJoinAndSelect("course.instructor_id", "instructor")
+        .leftJoinAndSelect("course.instructor_id", "instructor")
         .getMany();
 
     // return loaded courses
