@@ -102,7 +102,7 @@ class Course(Base):
 
     id = Column("Id", Integer, primary_key=True)
     name = Column("Name", String, nullable=False)
-    number = Column("Number", String, nullable=False)
+    number = Column("Class", String, nullable=False)
     credits = Column("Credits", Integer, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
     url = Column("URL", String)

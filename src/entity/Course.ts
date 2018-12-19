@@ -31,9 +31,15 @@ export class Course {
 
     @Column("varchar", {
         nullable: false,
-        name: "Number"
+        name: "Class"
     })
     number: string;
+
+    @Column("integer", {
+        nullable: false,
+        name: "Credits"
+    })
+    credits: number;
 
     @Column("integer", {
         nullable: false,
