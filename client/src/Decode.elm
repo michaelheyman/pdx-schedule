@@ -3,7 +3,6 @@ module Decode exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Extra as Decode
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Model exposing (..)
 
 
@@ -33,57 +32,6 @@ courseDecoder =
         |> Decode.andMap (Decode.maybe (Decode.field "url" Decode.string))
         |> Decode.andMap (Decode.maybe (Decode.field "instructor_id" instructorDecoder))
         |> Decode.andMap (Decode.field "timestamp" Decode.string)
-
-
-
---courseDecoder : Decode.Decoder Course
---courseDecoder =
---    Decode.succeed Course
---        |> required "id" Decode.int
---        |> required "name" Decode.string
---        |> required "number" Decode.string
---        |> required "days" Decode.string
---        |> required "time" Decode.string
---        |> required "credits" Decode.int
---        |> required "crn" Decode.int
---        |> optional "url" Decode.string ""
---        |> optional "instructor_id" instructorDecoder Nothing
---        |> required "timestamp" Decode.string
---courseDecoder : Decode.Decoder Course
---courseDecoder =
---    Decode.map8
---        Course
---        (Decode.field "id" Decode.int)
---        (Decode.field "name" Decode.string)
---        (Decode.field "number" Decode.string)
---        (Decode.field "credits" Decode.int)
---        (Decode.field "crn" Decode.int)
---        (Decode.maybe (Decode.field "url" Decode.string))
---        (Decode.maybe (Decode.field "instructor_id" instructorDecoder))
---        (Decode.field "timestamp" Decode.string)
-
-
-type alias User =
-    { id : Int
-    , email : Maybe String
-    , name : String
-    , percentExcited : Float
-    }
-
-
-userDecoder : Decode.Decoder User
-userDecoder =
-    Decode.succeed User
-        |> required "id" Decode.int
-        |> required "email" (Decode.nullable Decode.string)
-        -- `null` decodes to `Nothing`
-        |> optional "name" Decode.string "(fallback if name is `null` or not present)"
-        |> hardcoded 1.0
-
-
-
---(Decode.field "days" Decode.string)
---(Decode.field "time" Decode.string)
 
 
 courseListDecoder : Decode.Decoder (List Course)
