@@ -19,10 +19,11 @@
     "express": "^4.16.3",
     "mysql": "^2.15.0",
     "sqlite3": "^4.0.4",
-    "typeorm": "^0.2.0"
+    "typeorm": "^0.2.0",
+    "ts-node": "^7.0.1"
   },
   "scripts": {
-    "temp": "tsc && node src/index.js",
+    "nots": "tsc && node src/index.js",
     "start": "ts-node src/index.ts"
   }
 }
