@@ -85,11 +85,13 @@ class Instructor(Base):
 
 class CourseMgr:
     @staticmethod
-    def add_course(name, crn, number, credits, instructor_id=None):
+    def add_course(name, crn, number, days, time, credits, instructor_id=None):
         course = Course(
             name=name,
             crn=crn,
             number=number,
+            days=days,
+            time=time,
             credits=credits,
             instructor_id=instructor_id,
         )
@@ -103,6 +105,8 @@ class Course(Base):
     id = Column("Id", Integer, primary_key=True)
     name = Column("Name", String, nullable=False)
     number = Column("Class", String, nullable=False)
+    days = Column("Days", String, nullable=False)
+    time = Column("Time", String, nullable=False)
     credits = Column("Credits", Integer, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
     url = Column("URL", String)
@@ -115,6 +119,8 @@ class Course(Base):
             f"<Course(id={self.id}, "
             "name={self.name}, "
             "number={self.number}, "
+            "days={self.days}, "
+            "time={self.time}, "
             "credits={self.credits}, "
             "crn={self.crn}, "
             "url={self.url}, "

@@ -15,7 +15,17 @@ SCHEDULE_URL = urljoin(BASE_URL, "bwckschd.p_get_crse_unsec")
 REDIRECT_STRING = "You will be redirected"
 
 
-def crawl():
+def crawl(local=False):
+    if local:
+        try:
+            with open("index.html") as fp:
+                soup = BeautifulSoup(fp, "html.parser")
+                return soup
+        except IOError:
+            LOG.error("Problem opening index.html file")
+
+        return
+
     init_page = requests.get(INIT_URL)
 
     if not init_page.ok:

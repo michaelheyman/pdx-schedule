@@ -31,6 +31,8 @@ courseTable courses =
                     [ Table.th hiddenCell [ text "Id" ]
                     , Table.th [] [ text "Class" ]
                     , Table.th [] [ text "Name" ]
+                    , Table.th [] [ text "Days" ]
+                    , Table.th [] [ text "Time" ]
                     , Table.th [] [ text "Credits" ]
                     , Table.th
                         hiddenCell
@@ -49,6 +51,8 @@ courseRow course =
         [ Table.td hiddenCell [ text (Debug.toString course.id) ]
         , Table.td [] [ text course.number ]
         , Table.td [] [ text course.name ]
+        , Table.td [] [ text course.days ]
+        , Table.td [] [ text course.time ]
         , Table.td [] [ text (Debug.toString course.credits) ]
         , Table.td hiddenCell [ text (Debug.toString course.crn) ]
         , Table.td []

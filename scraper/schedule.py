@@ -30,9 +30,17 @@ class ScheduleScraper:
             name, crn, number = ScheduleScraper.get_course(elem)
             instructor = ScheduleScraper.get_instructor(elem)
             credits = ScheduleScraper.get_credits(elem)
+            time, days = ScheduleScraper.get_schedule(elem)
 
             if instructor is None:
-                CourseMgr.add_course(name=name, crn=crn, number=number, credits=credits)
+                CourseMgr.add_course(
+                    name=name,
+                    crn=crn,
+                    number=number,
+                    days=days,
+                    time=time,
+                    credits=credits,
+                )
                 continue
 
             instructor_record = InstructorMgr.add_instructor(instructor)
@@ -40,9 +48,32 @@ class ScheduleScraper:
                 name=name,
                 crn=crn,
                 number=number,
+                days=days,
+                time=time,
                 credits=credits,
                 instructor_id=instructor_record.id,
             )
+
+    @staticmethod
+    def get_schedule(header):
+        course_table = header.parent.next_sibling.next_sibling
+        if not course_table:
+            return None
+
+        cells = course_table.find_all("td", ScheduleScraper.DEFAULT_CLASS)
+        if not cells:
+            return None
+
+        time_data = cells[2]
+        days_data = cells[3]
+        time = time_data.get_text()
+        days = days_data.get_text()
+
+        if not time or not days:
+            LOG.error("Invalid date and time information in page.")
+            return None
+
+        return time, days
 
     @staticmethod
     def get_credits(header):
@@ -50,8 +81,6 @@ class ScheduleScraper:
         credits_text = course_table.find_all(text=re.compile(r"\d\.\d{3} Credits"))
 
         if not credits_text or len(credits_text) is not 1:
-            print(credits_text)
-            print(len(credits_text))
             LOG.error("Invalid course credit information in page.")
             return None
 

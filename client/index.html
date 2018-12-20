@@ -5041,24 +5041,62 @@ var author$project$Decode$instructorDecoder = A8(
 	elm$json$Json$Decode$maybe(
 		A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string)),
 	A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$string));
-var author$project$Model$Course = F8(
-	function (id, name, number, credits, crn, url, instructor, timestamp) {
-		return {credits: credits, crn: crn, id: id, instructor: instructor, name: name, number: number, timestamp: timestamp, url: url};
-	});
-var elm$json$Json$Decode$map8 = _Json_map8;
-var author$project$Decode$courseDecoder = A9(
-	elm$json$Json$Decode$map8,
-	author$project$Model$Course,
-	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'number', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'credits', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'crn', elm$json$Json$Decode$int),
-	elm$json$Json$Decode$maybe(
-		A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string)),
-	elm$json$Json$Decode$maybe(
-		A2(elm$json$Json$Decode$field, 'instructor_id', author$project$Decode$instructorDecoder)),
-	A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$string));
+var author$project$Model$Course = function (id) {
+	return function (name) {
+		return function (number) {
+			return function (days) {
+				return function (time) {
+					return function (credits) {
+						return function (crn) {
+							return function (url) {
+								return function (instructor) {
+									return function (timestamp) {
+										return {credits: credits, crn: crn, days: days, id: id, instructor: instructor, name: name, number: number, time: time, timestamp: timestamp, url: url};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm_community$json_extra$Json$Decode$Extra$andMap = elm$json$Json$Decode$map2(elm$core$Basics$apR);
+var author$project$Decode$courseDecoder = A2(
+	elm_community$json_extra$Json$Decode$Extra$andMap,
+	A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$string),
+	A2(
+		elm_community$json_extra$Json$Decode$Extra$andMap,
+		elm$json$Json$Decode$maybe(
+			A2(elm$json$Json$Decode$field, 'instructor_id', author$project$Decode$instructorDecoder)),
+		A2(
+			elm_community$json_extra$Json$Decode$Extra$andMap,
+			elm$json$Json$Decode$maybe(
+				A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string)),
+			A2(
+				elm_community$json_extra$Json$Decode$Extra$andMap,
+				A2(elm$json$Json$Decode$field, 'crn', elm$json$Json$Decode$int),
+				A2(
+					elm_community$json_extra$Json$Decode$Extra$andMap,
+					A2(elm$json$Json$Decode$field, 'credits', elm$json$Json$Decode$int),
+					A2(
+						elm_community$json_extra$Json$Decode$Extra$andMap,
+						A2(elm$json$Json$Decode$field, 'time', elm$json$Json$Decode$string),
+						A2(
+							elm_community$json_extra$Json$Decode$Extra$andMap,
+							A2(elm$json$Json$Decode$field, 'days', elm$json$Json$Decode$string),
+							A2(
+								elm_community$json_extra$Json$Decode$Extra$andMap,
+								A2(elm$json$Json$Decode$field, 'number', elm$json$Json$Decode$string),
+								A2(
+									elm_community$json_extra$Json$Decode$Extra$andMap,
+									A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
+									A2(
+										elm_community$json_extra$Json$Decode$Extra$andMap,
+										A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
+										elm$json$Json$Decode$succeed(author$project$Model$Course)))))))))));
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Decode$courseListDecoder = elm$json$Json$Decode$list(author$project$Decode$courseDecoder);
 var author$project$Model$GotCourseList = function (a) {
@@ -5948,7 +5986,7 @@ var elm$http$Http$get = function (r) {
 var author$project$Decode$getCourseList = elm$http$Http$get(
 	{
 		expect: A2(elm$http$Http$expectJson, author$project$Model$GotCourseList, author$project$Decode$courseListDecoder),
-		url: 'http://localhost:3000/courses/'
+		url: './courses/'
 	});
 var author$project$Model$Loading = {$: 'Loading'};
 var author$project$Main$init = function (_n0) {
@@ -6045,7 +6083,6 @@ var author$project$Update$update = F2(
 				}
 		}
 	});
-var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
 		case 'Normal':
@@ -6445,6 +6482,20 @@ var author$project$View$courseRow = function (course) {
 				_List_fromArray(
 					[
 						elm$html$Html$text(course.name)
+					])),
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Table$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(course.days)
+					])),
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Table$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(course.time)
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
@@ -7155,6 +7206,20 @@ var author$project$View$courseTable = function (courses) {
 								_List_fromArray(
 									[
 										elm$html$Html$text('Name')
+									])),
+								A2(
+								rundis$elm_bootstrap$Bootstrap$Table$th,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Days')
+									])),
+								A2(
+								rundis$elm_bootstrap$Bootstrap$Table$th,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Time')
 									])),
 								A2(
 								rundis$elm_bootstrap$Bootstrap$Table$th,
