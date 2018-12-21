@@ -56,31 +56,26 @@ courseRow course =
         , Table.td hiddenCell [ text (String.fromInt course.crn) ]
         , Table.td
             []
-            [ case course.instructor of
-                Just instructor ->
-                    Maybe.withDefault
-                        (text instructor.fullName)
-                        (Maybe.map2 (\a b -> text <| a ++ " " ++ b) instructor.firstName instructor.lastName)
-
-                Nothing ->
-                    text ""
+            [ Maybe.map viewName course.instructor
+                |> Maybe.withDefault (text "")
             ]
         , Table.td []
-            [ case course.instructor of
-                Just instructor ->
-                    case instructor.rating of
-                        Just rating ->
-                            Maybe.withDefault
-                                (text <| round 1 rating)
-                                (Maybe.map (\url -> a [ href url ] [ text <| round 1 rating ]) instructor.url)
-
-                        Nothing ->
-                            text ""
-
-                Nothing ->
-                    text ""
+            [ Maybe.map viewRating course.instructor
+                |> Maybe.withDefault (text "")
             ]
         ]
+
+
+viewName : Instructor -> Html msg
+viewName instructor =
+    Maybe.map2 (\a b -> text <| a ++ " " ++ b) instructor.firstName instructor.lastName
+        |> Maybe.withDefault (text instructor.fullName)
+
+
+viewRating : Instructor -> Html msg
+viewRating instructor =
+    Maybe.map2 (\r u -> a [ href u ] [ text <| round 1 r ]) instructor.rating instructor.url
+        |> Maybe.withDefault (text "")
 
 
 hiddenCell : List (Table.CellOption msg)
