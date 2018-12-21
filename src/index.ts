@@ -5,7 +5,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import { AppRoutes } from "./routes";
 
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 8080;
 
 // create connection with database
 // note that it's not active database connection
