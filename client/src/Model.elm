@@ -11,7 +11,6 @@ type Response
 
 type alias Model =
     { response : Response
-    , course : Maybe Course
     , courses : List Course
     }
 

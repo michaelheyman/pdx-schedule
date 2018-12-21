@@ -3,8 +3,9 @@ module View exposing (..)
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.Table as Table
-import Html exposing (Html, a, div, li, p, pre, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (class, href, style)
+import Html exposing (Html, a, text)
+import Html.Attributes exposing (class, colspan, href, style)
+import Html.Lazy exposing (lazy)
 import Http
 import Model exposing (..)
 import Round exposing (round)
@@ -16,7 +17,7 @@ view model =
         [ CDN.stylesheet
         , Grid.row []
             [ Grid.col []
-                [ courseTable model.courses ]
+                [ lazy courseTable model.courses ]
             ]
         ]
 
@@ -34,9 +35,7 @@ courseTable courses =
                     , Table.th [] [ text "Days" ]
                     , Table.th [] [ text "Time" ]
                     , Table.th [] [ text "Credits" ]
-                    , Table.th
-                        hiddenCell
-                        [ text "CRN" ]
+                    , Table.th hiddenCell [ text "CRN" ]
                     , Table.th [] [ text "Instructor" ]
                     , Table.th [] [ text "Rating" ]
                     ]
@@ -48,14 +47,15 @@ courseTable courses =
 courseRow : Course -> Table.Row msg
 courseRow course =
     Table.tr []
-        [ Table.td hiddenCell [ text (Debug.toString course.id) ]
+        [ Table.td hiddenCell [ text (String.fromInt course.id) ]
         , Table.td [] [ text course.number ]
         , Table.td [] [ text course.name ]
         , Table.td [] [ text course.days ]
         , Table.td [] [ text course.time ]
-        , Table.td [] [ text (Debug.toString course.credits) ]
-        , Table.td hiddenCell [ text (Debug.toString course.crn) ]
-        , Table.td []
+        , Table.td [] [ text (String.fromInt course.credits) ]
+        , Table.td hiddenCell [ text (String.fromInt course.crn) ]
+        , Table.td
+            []
             [ case course.instructor of
                 Just instructor ->
                     Maybe.withDefault
