@@ -81,8 +81,8 @@ class ScheduleScraper:
             LOG.error(f"Not enough cells: {cells}")
             return None
 
-        time_data = cells[2]
-        days_data = cells[3]
+        time_data = cells[1]
+        days_data = cells[2]
         time = time_data.get_text()
         days = days_data.get_text()
 

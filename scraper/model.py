@@ -19,7 +19,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)
 
-engine = create_engine("sqlite:///app.db", echo=False)
+engine = create_engine("sqlite:///alldisciplines.db", echo=False)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 DBSession = Session()

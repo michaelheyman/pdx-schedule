@@ -69,7 +69,7 @@ def crawl(local=False):
 
     for term in term_list:
         subject = term["value"]
-        LOG.DEBUG(subject)
+        LOG.debug(subject)
 
         scrape_page = requests.post(
             SCHEDULE_URL,
