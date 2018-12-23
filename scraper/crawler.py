@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: \t%(message)s")
+logging.basicConfig(level=logging.ERROR, format="%(levelname)s: \t%(message)s")
 LOG = logging.getLogger(__name__)
 
 
@@ -63,48 +63,52 @@ def crawl(local=False):
         LOG.error("Invalid request sent to term page")
         return None
 
-    # TODO: allow scraping of all subjects
-    subject = "CS"
+    term_soup = BeautifulSoup(term_page.content, "html.parser")
+    term_list = term_soup.find("select", {"id": "subj_id"})
+    term_list = term_list.find_all("option")
 
-    scrape_page = requests.post(
-        SCHEDULE_URL,
-        headers={"referer": TERM_URL},
-        cookies={"persistence": persistence},
-        data=[
-            ("term_in", str(latest_term["value"])),
-            ("sel_subj", "dummy"),
-            ("sel_subj", subject),
-            ("sel_day", "dummy"),
-            ("sel_schd", "dummy"),
-            ("sel_insm", "dummy"),
-            ("sel_insm", "%"),
-            ("sel_camp", "dummy"),
-            ("sel_levl", "dummy"),
-            ("sel_levl", "%"),
-            ("sel_sess", "dummy"),
-            ("sel_instr", "dummy"),
-            ("sel_instr", "%"),
-            ("sel_ptrm", "dummy"),
-            ("sel_attr", "dummy"),
-            ("sel_attr", "%"),
-            ("sel_crse", ""),
-            ("sel_title", ""),
-            ("sel_from_cred", ""),
-            ("sel_to_cred", ""),
-            ("begin_hh", "0"),
-            ("begin_mi", "0"),
-            ("begin_ap", "a"),
-            ("end_hh", "0"),
-            ("end_mi", "0"),
-            ("end_ap", "a"),
-        ],
-    )
+    for term in term_list:
+        subject = term["value"]
+        LOG.DEBUG(subject)
 
-    if not scrape_page.ok:
-        LOG.error(f"Failed to access {subject} schedule page")
-        return None
-    if REDIRECT_STRING in term_page.text:
-        LOG.error("Invalid request sent to scrape page")
-        return None
+        scrape_page = requests.post(
+            SCHEDULE_URL,
+            headers={"referer": TERM_URL},
+            cookies={"persistence": persistence},
+            data=[
+                ("term_in", str(latest_term["value"])),
+                ("sel_subj", "dummy"),
+                ("sel_subj", subject),
+                ("sel_day", "dummy"),
+                ("sel_schd", "dummy"),
+                ("sel_insm", "dummy"),
+                ("sel_insm", "%"),
+                ("sel_camp", "dummy"),
+                ("sel_levl", "dummy"),
+                ("sel_levl", "%"),
+                ("sel_sess", "dummy"),
+                ("sel_instr", "dummy"),
+                ("sel_instr", "%"),
+                ("sel_ptrm", "dummy"),
+                ("sel_attr", "dummy"),
+                ("sel_attr", "%"),
+                ("sel_crse", ""),
+                ("sel_title", ""),
+                ("sel_from_cred", ""),
+                ("sel_to_cred", ""),
+                ("begin_hh", "0"),
+                ("begin_mi", "0"),
+                ("begin_ap", "a"),
+                ("end_hh", "0"),
+                ("end_mi", "0"),
+                ("end_ap", "a"),
+            ],
+        )
 
-    return scrape_page.content
+        if not scrape_page.ok:
+            LOG.error(f"Failed to access {subject} schedule page")
+
+        if REDIRECT_STRING in term_page.text:
+            LOG.error("Invalid request sent to scrape page")
+
+        yield scrape_page.content

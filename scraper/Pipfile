@@ -12,6 +12,7 @@ beautifulsoup4 = "*"
 flake8 = "*"
 pre-commit = "*"
 black = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"
