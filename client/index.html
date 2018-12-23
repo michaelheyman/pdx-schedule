@@ -5083,10 +5083,12 @@ var author$project$Decode$courseDecoder = A2(
 					A2(elm$json$Json$Decode$field, 'credits', elm$json$Json$Decode$int),
 					A2(
 						elm_community$json_extra$Json$Decode$Extra$andMap,
-						A2(elm$json$Json$Decode$field, 'time', elm$json$Json$Decode$string),
+						elm$json$Json$Decode$maybe(
+							A2(elm$json$Json$Decode$field, 'time', elm$json$Json$Decode$string)),
 						A2(
 							elm_community$json_extra$Json$Decode$Extra$andMap,
-							A2(elm$json$Json$Decode$field, 'days', elm$json$Json$Decode$string),
+							elm$json$Json$Decode$maybe(
+								A2(elm$json$Json$Decode$field, 'days', elm$json$Json$Decode$string)),
 							A2(
 								elm_community$json_extra$Json$Decode$Extra$andMap,
 								A2(elm$json$Json$Decode$field, 'number', elm$json$Json$Decode$string),
@@ -6104,16 +6106,6 @@ var author$project$View$hiddenCell = _List_fromArray(
 		rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
 		A2(elm$html$Html$Attributes$style, 'visibility', 'hidden'))
 	]);
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
 var elm$core$Maybe$map2 = F3(
 	function (func, ma, mb) {
 		if (ma.$ === 1) {
@@ -6138,9 +6130,22 @@ var elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var elm$html$Html$a = _VirtualDom_node('a');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$View$viewName = function (instructor) {
+	return A2(
+		elm$core$Maybe$withDefault,
+		elm$html$Html$text(instructor.dC),
+		A3(
+			elm$core$Maybe$map2,
+			F2(
+				function (a, b) {
+					return elm$html$Html$text(a + (' ' + b));
+				}),
+			instructor.dA,
+			instructor.dK));
+};
+var elm$html$Html$a = _VirtualDom_node('a');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6165,6 +6170,16 @@ var elm$core$Basics$abs = function (n) {
 };
 var elm$core$Basics$isInfinite = _Basics_isInfinite;
 var elm$core$Basics$isNaN = _Basics_isNaN;
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
 var elm$core$String$fromFloat = _String_fromNumber;
 var elm$core$String$length = _String_length;
 var elm$core$String$cons = _String_cons;
@@ -6418,6 +6433,29 @@ var myrho$elm_round$Round$round = myrho$elm_round$Round$roundFun(
 				}
 			}
 		}));
+var author$project$View$viewRating = function (instructor) {
+	return A2(
+		elm$core$Maybe$withDefault,
+		elm$html$Html$text(''),
+		A3(
+			elm$core$Maybe$map2,
+			F2(
+				function (r, u) {
+					return A2(
+						elm$html$Html$a,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$href(u)
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								A2(myrho$elm_round$Round$round, 1, r))
+							]));
+				}),
+			instructor.dS,
+			instructor.cl));
+};
 var rundis$elm_bootstrap$Bootstrap$Table$Td = function (a) {
 	return {$: 0, a: a};
 };
@@ -6467,14 +6505,30 @@ var author$project$View$courseRow = function (course) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text(course.dx)
+						A2(
+						elm$core$Maybe$withDefault,
+						elm$html$Html$text(''),
+						A2(
+							elm$core$Maybe$map,
+							function (days) {
+								return elm$html$Html$text(days);
+							},
+							course.dx))
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text(course.d$)
+						A2(
+						elm$core$Maybe$withDefault,
+						elm$html$Html$text(''),
+						A2(
+							elm$core$Maybe$map,
+							function (time) {
+								return elm$html$Html$text(time);
+							},
+							course.d$))
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
@@ -6497,65 +6551,20 @@ var author$project$View$courseRow = function (course) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						function () {
-						var _n0 = course.dI;
-						if (!_n0.$) {
-							var instructor = _n0.a;
-							return A2(
-								elm$core$Maybe$withDefault,
-								elm$html$Html$text(instructor.dC),
-								A3(
-									elm$core$Maybe$map2,
-									F2(
-										function (a, b) {
-											return elm$html$Html$text(a + (' ' + b));
-										}),
-									instructor.dA,
-									instructor.dK));
-						} else {
-							return elm$html$Html$text('');
-						}
-					}()
+						A2(
+						elm$core$Maybe$withDefault,
+						elm$html$Html$text(''),
+						A2(elm$core$Maybe$map, author$project$View$viewName, course.dI))
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						function () {
-						var _n1 = course.dI;
-						if (!_n1.$) {
-							var instructor = _n1.a;
-							var _n2 = instructor.dS;
-							if (!_n2.$) {
-								var rating = _n2.a;
-								return A2(
-									elm$core$Maybe$withDefault,
-									elm$html$Html$text(
-										A2(myrho$elm_round$Round$round, 1, rating)),
-									A2(
-										elm$core$Maybe$map,
-										function (url) {
-											return A2(
-												elm$html$Html$a,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$href(url)
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text(
-														A2(myrho$elm_round$Round$round, 1, rating))
-													]));
-										},
-										instructor.cl));
-							} else {
-								return elm$html$Html$text('');
-							}
-						} else {
-							return elm$html$Html$text('');
-						}
-					}()
+						A2(
+						elm$core$Maybe$withDefault,
+						elm$html$Html$text(''),
+						A2(elm$core$Maybe$map, author$project$View$viewRating, course.dI))
 					]))
 			]));
 };

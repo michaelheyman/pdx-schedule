@@ -25,8 +25,8 @@ type alias Course =
     { id : Int
     , name : String
     , number : String
-    , days : String
-    , time : String
+    , days : Maybe String
+    , time : Maybe String
     , credits : Int
     , crn : Int
     , url : Maybe String

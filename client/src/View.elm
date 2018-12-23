@@ -50,8 +50,14 @@ courseRow course =
         [ Table.td hiddenCell [ text (String.fromInt course.id) ]
         , Table.td [] [ text course.number ]
         , Table.td [] [ text course.name ]
-        , Table.td [] [ text course.days ]
-        , Table.td [] [ text course.time ]
+        , Table.td []
+            [ Maybe.map (\days -> text days) course.days
+                |> Maybe.withDefault (text "")
+            ]
+        , Table.td []
+            [ Maybe.map (\time -> text time) course.time
+                |> Maybe.withDefault (text "")
+            ]
         , Table.td [] [ text (String.fromInt course.credits) ]
         , Table.td hiddenCell [ text (String.fromInt course.crn) ]
         , Table.td

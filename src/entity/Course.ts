@@ -36,13 +36,13 @@ export class Course {
     number: string;
 
     @Column("varchar", {
-        nullable: false,
+        nullable: true,
         name: "Days"
     })
     days: string;
 
     @Column("varchar", {
-        nullable: false,
+        nullable: true,
         name: "Time"
     })
     time: string;
