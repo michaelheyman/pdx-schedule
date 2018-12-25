@@ -47,7 +47,7 @@ instructorListDecoder =
 getInstructor : Int -> Cmd Msg
 getInstructor id =
     Http.get
-        { url = "./instructor/" ++ String.fromInt id
+        { url = "/instructor/" ++ String.fromInt id
         , expect = Http.expectJson GotInstructor instructorDecoder
         }
 
@@ -55,7 +55,7 @@ getInstructor id =
 getCourse : Int -> Cmd Msg
 getCourse id =
     Http.get
-        { url = "./course/" ++ String.fromInt id
+        { url = "/course/" ++ String.fromInt id
         , expect = Http.expectJson GotCourse courseDecoder
         }
 
@@ -63,6 +63,6 @@ getCourse id =
 getCourseList : Cmd Msg
 getCourseList =
     Http.get
-        { url = "./courses/"
+        { url = "/courses/"
         , expect = Http.expectJson GotCourseList courseListDecoder
         }
