@@ -31,43 +31,41 @@ class ScheduleScraper:
             for elem in ScheduleScraper.soup.find_all(
                 "th", ScheduleScraper.TITLE_CLASS
             ):
-                # TODO: refactor this by passing one class to a function
-                name, crn, number = ScheduleScraper.get_course(elem)
-                credits = ScheduleScraper.get_credits(elem)
+                ScheduleScraper.get_class_data(elem)
 
-                meeting_table_list = elem.parent.find_next_sibling("tr").findChildren(
-                    "table", {"class": ScheduleScraper.MEETING_TABLE_CLASS}
-                )
-                if meeting_table_list:
-                    meeting_table = meeting_table_list[0]
-                    instructor = ScheduleScraper.get_instructor(elem)
-                    time, days = ScheduleScraper.get_schedule(meeting_table)
-                else:
-                    instructor = None
-                    time, days = (None, None)
-                    LOG.warning("No meeting table found for this class")
+    @staticmethod
+    def get_class_data(elem):
+        name, crn, number = ScheduleScraper.get_course(elem)
+        credits = ScheduleScraper.get_credits(elem)
 
-                if instructor is None:
-                    CourseMgr.add_course(
-                        name=name,
-                        crn=crn,
-                        number=number,
-                        days=days,
-                        time=time,
-                        credits=credits,
-                    )
-                    continue
+        meeting_table_list = elem.parent.find_next_sibling("tr").findChildren(
+            "table", {"class": ScheduleScraper.MEETING_TABLE_CLASS}
+        )
+        if meeting_table_list:
+            meeting_table = meeting_table_list[0]
+            instructor = ScheduleScraper.get_instructor(meeting_table)
+            time, days = ScheduleScraper.get_schedule(meeting_table)
+        else:
+            instructor = None
+            time, days = (None, None)
+            LOG.warning("No meeting table found for this class")
 
-                instructor_record = InstructorMgr.add_instructor(instructor)
-                CourseMgr.add_course(
-                    name=name,
-                    crn=crn,
-                    number=number,
-                    days=days,
-                    time=time,
-                    credits=credits,
-                    instructor_id=instructor_record.id,
-                )
+        if instructor is None:
+            CourseMgr.add_course(
+                name=name, crn=crn, number=number, days=days, time=time, credits=credits
+            )
+            return
+
+        instructor_record = InstructorMgr.add_instructor(instructor)
+        CourseMgr.add_course(
+            name=name,
+            crn=crn,
+            number=number,
+            days=days,
+            time=time,
+            credits=credits,
+            instructor_id=instructor_record.id,
+        )
 
     @staticmethod
     def get_schedule(meeting_table):
@@ -114,17 +112,18 @@ class ScheduleScraper:
         return int(float(credits))
 
     @staticmethod
-    def get_instructor(header):
-        course_table = header.parent.next_sibling.next_sibling
-        if not course_table:
+    def get_instructor(meeting_table):
+        if not meeting_table:
             return None
 
-        cells = course_table.find_all("td", ScheduleScraper.DEFAULT_CLASS)
+        cells = meeting_table.find_all("td", ScheduleScraper.DEFAULT_CLASS)
         if not cells:
             return None
 
         last_cell = cells[-1]
-        instructor_name = last_cell.get_text()[0:-3].strip()
+        sep = " (P)"
+        last_cell_text = last_cell.get_text()
+        instructor_name = last_cell_text.split(sep, 1)[0]
         if not instructor_name:
             return None
 

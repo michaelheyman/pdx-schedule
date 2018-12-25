@@ -17,14 +17,7 @@ REDIRECT_STRING = "You will be redirected"
 
 def crawl(local=False):
     if local:
-        try:
-            with open("index.html") as fp:
-                soup = BeautifulSoup(fp, "html.parser")
-                return soup
-        except IOError:
-            LOG.error("Problem opening index.html file")
-
-        return
+        return open_local_file()
 
     init_page = requests.get(INIT_URL)
 
@@ -112,3 +105,12 @@ def crawl(local=False):
             LOG.error("Invalid request sent to scrape page")
 
         yield scrape_page.content
+
+
+def open_local_file():
+    try:
+        with open("index.html") as fp:
+            soup = BeautifulSoup(fp, "html.parser")
+            return soup
+    except IOError:
+        LOG.error("Problem opening index.html file")
