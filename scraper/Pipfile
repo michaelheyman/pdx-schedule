@@ -16,3 +16,6 @@ lxml = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+scrape = "python3 src/schedule.py"
