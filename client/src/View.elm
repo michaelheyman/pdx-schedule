@@ -25,7 +25,7 @@ view model =
 courseTable : List Course -> Html Msg
 courseTable courses =
     Table.table
-        { options = [ Table.hover, Table.responsive, Table.striped ]
+        { options = [ Table.hover, Table.responsive, Table.striped, Table.small ]
         , thead =
             Table.thead [ Table.headAttr (class "thead-dark") ]
                 [ Table.tr []

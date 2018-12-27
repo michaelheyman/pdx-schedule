@@ -6585,6 +6585,8 @@ var rundis$elm_bootstrap$Bootstrap$Table$Responsive = function (a) {
 	return {$: 5, a: a};
 };
 var rundis$elm_bootstrap$Bootstrap$Table$responsive = rundis$elm_bootstrap$Bootstrap$Table$Responsive(elm$core$Maybe$Nothing);
+var rundis$elm_bootstrap$Bootstrap$Table$Small = {$: 4};
+var rundis$elm_bootstrap$Bootstrap$Table$small = rundis$elm_bootstrap$Bootstrap$Table$Small;
 var rundis$elm_bootstrap$Bootstrap$Table$Striped = {$: 1};
 var rundis$elm_bootstrap$Bootstrap$Table$striped = rundis$elm_bootstrap$Bootstrap$Table$Striped;
 var elm$core$List$filter = F2(
@@ -7141,7 +7143,7 @@ var author$project$View$courseTable = function (courses) {
 	return rundis$elm_bootstrap$Bootstrap$Table$table(
 		{
 			dR: _List_fromArray(
-				[rundis$elm_bootstrap$Bootstrap$Table$hover, rundis$elm_bootstrap$Bootstrap$Table$responsive, rundis$elm_bootstrap$Bootstrap$Table$striped]),
+				[rundis$elm_bootstrap$Bootstrap$Table$hover, rundis$elm_bootstrap$Bootstrap$Table$responsive, rundis$elm_bootstrap$Bootstrap$Table$striped, rundis$elm_bootstrap$Bootstrap$Table$small]),
 			dZ: A2(
 				rundis$elm_bootstrap$Bootstrap$Table$tbody,
 				_List_Nil,
