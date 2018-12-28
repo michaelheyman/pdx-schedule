@@ -6,8 +6,8 @@ import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
-import Html exposing (Html, a, br, div, text)
-import Html.Attributes exposing (class, colspan, href, style)
+import Html exposing (Html, a, br, div, footer, text)
+import Html.Attributes exposing (align, class, colspan, href, style)
 import Html.Lazy exposing (lazy)
 import Http
 import Model exposing (..)
@@ -27,6 +27,11 @@ view model =
                     [ viewInput
                     , br [] []
                     , viewTable model
+                    , br [] []
+                    , div [ align "right" ]
+                        [ text "Last Updated: "
+                        , viewTimestamp model
+                        ]
                     ]
 
             Failure _ ->
@@ -35,6 +40,16 @@ view model =
                     , text "There was a problem loading the page."
                     ]
         ]
+
+
+viewTimestamp : Model -> Html Msg
+viewTimestamp model =
+    case List.head <| List.sortBy .timestamp model.courses of
+        Just course ->
+            text course.timestamp
+
+        Nothing ->
+            text ""
 
 
 viewInput : Html Msg
