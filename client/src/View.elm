@@ -1,7 +1,9 @@
 module View exposing (..)
 
+import Bootstrap.Alert as Alert
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
+import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
 import Html exposing (Html, a, text)
 import Html.Attributes exposing (class, colspan, href, style)
@@ -15,10 +17,35 @@ view : Model -> Html Msg
 view model =
     Grid.container []
         [ CDN.stylesheet
-        , Grid.row []
-            [ Grid.col []
-                [ lazy courseTable model.courses ]
-            ]
+        , case model.response of
+            Loading ->
+                viewProgressBar model.loadingValue
+
+            Success ->
+                viewTable model
+
+            Failure _ ->
+                Alert.simpleDanger []
+                    [ Html.strong [] [ text "Oh snap! " ]
+                    , text "There was a problem loading the page."
+                    ]
+        ]
+
+
+viewProgressBar : Float -> Html Msg
+viewProgressBar value =
+    Progress.progress
+        [ Progress.value value
+        , Progress.striped
+        , Progress.label "loading"
+        ]
+
+
+viewTable : Model -> Html Msg
+viewTable model =
+    Grid.row []
+        [ Grid.col []
+            [ lazy courseTable model.courses ]
         ]
 
 

@@ -1,24 +1,25 @@
 module Model exposing (..)
 
 import Http
+import Time
 
 
 type Response
     = Failure Http.Error
     | Loading
-    | Success String
+    | Success
 
 
 type alias Model =
     { response : Response
     , courses : List Course
+    , loadingValue : Float
     }
 
 
 type Msg
-    = GotInstructor (Result Http.Error Instructor)
-    | GotCourse (Result Http.Error Course)
-    | GotCourseList (Result Http.Error (List Course))
+    = GotCourseList (Result Http.Error (List Course))
+    | IncrementProgressBar Time.Posix
 
 
 type alias Course =

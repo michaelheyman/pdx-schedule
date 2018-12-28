@@ -39,27 +39,6 @@ courseListDecoder =
     Decode.list courseDecoder
 
 
-instructorListDecoder : Decode.Decoder (List Instructor)
-instructorListDecoder =
-    Decode.list instructorDecoder
-
-
-getInstructor : Int -> Cmd Msg
-getInstructor id =
-    Http.get
-        { url = "/instructor/" ++ String.fromInt id
-        , expect = Http.expectJson GotInstructor instructorDecoder
-        }
-
-
-getCourse : Int -> Cmd Msg
-getCourse id =
-    Http.get
-        { url = "/course/" ++ String.fromInt id
-        , expect = Http.expectJson GotCourse courseDecoder
-        }
-
-
 getCourseList : Cmd Msg
 getCourseList =
     Http.get
