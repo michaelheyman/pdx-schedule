@@ -27,3 +27,6 @@ update msg model =
 
         IncrementProgressBar _ ->
             ( { model | loadingValue = model.loadingValue + 75 }, Cmd.none )
+
+        Search str ->
+            ( { model | search = str }, Cmd.none )

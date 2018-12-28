@@ -2,10 +2,11 @@ module View exposing (..)
 
 import Bootstrap.Alert as Alert
 import Bootstrap.CDN as CDN
+import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
-import Html exposing (Html, a, text)
+import Html exposing (Html, a, br, div, text)
 import Html.Attributes exposing (class, colspan, href, style)
 import Html.Lazy exposing (lazy)
 import Http
@@ -22,13 +23,27 @@ view model =
                 viewProgressBar model.loadingValue
 
             Success ->
-                viewTable model
+                div []
+                    [ viewInput
+                    , br [] []
+                    , viewTable model
+                    ]
 
             Failure _ ->
                 Alert.simpleDanger []
                     [ Html.strong [] [ text "Oh snap! " ]
                     , text "There was a problem loading the page."
                     ]
+        ]
+
+
+viewInput : Html Msg
+viewInput =
+    Input.search
+        [ Input.id "searchInput"
+        , Input.small
+        , Input.placeholder "Search for class.."
+        , Input.onInput Search
         ]
 
 
@@ -45,12 +60,12 @@ viewTable : Model -> Html Msg
 viewTable model =
     Grid.row []
         [ Grid.col []
-            [ lazy courseTable model.courses ]
+            [ lazy courseTable model ]
         ]
 
 
-courseTable : List Course -> Html Msg
-courseTable courses =
+courseTable : Model -> Html Msg
+courseTable model =
     Table.table
         { options = [ Table.hover, Table.responsive, Table.striped, Table.small ]
         , thead =
@@ -67,7 +82,18 @@ courseTable courses =
                     , Table.th [] [ text "Rating" ]
                     ]
                 ]
-        , tbody = Table.tbody [] (List.map courseRow courses)
+        , tbody =
+            Table.tbody []
+                (List.map courseRow
+                    (List.filter
+                        (\c ->
+                            String.startsWith
+                                (String.toLower model.search)
+                                (String.toLower c.number)
+                        )
+                        model.courses
+                    )
+                )
         }
 
 

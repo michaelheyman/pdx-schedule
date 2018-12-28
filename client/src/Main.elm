@@ -24,6 +24,7 @@ init _ =
     ( { response = Loading
       , courses = []
       , loadingValue = 10
+      , search = ""
       }
     , getCourseList
     )

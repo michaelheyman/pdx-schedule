@@ -14,12 +14,14 @@ type alias Model =
     { response : Response
     , courses : List Course
     , loadingValue : Float
+    , search : String
     }
 
 
 type Msg
     = GotCourseList (Result Http.Error (List Course))
     | IncrementProgressBar Time.Posix
+    | Search String
 
 
 type alias Course =

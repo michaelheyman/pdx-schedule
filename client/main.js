@@ -1858,8 +1858,8 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 		flagDecoder,
 		args,
 		impl.ff,
-		impl.gh,
-		impl.fX,
+		impl.gi,
+		impl.fY,
 		function() { return function() {} }
 	);
 });
@@ -2331,9 +2331,9 @@ var _Http_toTask = F3(function(router, toTask, request)
 		elm$core$Maybe$isJust(request.y) && _Http_track(router, xhr, request.y.a);
 
 		try {
-			xhr.open(request.s, request.gi, true);
+			xhr.open(request.s, request.gj, true);
 		} catch (e) {
-			return done(elm$http$Http$BadUrl_(request.gi));
+			return done(elm$http$Http$BadUrl_(request.gj));
 		}
 
 		_Http_configureRequest(xhr, request);
@@ -2377,9 +2377,9 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		gi: xhr.responseURL,
+		gj: xhr.responseURL,
 		d2: xhr.status,
-		fS: xhr.statusText,
+		fT: xhr.statusText,
 		m: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
@@ -2475,7 +2475,7 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2(elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, elm$http$Http$Sending({
-			fL: event.loaded,
+			fM: event.loaded,
 			cO: event.total
 		}))));
 	});
@@ -4142,10 +4142,10 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 		flagDecoder,
 		args,
 		impl.ff,
-		impl.gh,
-		impl.fX,
+		impl.gi,
+		impl.fY,
 		function(sendToApp, initialModel) {
-			var view = impl.gj;
+			var view = impl.gk;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -4178,11 +4178,11 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		flagDecoder,
 		args,
 		impl.ff,
-		impl.gh,
-		impl.fX,
+		impl.gi,
+		impl.fY,
 		function(sendToApp, initialModel) {
 			var divertHrefToApp = impl.aP && impl.aP(sendToApp)
-			var view = impl.gj;
+			var view = impl.gk;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4195,7 +4195,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.gd) && (_VirtualDom_doc.title = title = doc.gd);
+				(title !== doc.ge) && (_VirtualDom_doc.title = title = doc.ge);
 			});
 		}
 	);
@@ -4286,9 +4286,9 @@ function _Browser_application(impl)
 		{
 			return A3(impl.ff, flags, _Browser_getUrl(), key);
 		},
-		gj: impl.gj,
-		gh: impl.gh,
-		fX: impl.fX
+		gk: impl.gk,
+		gi: impl.gi,
+		fY: impl.fY
 	});
 }
 
@@ -4570,7 +4570,7 @@ function _Browser_load(url)
 }
 var author$project$Model$Instructor = F7(
 	function (id, fullName, firstName, lastName, rating, url, timestamp) {
-		return {e2: firstName, e5: fullName, $7: id, fl: lastName, fB: rating, d5: timestamp, gi: url};
+		return {e2: firstName, e5: fullName, $7: id, fl: lastName, fB: rating, d5: timestamp, gj: url};
 	});
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
@@ -5087,7 +5087,7 @@ var author$project$Model$Course = function (id) {
 							return function (url) {
 								return function (instructor) {
 									return function (timestamp) {
-										return {eT: credits, eU: crn, eX: days, $7: id, fi: instructor, fq: name, fr: number, gc: time, d5: timestamp, gi: url};
+										return {eT: credits, eU: crn, eX: days, $7: id, fi: instructor, fq: name, fr: number, gd: time, d5: timestamp, gj: url};
 									};
 								};
 							};
@@ -5992,7 +5992,7 @@ var elm$http$Http$cmdMap = F2(
 					s: r.s,
 					t: r.t,
 					y: r.y,
-					gi: r.gi
+					gj: r.gj
 				});
 		}
 	});
@@ -6015,21 +6015,21 @@ var elm$http$Http$subscription = _Platform_leaf('Http');
 var elm$http$Http$request = function (r) {
 	return elm$http$Http$command(
 		elm$http$Http$Request(
-			{ah: false, eB: r.eB, e$: r.e$, m: r.m, s: r.s, t: r.t, y: r.y, gi: r.gi}));
+			{ah: false, eB: r.eB, e$: r.e$, m: r.m, s: r.s, t: r.t, y: r.y, gj: r.gj}));
 };
 var elm$http$Http$get = function (r) {
 	return elm$http$Http$request(
-		{eB: elm$http$Http$emptyBody, e$: r.e$, m: _List_Nil, s: 'GET', t: elm$core$Maybe$Nothing, y: elm$core$Maybe$Nothing, gi: r.gi});
+		{eB: elm$http$Http$emptyBody, e$: r.e$, m: _List_Nil, s: 'GET', t: elm$core$Maybe$Nothing, y: elm$core$Maybe$Nothing, gj: r.gj});
 };
 var author$project$Decode$getCourseList = elm$http$Http$get(
 	{
 		e$: A2(elm$http$Http$expectJson, author$project$Model$GotCourseList, author$project$Decode$courseListDecoder),
-		gi: '/courses/'
+		gj: '/courses/'
 	});
 var author$project$Model$Loading = {$: 1};
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{eS: _List_Nil, fn: 10, fD: author$project$Model$Loading},
+		{eS: _List_Nil, fn: 10, fD: author$project$Model$Loading, fL: ''},
 		author$project$Decode$getCourseList);
 };
 var author$project$Model$IncrementProgressBar = function (a) {
@@ -6343,36 +6343,79 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Update$update = F2(
 	function (msg, model) {
-		if (!msg.$) {
-			var result = msg.a;
-			if (!result.$) {
-				var value = result.a;
+		switch (msg.$) {
+			case 0:
+				var result = msg.a;
+				if (!result.$) {
+					var value = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								eS: A2(elm$core$List$append, model.eS, value),
+								fD: author$project$Model$Success
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								eS: model.eS,
+								fD: author$project$Model$Failure(error)
+							}),
+						elm$core$Platform$Cmd$none);
+				}
+			case 1:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{
-							eS: A2(elm$core$List$append, model.eS, value),
-							fD: author$project$Model$Success
-						}),
+						{fn: model.fn + 75}),
 					elm$core$Platform$Cmd$none);
-			} else {
-				var error = result.a;
+			default:
+				var str = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{
-							eS: model.eS,
-							fD: author$project$Model$Failure(error)
-						}),
+						{fL: str}),
 					elm$core$Platform$Cmd$none);
-			}
-		} else {
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{fn: model.fn + 75}),
-				elm$core$Platform$Cmd$none);
 		}
+	});
+var author$project$Model$Search = function (a) {
+	return {$: 2, a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Id = function (a) {
+	return {$: 1, a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$id = function (id_) {
+	return rundis$elm_bootstrap$Bootstrap$Form$Input$Id(id_);
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$OnInput = function (a) {
+	return {$: 5, a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$onInput = function (toMsg) {
+	return rundis$elm_bootstrap$Bootstrap$Form$Input$OnInput(toMsg);
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Placeholder = function (a) {
+	return {$: 7, a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$placeholder = function (value_) {
+	return rundis$elm_bootstrap$Bootstrap$Form$Input$Placeholder(value_);
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Search = 10;
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Input = elm$core$Basics$identity;
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Type = function (a) {
+	return {$: 2, a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$create = F2(
+	function (tipe, options) {
+		return {
+			fy: A2(
+				elm$core$List$cons,
+				rundis$elm_bootstrap$Bootstrap$Form$Input$Type(tipe),
+				options)
+		};
 	});
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
@@ -6386,6 +6429,269 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$html$Html$input = _VirtualDom_node('input');
+var elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$json$Json$Encode$string = _Json_wrap;
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var elm$html$Html$Attributes$disabled = elm$html$Html$Attributes$boolProperty('disabled');
+var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
+var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
+var elm$html$Html$Attributes$readonly = elm$html$Html$Attributes$boolProperty('readOnly');
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 1, a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 0:
+				var size_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						cO: elm$core$Maybe$Just(size_)
+					});
+			case 1:
+				var id_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						$7: elm$core$Maybe$Just(id_)
+					});
+			case 2:
+				var tipe = modifier.a;
+				return _Utils_update(
+					options,
+					{aR: tipe});
+			case 3:
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{bn: val});
+			case 4:
+				var value_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						G: elm$core$Maybe$Just(value_)
+					});
+			case 7:
+				var value_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						P: elm$core$Maybe$Just(value_)
+					});
+			case 5:
+				var onInput_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						bP: elm$core$Maybe$Just(onInput_)
+					});
+			case 6:
+				var validation_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						ck: elm$core$Maybe$Just(validation_)
+					});
+			case 8:
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{b4: val});
+			default:
+				var attrs_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						T: _Utils_ap(options.T, attrs_)
+					});
+		}
+	});
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Text = 0;
+var rundis$elm_bootstrap$Bootstrap$Form$Input$defaultOptions = {T: _List_Nil, bn: false, $7: elm$core$Maybe$Nothing, bP: elm$core$Maybe$Nothing, P: elm$core$Maybe$Nothing, b4: false, cO: elm$core$Maybe$Nothing, aR: 0, ck: elm$core$Maybe$Nothing, G: elm$core$Maybe$Nothing};
+var rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
+	switch (size) {
+		case 0:
+			return elm$core$Maybe$Nothing;
+		case 1:
+			return elm$core$Maybe$Just('sm');
+		case 2:
+			return elm$core$Maybe$Just('md');
+		case 3:
+			return elm$core$Maybe$Just('lg');
+		default:
+			return elm$core$Maybe$Just('xl');
+	}
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$sizeAttribute = function (size) {
+	return A2(
+		elm$core$Maybe$map,
+		function (s) {
+			return elm$html$Html$Attributes$class('form-control-' + s);
+		},
+		rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption(size));
+};
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
+var rundis$elm_bootstrap$Bootstrap$Form$Input$typeAttribute = function (inputType) {
+	return elm$html$Html$Attributes$type_(
+		function () {
+			switch (inputType) {
+				case 0:
+					return 'text';
+				case 1:
+					return 'password';
+				case 2:
+					return 'datetime-local';
+				case 3:
+					return 'date';
+				case 4:
+					return 'month';
+				case 5:
+					return 'time';
+				case 6:
+					return 'week';
+				case 7:
+					return 'number';
+				case 8:
+					return 'email';
+				case 9:
+					return 'url';
+				case 10:
+					return 'search';
+				case 11:
+					return 'tel';
+				default:
+					return 'color';
+			}
+		}());
+};
+var rundis$elm_bootstrap$Bootstrap$Form$FormInternal$validationToString = function (validation) {
+	if (!validation) {
+		return 'is-valid';
+	} else {
+		return 'is-invalid';
+	}
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$validationAttribute = function (validation) {
+	return elm$html$Html$Attributes$class(
+		rundis$elm_bootstrap$Bootstrap$Form$FormInternal$validationToString(validation));
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$toAttributes = function (modifiers) {
+	var options = A3(elm$core$List$foldl, rundis$elm_bootstrap$Bootstrap$Form$Input$applyModifier, rundis$elm_bootstrap$Bootstrap$Form$Input$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('form-control'),
+				elm$html$Html$Attributes$disabled(options.bn),
+				elm$html$Html$Attributes$readonly(options.b4),
+				rundis$elm_bootstrap$Bootstrap$Form$Input$typeAttribute(options.aR)
+			]),
+		_Utils_ap(
+			A2(
+				elm$core$List$filterMap,
+				elm$core$Basics$identity,
+				_List_fromArray(
+					[
+						A2(elm$core$Maybe$map, elm$html$Html$Attributes$id, options.$7),
+						A2(elm$core$Maybe$andThen, rundis$elm_bootstrap$Bootstrap$Form$Input$sizeAttribute, options.cO),
+						A2(elm$core$Maybe$map, elm$html$Html$Attributes$value, options.G),
+						A2(elm$core$Maybe$map, elm$html$Html$Attributes$placeholder, options.P),
+						A2(elm$core$Maybe$map, elm$html$Html$Events$onInput, options.bP),
+						A2(elm$core$Maybe$map, rundis$elm_bootstrap$Bootstrap$Form$Input$validationAttribute, options.ck)
+					])),
+			options.T));
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$view = function (_n0) {
+	var options = _n0.fy;
+	return A2(
+		elm$html$Html$input,
+		rundis$elm_bootstrap$Bootstrap$Form$Input$toAttributes(options),
+		_List_Nil);
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$input = F2(
+	function (tipe, options) {
+		return rundis$elm_bootstrap$Bootstrap$Form$Input$view(
+			A2(rundis$elm_bootstrap$Bootstrap$Form$Input$create, tipe, options));
+	});
+var rundis$elm_bootstrap$Bootstrap$Form$Input$search = rundis$elm_bootstrap$Bootstrap$Form$Input$input(10);
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Size = function (a) {
+	return {$: 0, a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$General$Internal$SM = 1;
+var rundis$elm_bootstrap$Bootstrap$Form$Input$small = rundis$elm_bootstrap$Bootstrap$Form$Input$Size(1);
+var author$project$View$viewInput = rundis$elm_bootstrap$Bootstrap$Form$Input$search(
+	_List_fromArray(
+		[
+			rundis$elm_bootstrap$Bootstrap$Form$Input$id('searchInput'),
+			rundis$elm_bootstrap$Bootstrap$Form$Input$small,
+			rundis$elm_bootstrap$Bootstrap$Form$Input$placeholder('Search for class..'),
+			rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Model$Search)
+		]));
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var rundis$elm_bootstrap$Bootstrap$Progress$Label = function (a) {
@@ -6399,15 +6705,6 @@ var rundis$elm_bootstrap$Bootstrap$Progress$label = function (text) {
 			]));
 };
 var elm$html$Html$div = _VirtualDom_node('div');
-var elm$json$Json$Encode$string = _Json_wrap;
-var elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$string(string));
-	});
-var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var rundis$elm_bootstrap$Bootstrap$Progress$Options = elm$core$Basics$identity;
 var rundis$elm_bootstrap$Bootstrap$Progress$applyOption = F2(
 	function (modifier, _n0) {
@@ -6674,16 +6971,6 @@ var elm$core$Basics$abs = function (n) {
 };
 var elm$core$Basics$isInfinite = _Basics_isInfinite;
 var elm$core$Basics$isNaN = _Basics_isNaN;
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
 var elm$core$String$length = _String_length;
 var elm$core$String$cons = _String_cons;
 var elm$core$String$fromChar = function (_char) {
@@ -6957,7 +7244,7 @@ var author$project$View$viewRating = function (instructor) {
 							]));
 				}),
 			instructor.fB,
-			instructor.gi));
+			instructor.gj));
 };
 var rundis$elm_bootstrap$Bootstrap$Table$Td = function (a) {
 	return {$: 0, a: a};
@@ -7031,7 +7318,7 @@ var author$project$View$courseRow = function (course) {
 							function (time) {
 								return elm$html$Html$text(time);
 							},
-							course.gc))
+							course.gd))
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Table$td,
@@ -7071,6 +7358,7 @@ var author$project$View$courseRow = function (course) {
 					]))
 			]));
 };
+var elm$core$String$toLower = _String_toLower;
 var rundis$elm_bootstrap$Bootstrap$Table$HeadAttr = function (a) {
 	return {$: 2, a: a};
 };
@@ -7245,29 +7533,6 @@ var elm$core$List$head = function (list) {
 		return elm$core$Maybe$Just(x);
 	} else {
 		return elm$core$Maybe$Nothing;
-	}
-};
-var elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
-	switch (size) {
-		case 0:
-			return elm$core$Maybe$Nothing;
-		case 1:
-			return elm$core$Maybe$Just('sm');
-		case 2:
-			return elm$core$Maybe$Just('md');
-		case 3:
-			return elm$core$Maybe$Just('lg');
-		default:
-			return elm$core$Maybe$Just('xl');
 	}
 };
 var rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive = F2(
@@ -7606,9 +7871,9 @@ var rundis$elm_bootstrap$Bootstrap$Table$table = function (rec) {
 			_List_fromArray(
 				[
 					rundis$elm_bootstrap$Bootstrap$Table$renderTHead(
-					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead, isInversed, rec.ga)),
+					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead, isInversed, rec.gb)),
 					rundis$elm_bootstrap$Bootstrap$Table$renderTBody(
-					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTBody, isInversed, rec.fY))
+					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTBody, isInversed, rec.fZ))
 				])));
 };
 var rundis$elm_bootstrap$Bootstrap$Table$tbody = F2(
@@ -7625,16 +7890,27 @@ var rundis$elm_bootstrap$Bootstrap$Table$thead = F2(
 	function (options, rows) {
 		return {fy: options, fG: rows};
 	});
-var author$project$View$courseTable = function (courses) {
+var author$project$View$courseTable = function (model) {
 	return rundis$elm_bootstrap$Bootstrap$Table$table(
 		{
 			fy: _List_fromArray(
 				[rundis$elm_bootstrap$Bootstrap$Table$hover, rundis$elm_bootstrap$Bootstrap$Table$responsive, rundis$elm_bootstrap$Bootstrap$Table$striped, rundis$elm_bootstrap$Bootstrap$Table$small]),
-			fY: A2(
+			fZ: A2(
 				rundis$elm_bootstrap$Bootstrap$Table$tbody,
 				_List_Nil,
-				A2(elm$core$List$map, author$project$View$courseRow, courses)),
-			ga: A2(
+				A2(
+					elm$core$List$map,
+					author$project$View$courseRow,
+					A2(
+						elm$core$List$filter,
+						function (c) {
+							return A2(
+								elm$core$String$startsWith,
+								elm$core$String$toLower(model.fL),
+								elm$core$String$toLower(c.fr));
+						},
+						model.eS))),
+			gb: A2(
 				rundis$elm_bootstrap$Bootstrap$Table$thead,
 				_List_fromArray(
 					[
@@ -8522,10 +8798,11 @@ var author$project$View$viewTable = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						A2(elm$html$Html$Lazy$lazy, author$project$View$courseTable, model.eS)
+						A2(elm$html$Html$Lazy$lazy, author$project$View$courseTable, model)
 					]))
 			]));
 };
+var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$strong = _VirtualDom_node('strong');
 var rundis$elm_bootstrap$Bootstrap$Alert$Shown = 0;
 var rundis$elm_bootstrap$Bootstrap$Alert$Config = elm$core$Basics$identity;
@@ -8554,11 +8831,9 @@ var rundis$elm_bootstrap$Bootstrap$Alert$role = F2(
 	});
 var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$span = _VirtualDom_node('span');
-var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var elm$html$Html$Events$on = F2(
 	function (event, decoder) {
 		return A2(
@@ -8751,7 +9026,15 @@ var author$project$View$view = function (model) {
 					case 1:
 						return author$project$View$viewProgressBar(model.fn);
 					case 2:
-						return author$project$View$viewTable(model);
+						return A2(
+							elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									author$project$View$viewInput,
+									A2(elm$html$Html$br, _List_Nil, _List_Nil),
+									author$project$View$viewTable(model)
+								]));
 					default:
 						return A2(
 							rundis$elm_bootstrap$Bootstrap$Alert$simpleDanger,
@@ -8956,6 +9239,6 @@ var elm$url$Url$fromString = function (str) {
 };
 var elm$browser$Browser$element = _Browser_element;
 var author$project$Main$main = elm$browser$Browser$element(
-	{ff: author$project$Main$init, fX: author$project$Subscriptions$subscriptions, gh: author$project$Update$update, gj: author$project$View$view});
+	{ff: author$project$Main$init, fY: author$project$Subscriptions$subscriptions, gi: author$project$Update$update, gk: author$project$View$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
 	elm$json$Json$Decode$succeed(0))(0)}});}(this));
