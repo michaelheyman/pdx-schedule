@@ -19,10 +19,16 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)
 
-engine = create_engine("sqlite:///../alldisciplines.db", echo=False)
+engine = create_engine("sqlite:///app.db", echo=False)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 DBSession = Session()
+
+
+class ConnectionMgr:
+    @staticmethod
+    def commit():
+        DBSession.commit()
 
 
 class InstructorMgr:
@@ -57,8 +63,6 @@ class InstructorMgr:
         else:
             LOG.debug(f"{instructor} was already in db!")
 
-        DBSession.commit()
-
         return instructor_record
 
 
@@ -71,7 +75,7 @@ class Instructor(Base):
     last_name = Column("LastName", String)
     rating = Column("Rating", Float)
     url = Column("URL", String)
-    timestamp = Column("Timestamp", DateTime, default=datetime.utcnow)
+    timestamp = Column("Timestamp", DateTime, default=datetime.now)
 
     def __repr__(self):
         return (
@@ -96,7 +100,6 @@ class CourseMgr:
             instructor_id=instructor_id,
         )
         DBSession.add(course)
-        DBSession.commit()
 
 
 class Course(Base):
@@ -112,7 +115,7 @@ class Course(Base):
     url = Column("URL", String)
     instructor_id = Column("InstructorId", Integer, ForeignKey("Instructor.Id"))
     instructor = relationship("Instructor")
-    timestamp = Column("Timestamp", DateTime, default=datetime.utcnow)
+    timestamp = Column("Timestamp", DateTime, default=datetime.now)
 
     def __repr__(self):
         return (
@@ -132,6 +135,8 @@ class Course(Base):
 
 def main():
     Base.metadata.create_all(engine)
+    Course.__table__.drop(engine)
+    Instructor.__table__.drop(engine)
 
 
 main()

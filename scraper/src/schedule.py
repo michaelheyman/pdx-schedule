@@ -6,6 +6,7 @@ from model import Base
 from model import engine
 from model import InstructorMgr
 from model import CourseMgr
+from model import ConnectionMgr
 from crawler import crawl
 
 LOG = logging.getLogger(__name__)
@@ -32,6 +33,8 @@ class ScheduleScraper:
                 "th", ScheduleScraper.TITLE_CLASS
             ):
                 ScheduleScraper.get_class_data(elem)
+
+        ConnectionMgr.commit()
 
     @staticmethod
     def get_class_data(elem):
