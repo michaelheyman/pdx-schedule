@@ -62,6 +62,7 @@ class InstructorMgr:
             DBSession.flush()
         else:
             LOG.debug(f"{instructor} was already in db!")
+        DBSession.commit()
 
         return instructor_record
 
@@ -89,7 +90,9 @@ class Instructor(Base):
 
 class CourseMgr:
     @staticmethod
-    def add_course(name, crn, number, days, time, credits, instructor_id=None):
+    def add_course(
+        name, crn, number, discipline, days, time, credits, instructor_id=None
+    ):
         course = Course(
             name=name,
             crn=crn,
@@ -97,9 +100,11 @@ class CourseMgr:
             days=days,
             time=time,
             credits=credits,
+            discipline=discipline,
             instructor_id=instructor_id,
         )
         DBSession.add(course)
+        DBSession.commit()
 
 
 class Course(Base):
@@ -108,11 +113,11 @@ class Course(Base):
     id = Column("Id", Integer, primary_key=True)
     name = Column("Name", String, nullable=False)
     number = Column("Class", String, nullable=False)
+    discipline = Column("Discipline", String, nullable=False)
     days = Column("Days", String)
     time = Column("Time", String)
     credits = Column("Credits", Integer, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
-    url = Column("URL", String)
     instructor_id = Column("InstructorId", Integer, ForeignKey("Instructor.Id"))
     instructor = relationship("Instructor")
     timestamp = Column("Timestamp", DateTime, default=datetime.now)
@@ -126,7 +131,7 @@ class Course(Base):
             "time={self.time}, "
             "credits={self.credits}, "
             "crn={self.crn}, "
-            "url={self.url}, "
+            "discipline={self.discipline}, "
             "instructor_id={self.instructor_id}, "
             "instructor={self.instructor}, "
             "timestamp={self.timestamp})>"

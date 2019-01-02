@@ -36,6 +36,11 @@ export class Course {
     number: string;
 
     @Column("varchar", {
+        name: "Discipline"
+    })
+    discipline: string;
+
+    @Column("varchar", {
         nullable: true,
         name: "Days"
     })
@@ -58,12 +63,6 @@ export class Course {
         name: "CRN"
     })
     crn: number;
-
-    @Column("varchar", {
-        nullable: true,
-        name: "URL"
-    })
-    url: string | null;
 
     @ManyToOne(type => Instructor, Instructor => Instructor.courses, {})
     @JoinColumn({ name: "InstructorId" })

@@ -28,11 +28,11 @@ type alias Course =
     { id : Int
     , name : String
     , number : String
+    , discipline : String
     , days : Maybe String
     , time : Maybe String
     , credits : Int
     , crn : Int
-    , url : Maybe String
     , instructor : Maybe Instructor
     , timestamp : String
     }

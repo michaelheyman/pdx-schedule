@@ -28,16 +28,17 @@ class ScheduleScraper:
 
         for content in contents:
             ScheduleScraper.soup = BeautifulSoup(content, "lxml")
+            discipline = ScheduleScraper.soup.find("b").get_text()
 
             for elem in ScheduleScraper.soup.find_all(
                 "th", ScheduleScraper.TITLE_CLASS
             ):
-                ScheduleScraper.get_class_data(elem)
+                ScheduleScraper.get_class_data(elem, discipline)
 
         ConnectionMgr.commit()
 
     @staticmethod
-    def get_class_data(elem):
+    def get_class_data(elem, discipline):
         name, crn, number = ScheduleScraper.get_course(elem)
         credits = ScheduleScraper.get_credits(elem)
 
@@ -55,7 +56,13 @@ class ScheduleScraper:
 
         if instructor is None:
             CourseMgr.add_course(
-                name=name, crn=crn, number=number, days=days, time=time, credits=credits
+                name=name,
+                crn=crn,
+                number=number,
+                discipline=discipline,
+                days=days,
+                time=time,
+                credits=credits,
             )
             return
 
@@ -64,11 +71,16 @@ class ScheduleScraper:
             name=name,
             crn=crn,
             number=number,
+            discipline=discipline,
             days=days,
             time=time,
             credits=credits,
             instructor_id=instructor_record.id,
         )
+
+    @staticmethod
+    def get_discipline(elem):
+        pass
 
     @staticmethod
     def get_schedule(meeting_table):
