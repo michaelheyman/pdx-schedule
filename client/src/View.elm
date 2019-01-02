@@ -9,9 +9,12 @@ import Bootstrap.Grid.Row as Row
 import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
 import Bootstrap.Text as Text
+import Bootstrap.Utilities.Border as Border
+import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (Html, a, br, div, footer, h1, i, li, main_, p, span, text, ul)
-import Html.Attributes exposing (align, attribute, autocomplete, class, colspan, href, style, target)
+import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy)
 import Http
 import Model exposing (..)
@@ -62,8 +65,16 @@ pageHeader =
         pageHeaderStyle
         [ div
             [ class "container" ]
-            [ h1 [] [ text "PSU Class Schedule" ] ]
+            [ h1 [] [ text "PSU Schedule" ] ]
         ]
+
+
+viewDisciplines : Model -> List (Html Msg)
+viewDisciplines model =
+    [ viewInput
+    , br [] []
+    ]
+        ++ List.map (\x -> p [] [ text x ]) model.disciplines
 
 
 viewPage : Model -> List (Html Msg)
@@ -99,15 +110,16 @@ courseTable model =
         { options = [ Table.hover, Table.responsiveXl, Table.striped ]
         , thead =
             Table.thead [ Table.headAttr (class "thead-dark") ]
-                [ Table.tr []
+                [ Table.tr
+                    [ Table.rowAttr Display.none
+                    , Table.rowAttr Display.tableRowSm
+                    ]
                     [ Table.th hiddenCell [ text "Id" ]
                     , Table.th [] [ text "Class" ]
                     , Table.th [] [ text "Name" ]
                     , Table.th hiddenSm [ text "Days" ]
                     , Table.th hiddenSm [ text "Time" ]
                     , Table.th hiddenMd [ text "Credits" ]
-
-                    --, Table.th hiddenCell [ text "CRN" ]
                     , Table.th [] [ text "Instructor" ]
                     , Table.th [] [ text "Rating" ]
                     ]
@@ -129,17 +141,33 @@ courseTable model =
 
 courseRow : Course -> Table.Row msg
 courseRow course =
-    Table.tr [ Table.rowAttr Flex.col ]
+    Table.tr
+        [ Table.rowAttr Flex.col
+        ]
         [ Table.td hiddenCell [ text (String.fromInt course.id) ]
-        , Table.td [] [ text course.number ]
-        , Table.td [] [ text course.name ]
         , Table.td
-            hiddenSm
+            [ Table.cellAttr Display.block
+            , Table.cellAttr Display.tableCellSm
+            ]
+            [ text course.number ]
+        , Table.td
+            [ Table.cellAttr Display.block
+            , Table.cellAttr Display.tableCellSm
+            ]
+            [ text course.name ]
+        , Table.td
+            [ Table.cellAttr Display.block
+            , Table.cellAttr Display.noneSm
+            , Table.cellAttr Display.tableCellMd
+            ]
             [ Maybe.map (\days -> text days) course.days
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
-            hiddenSm
+            [ Table.cellAttr Display.block
+            , Table.cellAttr Display.noneSm
+            , Table.cellAttr Display.tableCellMd
+            ]
             [ Maybe.map (\time -> text time) course.time
                 |> Maybe.withDefault (text "")
             ]
@@ -147,11 +175,19 @@ courseRow course =
             hiddenMd
             [ text (String.fromInt course.credits) ]
         , Table.td hiddenCell [ text (String.fromInt course.crn) ]
-        , Table.td []
+        , Table.td
+            [ Table.cellAttr Display.block
+            , Table.cellAttr Display.tableCellSm
+            ]
             [ Maybe.map viewName course.instructor
                 |> Maybe.withDefault (text "")
             ]
-        , Table.td []
+        , Table.td
+            [ Table.cellAttr Display.block
+            , Table.cellAttr Display.tableCellSm
+            , Table.cellAttr Spacing.mb5
+            , Table.cellAttr Spacing.mb0Sm
+            ]
             [ Maybe.map viewRating course.instructor
                 |> Maybe.withDefault (text "")
             ]

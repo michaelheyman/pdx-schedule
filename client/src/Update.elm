@@ -1,6 +1,7 @@
 module Update exposing (..)
 
 import Http
+import List.Extra exposing (unique, uniqueBy)
 import Model exposing (..)
 
 
@@ -13,6 +14,11 @@ update msg model =
                     ( { model
                         | response = Success
                         , courses = List.append model.courses value
+                        , disciplines =
+                            value
+                                |> List.map .discipline
+                                |> unique
+                                |> List.append model.disciplines
                       }
                     , Cmd.none
                     )
@@ -20,7 +26,8 @@ update msg model =
                 Err error ->
                     ( { model
                         | response = Failure error
-                        , courses = model.courses
+                        , courses = []
+                        , disciplines = []
                       }
                     , Cmd.none
                     )

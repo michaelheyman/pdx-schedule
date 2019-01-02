@@ -23,6 +23,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { response = Loading
       , courses = []
+      , disciplines = []
       , loadingValue = 10
       , search = ""
       }

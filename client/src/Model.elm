@@ -13,6 +13,7 @@ type Response
 type alias Model =
     { response : Response
     , courses : List Course
+    , disciplines : List String
     , loadingValue : Float
     , search : String
     }
