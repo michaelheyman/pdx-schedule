@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Bootstrap.Accordion as Accordion
 import Browser
 import Decode exposing (..)
 import Model exposing (..)
@@ -26,6 +27,8 @@ init _ =
       , disciplines = []
       , loadingValue = 10
       , search = ""
+      , filter = ""
+      , accordionState = Accordion.initialState
       }
     , getCourseList
     )

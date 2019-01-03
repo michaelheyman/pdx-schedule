@@ -37,3 +37,9 @@ update msg model =
 
         Search str ->
             ( { model | search = str }, Cmd.none )
+
+        Filter str ->
+            ( { model | filter = str }, Cmd.none )
+
+        AccordionMsg state ->
+            ( { model | accordionState = state }, Cmd.none )

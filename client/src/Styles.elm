@@ -42,13 +42,9 @@ pageHeaderStyle =
     , style "color" "white"
     , Spacing.pt5
     , Spacing.pb5
-    , Spacing.mb4
+    , Spacing.mb3
+    , Spacing.mb5Md
     ]
-
-
-inputBoxStyle : List (Html.Attribute msg)
-inputBoxStyle =
-    [ Spacing.mt3 ]
 
 
 

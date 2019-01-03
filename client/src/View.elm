@@ -1,11 +1,14 @@
 module View exposing (..)
 
+import Bootstrap.Accordion as Accordion
 import Bootstrap.Alert as Alert
 import Bootstrap.CDN as CDN
+import Bootstrap.Card as Card
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
+import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
 import Bootstrap.Text as Text
@@ -13,13 +16,71 @@ import Bootstrap.Utilities.Border as Border
 import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
-import Html exposing (Html, a, br, div, footer, h1, i, li, main_, p, span, text, ul)
+import Html exposing (Html, a, b, br, div, footer, h1, i, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
 import Http
 import Model exposing (..)
 import Round exposing (round)
 import Styles exposing (..)
+
+
+accordionLink : Model -> String -> ListGroup.Item Msg
+accordionLink model string =
+    ListGroup.li
+        [ ListGroup.attrs
+            [ style "font-size" "0.8em"
+            , let
+                value =
+                    case string == "All" of
+                        True ->
+                            ""
+
+                        False ->
+                            string
+              in
+              onClick (Filter value)
+            , style "cursor" "pointer"
+            , Border.topNone
+            , Spacing.pt1
+            ]
+        , ListGroup.light
+        ]
+        [ if model.filter == string then
+            b [] [ text string ]
+          else if model.filter == "" && string == "All" then
+            b [] [ text string ]
+          else
+            text string
+        ]
+
+
+viewAccordion : Model -> Html Msg
+viewAccordion model =
+    Accordion.config AccordionMsg
+        |> Accordion.withAnimation
+        |> Accordion.cards
+            [ Accordion.card
+                { id = "disciplineCard"
+                , options =
+                    [ Card.light
+                    , Card.outlineLight
+                    , Card.textColor Text.secondary
+                    , Card.attrs [ Spacing.mb4 ]
+                    , Card.align Text.alignXsLeft
+                    ]
+                , header =
+                    Accordion.header [ Spacing.pl0 ] <| Accordion.toggle [] [ text "Discipline" ]
+                , blocks =
+                    [ Accordion.listGroup
+                        ([ accordionLink model "All" ]
+                            ++ List.map (accordionLink model) model.disciplines
+                        )
+                    ]
+                }
+            ]
+        |> Accordion.view model.accordionState
 
 
 view : Model -> Html Msg
@@ -48,7 +109,21 @@ renderPage model =
         [ Grid.row
             [ Row.centerSm ]
             [ Grid.col
-                [ Col.xs12, Col.md12, Col.xl10, Col.pullMd2, Col.attrs [ class "bd-content" ] ]
+                [ Col.attrs [ Display.none, Display.blockMd ]
+                , Col.xs12
+                , Col.md2
+                , Col.attrs [ class "bd-sidebar" ]
+                ]
+                [ lazy viewSidebar model ]
+            , Grid.col
+                [ Col.attrs [ Display.noneMd ]
+                , Col.xs12
+                , Col.md2
+                , Col.attrs [ class "bd-accordion" ]
+                ]
+                [ lazy viewAccordion model ]
+            , Grid.col
+                [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
                 [ main_
                     []
                     (viewPage model)
@@ -64,23 +139,62 @@ pageHeader =
     div
         pageHeaderStyle
         [ div
-            [ class "container" ]
+            [ class "container"
+            ]
             [ h1 [] [ text "PSU Schedule" ] ]
         ]
 
 
-viewDisciplines : Model -> List (Html Msg)
-viewDisciplines model =
-    [ viewInput
-    , br [] []
-    ]
-        ++ List.map (\x -> p [] [ text x ]) model.disciplines
+sidebarLink : Model -> String -> Html Msg
+sidebarLink model string =
+    li
+        [ style "font-size" "0.8em"
+        , style "color" "#99979c"
+        , onClick (Filter string)
+        , style "cursor" "pointer"
+        ]
+        [ if model.filter == string then
+            b [] [ text string ]
+          else
+            text string
+        ]
+
+
+viewSidebar : Model -> Html Msg
+viewSidebar model =
+    nav
+        [ class "bd-links"
+        ]
+        [ div [ class "bd-toc-item active" ]
+            [ text "Disciplines"
+            , ul
+                [ class "bd-sidenav"
+                , style "list-style-type" "none"
+                , Spacing.pl2
+                ]
+                ([ li
+                    [ style "font-size" "0.8em"
+                    , style "color" "#99979c"
+                    , onClick (Filter "")
+                    , style "cursor" "pointer"
+                    ]
+                    [ if model.filter == "" then
+                        b [] [ text "All" ]
+                      else
+                        text "All"
+                    ]
+                 ]
+                    ++ List.map
+                        (sidebarLink model)
+                        model.disciplines
+                )
+            ]
+        ]
 
 
 viewPage : Model -> List (Html Msg)
 viewPage model =
     [ viewInput
-    , br [] []
     , lazy courseTable model
     ]
 
@@ -91,7 +205,7 @@ viewInput =
         [ Input.id "searchInput"
         , Input.placeholder "Search for class.."
         , Input.onInput Search
-        , Input.attrs inputBoxStyle
+        , Input.attrs [ Spacing.mb4 ]
         ]
 
 
@@ -117,9 +231,21 @@ courseTable model =
                     [ Table.th hiddenCell [ text "Id" ]
                     , Table.th [] [ text "Class" ]
                     , Table.th [] [ text "Name" ]
-                    , Table.th hiddenSm [ text "Days" ]
-                    , Table.th hiddenSm [ text "Time" ]
-                    , Table.th hiddenMd [ text "Credits" ]
+                    , Table.th
+                        [ Table.cellAttr Display.none
+                        , Table.cellAttr Display.tableCellMd
+                        ]
+                        [ text "Days" ]
+                    , Table.th
+                        [ Table.cellAttr Display.none
+                        , Table.cellAttr Display.tableCellMd
+                        ]
+                        [ text "Time" ]
+                    , Table.th
+                        [ Table.cellAttr Display.none
+                        , Table.cellAttr Display.tableCellLg
+                        ]
+                        [ text "Credits" ]
                     , Table.th [] [ text "Instructor" ]
                     , Table.th [] [ text "Rating" ]
                     ]
@@ -133,7 +259,14 @@ courseTable model =
                                 (String.toLower model.search)
                                 (String.toLower c.number)
                         )
-                        model.courses
+                        (List.filter
+                            (\c ->
+                                String.startsWith
+                                    (String.toLower model.filter)
+                                    (String.toLower c.discipline)
+                            )
+                            model.courses
+                        )
                     )
                 )
         }
@@ -148,11 +281,13 @@ courseRow course =
         , Table.td
             [ Table.cellAttr Display.block
             , Table.cellAttr Display.tableCellSm
+            , Table.cellAttr (class "text-nowrap")
             ]
             [ text course.number ]
         , Table.td
             [ Table.cellAttr Display.block
             , Table.cellAttr Display.tableCellSm
+            , Table.cellAttr Flex.nowrap
             ]
             [ text course.name ]
         , Table.td
@@ -167,12 +302,15 @@ courseRow course =
             [ Table.cellAttr Display.block
             , Table.cellAttr Display.noneSm
             , Table.cellAttr Display.tableCellMd
+            , Table.cellAttr (class "text-nowrap")
             ]
             [ Maybe.map (\time -> text time) course.time
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
-            hiddenMd
+            [ Table.cellAttr Display.none
+            , Table.cellAttr Display.tableCellLg
+            ]
             [ text (String.fromInt course.credits) ]
         , Table.td hiddenCell [ text (String.fromInt course.crn) ]
         , Table.td
@@ -185,8 +323,6 @@ courseRow course =
         , Table.td
             [ Table.cellAttr Display.block
             , Table.cellAttr Display.tableCellSm
-            , Table.cellAttr Spacing.mb5
-            , Table.cellAttr Spacing.mb0Sm
             ]
             [ Maybe.map viewRating course.instructor
                 |> Maybe.withDefault (text "")

@@ -1,5 +1,6 @@
 module Model exposing (..)
 
+import Bootstrap.Accordion as Accordion
 import Http
 import Time
 
@@ -16,6 +17,8 @@ type alias Model =
     , disciplines : List String
     , loadingValue : Float
     , search : String
+    , filter : String
+    , accordionState : Accordion.State
     }
 
 
@@ -23,6 +26,8 @@ type Msg
     = GotCourseList (Result Http.Error (List Course))
     | IncrementProgressBar Time.Posix
     | Search String
+    | Filter String
+    | AccordionMsg Accordion.State
 
 
 type alias Course =
