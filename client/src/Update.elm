@@ -1,5 +1,6 @@
 module Update exposing (..)
 
+import Bootstrap.Accordion as Accordion
 import Http
 import List.Extra exposing (unique, uniqueBy)
 import Model exposing (..)
@@ -39,7 +40,12 @@ update msg model =
             ( { model | search = str }, Cmd.none )
 
         Filter str ->
-            ( { model | filter = str }, Cmd.none )
+            ( { model
+                | filter = str
+                , accordionState = Accordion.initialState
+              }
+            , Cmd.none
+            )
 
         AccordionMsg state ->
             ( { model | accordionState = state }, Cmd.none )
