@@ -26,63 +26,6 @@ import Round exposing (round)
 import Styles exposing (..)
 
 
-accordionLink : Model -> String -> ListGroup.Item Msg
-accordionLink model string =
-    ListGroup.li
-        [ ListGroup.attrs
-            [ style "font-size" "0.8em"
-            , let
-                value =
-                    case string == "All" of
-                        True ->
-                            ""
-
-                        False ->
-                            string
-              in
-              onClick (Filter value)
-            , style "cursor" "pointer"
-            , Border.topNone
-            , Spacing.pt1
-            ]
-        , ListGroup.light
-        ]
-        [ if model.filter == string then
-            b [] [ text string ]
-          else if model.filter == "" && string == "All" then
-            b [] [ text string ]
-          else
-            text string
-        ]
-
-
-viewAccordion : Model -> Html Msg
-viewAccordion model =
-    Accordion.config AccordionMsg
-        |> Accordion.withAnimation
-        |> Accordion.cards
-            [ Accordion.card
-                { id = "disciplineCard"
-                , options =
-                    [ Card.light
-                    , Card.outlineLight
-                    , Card.textColor Text.secondary
-                    , Card.attrs [ Spacing.mb4 ]
-                    , Card.align Text.alignXsLeft
-                    ]
-                , header =
-                    Accordion.header [ Spacing.pl0 ] <| Accordion.toggle [] [ text "Discipline" ]
-                , blocks =
-                    [ Accordion.listGroup
-                        ([ accordionLink model "All" ]
-                            ++ List.map (accordionLink model) model.disciplines
-                        )
-                    ]
-                }
-            ]
-        |> Accordion.view model.accordionState
-
-
 view : Model -> Html Msg
 view model =
     div []
@@ -153,21 +96,6 @@ pageHeader =
         ]
 
 
-sidebarLink : Model -> String -> Html Msg
-sidebarLink model string =
-    li
-        [ style "font-size" "0.8em"
-        , style "color" "#99979c"
-        , onClick (Filter string)
-        , style "cursor" "pointer"
-        ]
-        [ if model.filter == string then
-            b [] [ text string ]
-          else
-            text string
-        ]
-
-
 viewSidebar : Model -> Html Msg
 viewSidebar model =
     nav
@@ -217,6 +145,33 @@ viewInput =
         ]
 
 
+viewAccordion : Model -> Html Msg
+viewAccordion model =
+    Accordion.config AccordionMsg
+        |> Accordion.withAnimation
+        |> Accordion.cards
+            [ Accordion.card
+                { id = "disciplineCard"
+                , options =
+                    [ Card.light
+                    , Card.outlineLight
+                    , Card.textColor Text.secondary
+                    , Card.attrs [ Spacing.mb4 ]
+                    , Card.align Text.alignXsLeft
+                    ]
+                , header =
+                    Accordion.header [ Spacing.pl0 ] <| Accordion.toggle [] [ text "Disciplines" ]
+                , blocks =
+                    [ Accordion.listGroup
+                        ([ accordionLink model "All" ]
+                            ++ List.map (accordionLink model) model.disciplines
+                        )
+                    ]
+                }
+            ]
+        |> Accordion.view model.accordionState
+
+
 viewProgressBar : Float -> Html Msg
 viewProgressBar value =
     Progress.progress
@@ -238,22 +193,22 @@ courseTable model =
                     , Table.th [] [ text "Class" ]
                     , Table.th
                         [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellMd
+                        , Table.cellAttr Display.tableCellSm
                         ]
                         [ text "Name" ]
                     , Table.th
                         [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellMd
+                        , Table.cellAttr Display.tableCellLg
                         ]
                         [ text "Days" ]
                     , Table.th
                         [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellMd
+                        , Table.cellAttr Display.tableCellLg
                         ]
                         [ text "Time" ]
                     , Table.th
                         [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellLg
+                        , Table.cellAttr Display.tableCellXl
                         ]
                         [ text "Credits" ]
                     , Table.th [] [ text "Instructor" ]
@@ -300,14 +255,14 @@ courseRow course =
             [ text course.name ]
         , Table.td
             [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellMd
+            , Table.cellAttr Display.tableCellLg
             ]
             [ Maybe.map (\days -> text days) course.days
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
             [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellMd
+            , Table.cellAttr Display.tableCellLg
             , Table.cellAttr (class "text-nowrap")
             ]
             [ Maybe.map (\time -> text time) course.time
@@ -315,7 +270,7 @@ courseRow course =
             ]
         , Table.td
             [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellLg
+            , Table.cellAttr Display.tableCellXl
             ]
             [ text (String.fromInt course.credits) ]
         , Table.td hiddenCell [ text (String.fromInt course.crn) ]
@@ -432,3 +387,48 @@ externalLink : String -> String -> Html msg
 externalLink url label =
     a [ href url, target "_blank" ]
         [ text label ]
+
+
+sidebarLink : Model -> String -> Html Msg
+sidebarLink model string =
+    li
+        [ style "font-size" "0.8em"
+        , style "color" "#99979c"
+        , onClick (Filter string)
+        , style "cursor" "pointer"
+        ]
+        [ if model.filter == string then
+            b [] [ text string ]
+          else
+            text string
+        ]
+
+
+accordionLink : Model -> String -> ListGroup.Item Msg
+accordionLink model string =
+    ListGroup.li
+        [ ListGroup.attrs
+            [ style "font-size" "0.8em"
+            , let
+                value =
+                    case string == "All" of
+                        True ->
+                            ""
+
+                        False ->
+                            string
+              in
+              onClick (Filter value)
+            , style "cursor" "pointer"
+            , Border.topNone
+            , Spacing.pt1
+            ]
+        , ListGroup.light
+        ]
+        [ if model.filter == string then
+            b [] [ text string ]
+          else if model.filter == "" && string == "All" then
+            b [] [ text string ]
+          else
+            text string
+        ]
