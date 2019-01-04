@@ -325,9 +325,13 @@ viewTimestamp model =
 viewFooter : Model -> Html Msg
 viewFooter model =
     footer
-        footerStyle
+        [ class "bd-footer text-muted"
+        , style "background-color" "#f7f7f7"
+        , Spacing.py5
+        , Spacing.px2
+        ]
         [ div [ class "container" ]
-            [ Grid.containerFluid
+            [ Grid.container
                 []
                 [ Grid.row
                     [ Row.centerSm ]
@@ -368,7 +372,6 @@ viewFooter model =
                         [ span
                             []
                             [ text "Last Updated: "
-                            , br [] []
                             , viewTimestamp model
                             ]
                         ]
