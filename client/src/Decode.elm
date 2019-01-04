@@ -8,15 +8,14 @@ import Model exposing (..)
 
 instructorDecoder : Decode.Decoder Instructor
 instructorDecoder =
-    Decode.map7
-        Instructor
-        (Decode.field "id" Decode.int)
-        (Decode.field "fullName" Decode.string)
-        (Decode.maybe (Decode.field "firstName" Decode.string))
-        (Decode.maybe (Decode.field "lastName" Decode.string))
-        (Decode.maybe (Decode.field "rating" Decode.float))
-        (Decode.maybe (Decode.field "url" Decode.string))
-        (Decode.field "timestamp" Decode.string)
+    Decode.succeed Instructor
+        |> Decode.andMap (Decode.field "id" Decode.int)
+        |> Decode.andMap (Decode.field "fullName" Decode.string)
+        |> Decode.andMap (Decode.maybe (Decode.field "firstName" Decode.string))
+        |> Decode.andMap (Decode.maybe (Decode.field "lastName" Decode.string))
+        |> Decode.andMap (Decode.maybe (Decode.field "rating" Decode.float))
+        |> Decode.andMap (Decode.maybe (Decode.field "url" Decode.string))
+        |> Decode.andMap (Decode.field "timestamp" Decode.string)
 
 
 courseDecoder : Decode.Decoder Course

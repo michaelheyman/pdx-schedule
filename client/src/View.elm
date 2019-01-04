@@ -16,33 +16,37 @@ import Bootstrap.Utilities.Border as Border
 import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
+import Browser exposing (Document)
 import Html exposing (Html, a, b, br, div, footer, h1, i, li, main_, nav, p, span, text, ul)
-import Html.Attributes exposing (..)
+import Html.Attributes exposing (attribute, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
 import Http
 import Model exposing (..)
 import Round exposing (round)
-import Styles exposing (..)
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
-    div []
-        (case model.response of
-            Loading ->
-                [ viewProgressBar model.loadingValue ]
+    { title = "PSU Schedule"
+    , body =
+        [ div []
+            (case model.response of
+                Loading ->
+                    [ viewProgressBar model.loadingValue ]
 
-            Success ->
-                renderPage model
+                Success ->
+                    renderPage model
 
-            Failure _ ->
-                [ Alert.simpleDanger []
-                    [ Html.strong [] [ text "Oh snap! " ]
-                    , text "There was a problem loading the page."
+                Failure _ ->
+                    [ Alert.simpleDanger []
+                        [ Html.strong [] [ text "Oh snap! " ]
+                        , text "There was a problem loading the page."
+                        ]
                     ]
-                ]
-        )
+            )
+        ]
+    }
 
 
 renderPage : Model -> List (Html Msg)
@@ -80,7 +84,14 @@ renderPage model =
 pageHeader : Html Msg
 pageHeader =
     div
-        pageHeaderStyle
+        [ class "bd-pageheader"
+        , style "background-color" "#563d7c"
+        , style "color" "white"
+        , Spacing.pt5
+        , Spacing.pb5
+        , Spacing.mb3
+        , Spacing.mb5Md
+        ]
         [ Grid.containerFluid []
             [ Grid.row []
                 [ Grid.col
@@ -189,7 +200,11 @@ courseTable model =
             Table.thead [ Table.headAttr (class "thead-dark") ]
                 [ Table.tr
                     []
-                    [ Table.th hiddenCell [ text "Id" ]
+                    [ Table.th
+                        [ Table.cellAttr (style "display" "none")
+                        , Table.cellAttr (style "visibility" "hidden")
+                        ]
+                        [ text "Id" ]
                     , Table.th [] [ text "Class" ]
                     , Table.th
                         [ Table.cellAttr Display.none
@@ -223,15 +238,11 @@ courseTable model =
                             String.startsWith
                                 (String.toLower model.search)
                                 (String.toLower c.number)
-                        )
-                        (List.filter
-                            (\c ->
-                                String.startsWith
+                                && String.startsWith
                                     (String.toLower model.filter)
                                     (String.toLower c.discipline)
-                            )
-                            model.courses
                         )
+                        model.courses
                     )
                 )
         }
@@ -242,7 +253,11 @@ courseRow course =
     Table.tr
         [ Table.rowAttr Flex.col
         ]
-        [ Table.td hiddenCell [ text (String.fromInt course.id) ]
+        [ Table.td
+            [ Table.cellAttr (style "display" "none")
+            , Table.cellAttr (style "visibility" "hidden")
+            ]
+            [ text (String.fromInt course.id) ]
         , Table.td
             [ Table.cellAttr (class "text-nowrap")
             ]
@@ -273,7 +288,11 @@ courseRow course =
             , Table.cellAttr Display.tableCellXl
             ]
             [ text (String.fromInt course.credits) ]
-        , Table.td hiddenCell [ text (String.fromInt course.crn) ]
+        , Table.td
+            [ Table.cellAttr (style "display" "none")
+            , Table.cellAttr (style "visibility" "hidden")
+            ]
+            [ text (String.fromInt course.crn) ]
         , Table.td
             [ Table.cellAttr Display.tableCellSm
             ]
