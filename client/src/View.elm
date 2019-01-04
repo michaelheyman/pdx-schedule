@@ -138,10 +138,18 @@ pageHeader : Html Msg
 pageHeader =
     div
         pageHeaderStyle
-        [ div
-            [ class "container"
+        [ Grid.containerFluid []
+            [ Grid.row []
+                [ Grid.col
+                    [ Col.offsetXs1
+                    , Col.offsetMd2
+                    , Col.offsetXl0
+                    ]
+                    [ div [ class "container" ]
+                        [ h1 [] [ text "PSU Schedule" ] ]
+                    ]
+                ]
             ]
-            [ h1 [] [ text "PSU Schedule" ] ]
         ]
 
 
@@ -225,12 +233,14 @@ courseTable model =
         , thead =
             Table.thead [ Table.headAttr (class "thead-dark") ]
                 [ Table.tr
-                    [ Table.rowAttr Display.none
-                    , Table.rowAttr Display.tableRowSm
-                    ]
+                    []
                     [ Table.th hiddenCell [ text "Id" ]
                     , Table.th [] [ text "Class" ]
-                    , Table.th [] [ text "Name" ]
+                    , Table.th
+                        [ Table.cellAttr Display.none
+                        , Table.cellAttr Display.tableCellMd
+                        ]
+                        [ text "Name" ]
                     , Table.th
                         [ Table.cellAttr Display.none
                         , Table.cellAttr Display.tableCellMd
@@ -279,28 +289,24 @@ courseRow course =
         ]
         [ Table.td hiddenCell [ text (String.fromInt course.id) ]
         , Table.td
-            [ Table.cellAttr Display.block
-            , Table.cellAttr Display.tableCellSm
-            , Table.cellAttr (class "text-nowrap")
+            [ Table.cellAttr (class "text-nowrap")
             ]
             [ text course.number ]
         , Table.td
-            [ Table.cellAttr Display.block
+            [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellSm
             , Table.cellAttr Flex.nowrap
             ]
             [ text course.name ]
         , Table.td
-            [ Table.cellAttr Display.block
-            , Table.cellAttr Display.noneSm
+            [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellMd
             ]
             [ Maybe.map (\days -> text days) course.days
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
-            [ Table.cellAttr Display.block
-            , Table.cellAttr Display.noneSm
+            [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellMd
             , Table.cellAttr (class "text-nowrap")
             ]
@@ -314,15 +320,13 @@ courseRow course =
             [ text (String.fromInt course.credits) ]
         , Table.td hiddenCell [ text (String.fromInt course.crn) ]
         , Table.td
-            [ Table.cellAttr Display.block
-            , Table.cellAttr Display.tableCellSm
+            [ Table.cellAttr Display.tableCellSm
             ]
             [ Maybe.map viewName course.instructor
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
-            [ Table.cellAttr Display.block
-            , Table.cellAttr Display.tableCellSm
+            [ Table.cellAttr Display.tableCellSm
             ]
             [ Maybe.map viewRating course.instructor
                 |> Maybe.withDefault (text "")
@@ -368,24 +372,57 @@ viewFooter model =
     footer
         footerStyle
         [ div [ class "container" ]
-            [ div
-                [ Flex.block
-                , Flex.justifyBetween
-                ]
-                [ span
-                    [ class "bd-footer-links" ]
-                    [ i [ class "fa fa-github", attribute "aria-hidden" "true" ] []
-                    , externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source"
+            [ Grid.containerFluid
+                []
+                [ Grid.row
+                    [ Row.centerSm ]
+                    [ Grid.col [ Col.xs12, Col.md6 ]
+                        [ span
+                            [ class "bd-footer-links" ]
+                            [ i [ class "fa fa-github", attribute "aria-hidden" "true" ] []
+                            , externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source"
+                            ]
+                        ]
+                    , Grid.col
+                        [ Col.xs12
+                        , Col.md6
+                        , Col.attrs
+                            [ Flex.row
+                            , Flex.alignItemsEnd
+
+                            -- TODO: remove the following when elm-boostrap supports Text.align in things other than Cards
+                            , class "text-right"
+                            , Display.none
+                            , Display.blockMd
+                            ]
+                        ]
+                        [ span
+                            []
+                            [ text "Last Updated: "
+                            , viewTimestamp model
+                            ]
+                        ]
+                    , Grid.col
+                        [ Col.xs12
+                        , Col.attrs
+                            [ Flex.row
+                            , Display.noneMd
+                            , Spacing.mt2
+                            ]
+                        ]
+                        [ span
+                            []
+                            [ text "Last Updated: "
+                            , br [] []
+                            , viewTimestamp model
+                            ]
+                        ]
+                    , Grid.col
+                        [ Col.attrs [ Spacing.mt5, Spacing.mt4Md ] ]
+                        [ p []
+                            [ text "The contents of this page are not sanctioned by Portland State University." ]
+                        ]
                     ]
-                , span
-                    []
-                    [ text "Last Updated: "
-                    , viewTimestamp model
-                    ]
-                ]
-            , br [] []
-            , div []
-                [ p [] [ text "The contents of this page are not sanctioned by Portland State University." ]
                 ]
             ]
         ]
