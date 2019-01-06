@@ -1,8 +1,7 @@
-module View exposing (..)
+module View exposing (view)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Alert as Alert
-import Bootstrap.CDN as CDN
 import Bootstrap.Card as Card
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
@@ -17,12 +16,11 @@ import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
-import Html exposing (Html, a, b, br, div, footer, h1, i, li, main_, nav, p, span, text, ul)
+import Html exposing (Html, a, b, div, footer, h1, i, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
-import Http
-import Model exposing (..)
+import Model exposing (Course, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
 
@@ -116,7 +114,7 @@ viewSidebar model =
                 , style "list-style-type" "none"
                 , Spacing.pl2
                 ]
-                ([ li
+                (li
                     [ style "font-size" "0.8em"
                     , style "color" "#99979c"
                     , onClick (Filter "")
@@ -127,8 +125,7 @@ viewSidebar model =
                       else
                         text "All"
                     ]
-                 ]
-                    ++ List.map
+                    :: List.map
                         (sidebarLink model)
                         model.disciplines
                 )
@@ -175,8 +172,8 @@ viewAccordion model =
                     Accordion.header [ Spacing.pl0 ] <| Accordion.toggle [] [ text "Disciplines" ]
                 , blocks =
                     [ Accordion.listGroup
-                        ([ accordionLink model "All" ]
-                            ++ List.map (accordionLink model) model.disciplines
+                        (accordionLink model "All"
+                            :: List.map (accordionLink model) model.disciplines
                         )
                     ]
                 }
@@ -387,7 +384,7 @@ viewFooter model =
                             [ Flex.row
                             , Flex.alignItemsEnd
 
-                            -- TODO: remove the following when elm-boostrap supports Text.align in things other than Cards
+                            -- NOTE: remove the following when elm-boostrap supports Text.align in things other than Cards
                             , class "text-right"
                             , Display.none
                             , Display.blockMd
@@ -464,12 +461,10 @@ accordionLink model string =
             [ style "font-size" "0.8em"
             , let
                 value =
-                    case string == "All" of
-                        True ->
-                            ""
-
-                        False ->
-                            string
+                    if string == "All" then
+                        ""
+                    else
+                        string
               in
               onClick (Filter value)
             , style "cursor" "pointer"

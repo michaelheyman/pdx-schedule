@@ -1,8 +1,8 @@
-module Subscriptions exposing (..)
+module Subscriptions exposing (subscriptions)
 
 import Bootstrap.Accordion as Accordion
-import Model exposing (..)
-import Time exposing (..)
+import Model exposing (Model, Msg(..), Response(..))
+import Time exposing (every)
 
 
 subscriptions : Model -> Sub Msg

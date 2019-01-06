@@ -1,16 +1,15 @@
-module Main exposing (..)
+module Main exposing (init, main)
 
 import Bootstrap.Accordion as Accordion
 import Browser
-import Decode exposing (..)
-import Model exposing (..)
-import Process
-import Subscriptions exposing (..)
-import Time exposing (..)
-import Update exposing (..)
-import View exposing (..)
+import Decode exposing (getCourseList)
+import Model exposing (Model, Msg(..), Response(..))
+import Subscriptions exposing (subscriptions)
+import Update exposing (update)
+import View exposing (view)
 
 
+main : Program () Model Msg
 main =
     Browser.document
         { init = init

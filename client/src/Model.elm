@@ -1,4 +1,4 @@
-module Model exposing (..)
+module Model exposing (Course, Instructor, Model, Msg(..), Response(..))
 
 import Bootstrap.Accordion as Accordion
 import Http

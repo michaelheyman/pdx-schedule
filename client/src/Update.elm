@@ -1,9 +1,8 @@
-module Update exposing (..)
+module Update exposing (update)
 
 import Bootstrap.Accordion as Accordion
-import Http
-import List.Extra exposing (unique, uniqueBy)
-import Model exposing (..)
+import List.Extra exposing (unique)
+import Model exposing (Model, Msg(..), Response(..))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

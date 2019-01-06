@@ -1,9 +1,9 @@
-module Decode exposing (..)
+module Decode exposing (getCourseList)
 
 import Http
 import Json.Decode as Decode
 import Json.Decode.Extra as Decode
-import Model exposing (..)
+import Model exposing (Course, Instructor, Msg(..))
 
 
 instructorDecoder : Decode.Decoder Instructor
