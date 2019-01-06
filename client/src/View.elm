@@ -18,7 +18,7 @@ import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
 import Html exposing (Html, a, b, br, div, footer, h1, i, li, main_, nav, p, span, text, ul)
-import Html.Attributes exposing (attribute, class, href, style, target)
+import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
 import Http
@@ -31,54 +31,51 @@ view model =
     { title = "PSU Schedule"
     , body =
         [ div []
-            (case model.response of
+            [ case model.response of
                 Loading ->
-                    [ viewProgressBar model.loadingValue ]
+                    viewProgressBar model.loadingValue
 
                 Success ->
                     renderPage model
 
                 Failure _ ->
-                    [ Alert.simpleDanger []
-                        [ Html.strong [] [ text "Oh snap! " ]
-                        , text "There was a problem loading the page."
-                        ]
-                    ]
-            )
+                    viewError
+            ]
         ]
     }
 
 
-renderPage : Model -> List (Html Msg)
+renderPage : Model -> Html Msg
 renderPage model =
-    [ pageHeader
-    , Grid.containerFluid []
-        [ Grid.row
-            [ Row.centerSm ]
-            [ Grid.col
-                [ Col.attrs [ Display.none, Display.blockMd ]
-                , Col.xs12
-                , Col.md2
-                , Col.attrs [ class "bd-sidebar" ]
-                ]
-                [ lazy viewSidebar model ]
-            , Grid.col
-                [ Col.attrs [ Display.noneMd ]
-                , Col.xs12
-                , Col.md2
-                , Col.attrs [ class "bd-accordion" ]
-                ]
-                [ lazy viewAccordion model ]
-            , Grid.col
-                [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
-                [ main_
-                    []
-                    (viewPage model)
+    div []
+        [ pageHeader
+        , Grid.containerFluid []
+            [ Grid.row
+                [ Row.centerSm ]
+                [ Grid.col
+                    [ Col.attrs [ Display.none, Display.blockMd ]
+                    , Col.xs12
+                    , Col.md2
+                    , Col.attrs [ class "bd-sidebar" ]
+                    ]
+                    [ lazy viewSidebar model ]
+                , Grid.col
+                    [ Col.attrs [ Display.noneMd ]
+                    , Col.xs12
+                    , Col.md2
+                    , Col.attrs [ class "bd-accordion" ]
+                    ]
+                    [ lazy viewAccordion model ]
+                , Grid.col
+                    [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
+                    [ main_
+                        []
+                        [ viewPage model ]
+                    ]
                 ]
             ]
+        , viewFooter model
         ]
-    , viewFooter model
-    ]
 
 
 pageHeader : Html Msg
@@ -139,11 +136,12 @@ viewSidebar model =
         ]
 
 
-viewPage : Model -> List (Html Msg)
+viewPage : Model -> Html Msg
 viewPage model =
-    [ viewInput
-    , lazy courseTable model
-    ]
+    div []
+        [ viewInput
+        , lazy courseTable model
+        ]
 
 
 viewInput : Html Msg
@@ -152,7 +150,10 @@ viewInput =
         [ Input.id "searchInput"
         , Input.placeholder "Search for class.."
         , Input.onInput Search
-        , Input.attrs [ Spacing.mb4 ]
+        , Input.attrs
+            [ Spacing.mb4
+            , autocomplete False
+            ]
         ]
 
 
@@ -189,6 +190,14 @@ viewProgressBar value =
         [ Progress.value value
         , Progress.striped
         , Progress.label "loading"
+        ]
+
+
+viewError : Html Msg
+viewError =
+    Alert.simpleDanger []
+        [ Html.strong [] [ text "Oh snap! " ]
+        , text "There was a problem loading the page."
         ]
 
 
@@ -234,22 +243,26 @@ courseTable model =
             Table.tbody []
                 (List.map courseRow
                     (List.filter
-                        (\c ->
-                            (String.contains
-                                (String.toLower model.search)
-                                (String.toLower c.name)
-                                || String.startsWith
-                                    (String.toLower model.search)
-                                    (String.toLower c.number)
-                            )
-                                && String.startsWith
-                                    (String.toLower model.filter)
-                                    (String.toLower c.discipline)
-                        )
+                        (filterCourse model.search model.filter)
                         model.courses
                     )
                 )
         }
+
+
+filterCourse : String -> String -> Course -> Bool
+filterCourse search filter c =
+    let
+        containsName =
+            String.contains (String.toLower search) (String.toLower c.name)
+
+        startsWithSearch =
+            String.startsWith (String.toLower search) (String.toLower c.number)
+
+        startsWithFilter =
+            String.startsWith (String.toLower filter) (String.toLower c.discipline)
+    in
+    startsWithFilter && (startsWithSearch || containsName)
 
 
 courseRow : Course -> Table.Row msg
@@ -326,20 +339,22 @@ viewRating instructor =
 
 viewTimestamp : Model -> Html Msg
 viewTimestamp model =
+    let
+        timeFormat course =
+            String.dropRight 5
+                (String.map
+                    (\x ->
+                        if Char.isAlpha x then
+                            ' '
+                        else
+                            x
+                    )
+                    course.timestamp
+                )
+    in
     case List.head <| List.sortBy .timestamp model.courses of
         Just course ->
-            text
-                (String.dropRight 5
-                    (String.map
-                        (\x ->
-                            if Char.isAlpha x then
-                                ' '
-                            else
-                                x
-                        )
-                        course.timestamp
-                    )
-                )
+            text (timeFormat course)
 
         Nothing ->
             text ""
@@ -417,21 +432,33 @@ externalLink url label =
 
 sidebarLink : Model -> String -> Html Msg
 sidebarLink model string =
+    let
+        disciplineText =
+            if model.filter == string then
+                b [] [ text string ]
+            else
+                text string
+    in
     li
         [ style "font-size" "0.8em"
         , style "color" "#99979c"
         , onClick (Filter string)
         , style "cursor" "pointer"
         ]
-        [ if model.filter == string then
-            b [] [ text string ]
-          else
-            text string
-        ]
+        [ disciplineText ]
 
 
 accordionLink : Model -> String -> ListGroup.Item Msg
 accordionLink model string =
+    let
+        disciplineText =
+            if model.filter == string then
+                b [] [ text string ]
+            else if model.filter == "" && string == "All" then
+                b [] [ text string ]
+            else
+                text string
+    in
     ListGroup.li
         [ ListGroup.attrs
             [ style "font-size" "0.8em"
@@ -451,10 +478,4 @@ accordionLink model string =
             ]
         , ListGroup.light
         ]
-        [ if model.filter == string then
-            b [] [ text string ]
-          else if model.filter == "" && string == "All" then
-            b [] [ text string ]
-          else
-            text string
-        ]
+        [ disciplineText ]
