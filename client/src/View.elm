@@ -235,9 +235,13 @@ courseTable model =
                 (List.map courseRow
                     (List.filter
                         (\c ->
-                            String.startsWith
+                            (String.contains
                                 (String.toLower model.search)
-                                (String.toLower c.number)
+                                (String.toLower c.name)
+                                || String.startsWith
+                                    (String.toLower model.search)
+                                    (String.toLower c.number)
+                            )
                                 && String.startsWith
                                     (String.toLower model.filter)
                                     (String.toLower c.discipline)
