@@ -50,7 +50,7 @@ renderPage model =
         [ pageHeader
         , Grid.containerFluid []
             [ Grid.row
-                [ Row.centerSm ]
+                [ Row.centerXs ]
                 [ Grid.col
                     [ Col.attrs [ Display.none, Display.blockMd ]
                     , Col.xs12
@@ -232,34 +232,20 @@ mobileCourseRow course =
         , Table.td [ Table.cellDark ] [ text course.number ]
         ]
     , Table.tr
-        [ Table.rowAttr Flex.col
+        [ Table.rowAttr (style "word-wrap" "break-word")
+        , Table.rowAttr (style "word-break" "break-all")
         ]
         [ Table.th [] [ text "Name" ]
-        , Table.td [] [ text course.name ]
+        , Table.td [ Table.cellAttr Flex.wrap ] [ text course.name ]
         ]
-    , Table.tr
-        [ Table.rowAttr Flex.col
-        ]
-        [ Table.th [] [ text "Instructor" ]
-        , Table.td
-            []
-            [ Maybe.map viewName course.instructor
-                |> Maybe.withDefault (text "")
-            ]
-        ]
-    , Table.tr
-        [ Table.rowAttr Flex.col
-        ]
+    , Table.tr []
         [ Table.th [] [ text "Days" ]
-        , Table.td
-            []
+        , Table.td []
             [ Maybe.map (\days -> text days) course.days
                 |> Maybe.withDefault (text "")
             ]
         ]
-    , Table.tr
-        [ Table.rowAttr Flex.col
-        ]
+    , Table.tr []
         [ Table.th [] [ text "Time" ]
         , Table.td
             []
@@ -267,9 +253,15 @@ mobileCourseRow course =
                 |> Maybe.withDefault (text "")
             ]
         ]
-    , Table.tr
-        [ Table.rowAttr Flex.col
+    , Table.tr []
+        [ Table.th [] [ text "Instructor" ]
+        , Table.td
+            [ Table.cellAttr Flex.wrap ]
+            [ Maybe.map viewName course.instructor
+                |> Maybe.withDefault (text "")
+            ]
         ]
+    , Table.tr []
         [ Table.th [] [ text "Rating" ]
         , Table.td
             []
