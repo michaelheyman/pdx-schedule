@@ -140,6 +140,7 @@ viewPage : Model -> Html Msg
 viewPage model =
     div []
         [ viewInput
+        , lazy mobileCourseTable model
         , lazy courseTable model
         ]
 
@@ -201,14 +202,98 @@ viewError =
         ]
 
 
+mobileCourseTable : Model -> Html Msg
+mobileCourseTable model =
+    Table.table
+        { options = []
+        , thead =
+            Table.thead []
+                []
+        , tbody =
+            Table.tbody [ Display.noneSm ]
+                (List.foldr (++)
+                    []
+                    (List.map mobileCourseRow
+                        (List.filter
+                            (filterCourse model.search model.filter)
+                            model.courses
+                        )
+                    )
+                )
+        }
+
+
+mobileCourseRow : Course -> List (Table.Row msg)
+mobileCourseRow course =
+    [ Table.tr
+        [ Table.rowAttr Flex.col
+        ]
+        [ Table.th [ Table.cellDark ] [ text "Class" ]
+        , Table.td [ Table.cellDark ] [ text course.number ]
+        ]
+    , Table.tr
+        [ Table.rowAttr Flex.col
+        ]
+        [ Table.th [] [ text "Name" ]
+        , Table.td [] [ text course.name ]
+        ]
+    , Table.tr
+        [ Table.rowAttr Flex.col
+        ]
+        [ Table.th [] [ text "Instructor" ]
+        , Table.td
+            []
+            [ Maybe.map viewName course.instructor
+                |> Maybe.withDefault (text "")
+            ]
+        ]
+    , Table.tr
+        [ Table.rowAttr Flex.col
+        ]
+        [ Table.th [] [ text "Days" ]
+        , Table.td
+            []
+            [ Maybe.map (\days -> text days) course.days
+                |> Maybe.withDefault (text "")
+            ]
+        ]
+    , Table.tr
+        [ Table.rowAttr Flex.col
+        ]
+        [ Table.th [] [ text "Time" ]
+        , Table.td
+            []
+            [ Maybe.map (\time -> text time) course.time
+                |> Maybe.withDefault (text "")
+            ]
+        ]
+    , Table.tr
+        [ Table.rowAttr Flex.col
+        ]
+        [ Table.th [] [ text "Rating" ]
+        , Table.td
+            []
+            [ Maybe.map viewRating course.instructor
+                |> Maybe.withDefault (text "")
+            ]
+        ]
+    , Table.tr []
+        [ Table.th [] []
+        , Table.td [] []
+        ]
+    ]
+
+
 courseTable : Model -> Html Msg
 courseTable model =
     Table.table
-        { options = [ Table.hover, Table.responsiveXl, Table.striped ]
+        { options = [ Table.hover, Table.responsive, Table.striped ]
         , thead =
             Table.thead [ Table.headAttr (class "thead-dark") ]
                 [ Table.tr
-                    []
+                    [ Table.rowAttr Display.none
+                    , Table.rowAttr Display.tableRowSm
+                    ]
                     [ Table.th
                         [ Table.cellAttr (style "display" "none")
                         , Table.cellAttr (style "visibility" "hidden")
@@ -269,6 +354,8 @@ courseRow : Course -> Table.Row msg
 courseRow course =
     Table.tr
         [ Table.rowAttr Flex.col
+        , Table.rowAttr Display.none
+        , Table.rowAttr Display.tableRowSm
         ]
         [ Table.td
             [ Table.cellAttr (style "display" "none")
