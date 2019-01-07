@@ -1,8 +1,10 @@
 module Update exposing (update)
 
 import Bootstrap.Accordion as Accordion
+import Browser.Dom as Dom
 import List.Extra exposing (unique)
 import Model exposing (Model, Msg(..), Response(..))
+import Task
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -43,8 +45,16 @@ update msg model =
                 | filter = str
                 , accordionState = Accordion.initialState
               }
-            , Cmd.none
+            , resetViewport
             )
 
         AccordionMsg state ->
             ( { model | accordionState = state }, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
+
+
+resetViewport : Cmd Msg
+resetViewport =
+    Task.perform (\_ -> NoOp) (Dom.setViewport 0 0)

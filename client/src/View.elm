@@ -16,7 +16,8 @@ import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
-import Html exposing (Html, a, b, div, footer, h1, i, li, main_, nav, p, span, text, ul)
+import Color exposing (rgba)
+import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
@@ -95,7 +96,9 @@ pageHeader =
                     , Col.offsetXl0
                     ]
                     [ div [ class "container" ]
-                        [ h1 [] [ text "PSU Schedule" ] ]
+                        [ h1 [] [ text "PSU Schedule" ]
+                        , h6 [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ] [ text "Winter 2019" ]
+                        ]
                     ]
                 ]
             ]

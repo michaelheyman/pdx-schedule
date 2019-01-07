@@ -28,6 +28,7 @@ type Msg
     | Search String
     | Filter String
     | AccordionMsg Accordion.State
+    | NoOp
 
 
 type alias Course =
