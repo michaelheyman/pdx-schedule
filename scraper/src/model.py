@@ -70,78 +70,172 @@ class InstructorMgr:
 class Instructor(Base):
     __tablename__ = "Instructor"
 
-    id = Column("Id", Integer, primary_key=True)
+    instructor_id = Column("InstructorId", Integer, primary_key=True)
     full_name = Column("FullName", String, nullable=False)
     first_name = Column("FirstName", String)
     last_name = Column("LastName", String)
     rating = Column("Rating", Float)
     url = Column("URL", String)
-    timestamp = Column("Timestamp", DateTime, default=datetime.now)
 
     def __repr__(self):
         return (
-            f"<Instructor(id={self.id}, "
-            "name={self.full_name}, "
-            "rating={self.rating}, "
-            "url={self.url}, "
-            "timestamp={self.timestamp})>"
+            f"<Instructor(id={self.instructor_id}, "
+            f"name={self.full_name}, "
+            f"rating={self.rating}, "
+            f"url={self.url}, "
         )
 
 
 class CourseMgr:
     @staticmethod
-    def add_course(
-        name, crn, number, discipline, days, time, credits, instructor_id=None
-    ):
-        course = Course(
-            name=name,
-            crn=crn,
-            number=number,
-            days=days,
-            time=time,
-            credits=credits,
-            discipline=discipline,
-            instructor_id=instructor_id,
-        )
-        DBSession.add(course)
-        DBSession.commit()
+    def add_course(name, number, discipline):
+        exists = (
+            DBSession.query(Course)
+            .filter(
+                Course.name == name,
+                Course.number == number,
+                Course.discipline == discipline,
+            )
+            .first()
+        ) is not None
+
+        if not exists:
+            course = Course(name=name, number=number, discipline=discipline)
+            DBSession.add(course)
+            DBSession.commit()
 
 
 class Course(Base):
     __tablename__ = "Course"
 
-    id = Column("Id", Integer, primary_key=True)
+    course_id = Column("CourseId", Integer, primary_key=True)
     name = Column("Name", String, nullable=False)
     number = Column("Class", String, nullable=False)
     discipline = Column("Discipline", String, nullable=False)
+
+    def __repr__(self):
+        return (
+            f"<Course(id={self.course_id}, "
+            f"name={self.name}, "
+            f"number={self.number}, "
+            f"discipline={self.discipline}, "
+        )
+
+
+class ClassOfferingMgr:
+    @staticmethod
+    def add_class_offering(
+        course_name, course_number, instructor_name, term, credits, days, time, crn
+    ):
+        course_id = (
+            DBSession.query(Course.course_id)
+            .filter(Course.name == course_name, Course.number == course_number)
+            .scalar()
+        )
+        instructor_id = (
+            DBSession.query(Instructor.instructor_id)
+            .filter(Instructor.full_name == instructor_name)
+            .scalar()
+        )
+
+        class_offering_record = (
+            DBSession.query(ClassOffering)
+            .filter(
+                ClassOffering.term == term,
+                ClassOffering.course_id == course_id,
+                ClassOffering.instructor_id == instructor_id,
+                ClassOffering.crn == crn,
+                ClassOffering.credits == credits,
+            )
+            .first()
+        )
+
+        if class_offering_record is None:
+            class_offering_record = ClassOffering(
+                course_id=course_id,
+                instructor_id=instructor_id,
+                term=term,
+                credits=credits,
+                crn=crn,
+                days=days,
+                time=time,
+            )
+
+            DBSession.add(class_offering_record)
+            DBSession.flush()
+        else:
+            LOG.error(f"{class_offering_record} was already in db!")
+        DBSession.commit()
+
+        return class_offering_record
+
+
+class ClassOffering(Base):
+    __tablename__ = "ClassOffering"
+
+    class_offering_id = Column("ClassOfferingId", Integer, primary_key=True)
+    course_id = Column(
+        "CourseId", Integer, ForeignKey("Course.CourseId"), nullable=False
+    )
+    course = relationship("Course")
+    instructor_id = Column(
+        "InstructorId", Integer, ForeignKey("Instructor.InstructorId")
+    )
+    instructor = relationship("Instructor")
+    term = Column("Term", String, ForeignKey("Term.Description"))
+    credits = Column("Credits", Integer, nullable=False)
     days = Column("Days", String)
     time = Column("Time", String)
-    credits = Column("Credits", Integer, nullable=False)
     crn = Column("CRN", Integer, nullable=False)
-    instructor_id = Column("InstructorId", Integer, ForeignKey("Instructor.Id"))
-    instructor = relationship("Instructor")
     timestamp = Column("Timestamp", DateTime, default=datetime.now)
 
     def __repr__(self):
         return (
-            f"<Course(id={self.id}, "
-            "name={self.name}, "
-            "number={self.number}, "
-            "days={self.days}, "
-            "time={self.time}, "
-            "credits={self.credits}, "
-            "crn={self.crn}, "
-            "discipline={self.discipline}, "
-            "instructor_id={self.instructor_id}, "
-            "instructor={self.instructor}, "
-            "timestamp={self.timestamp})>"
+            f"<ClassOfferingId(id={self.class_offering_id}, "
+            f"course_id={self.course_id}, "
+            f"instructor_id={self.instructor_id}, "
+            f"credits={self.credits}, "
+            f"days={self.days}, "
+            f"time={self.time}, "
+            f"crn={self.crn}, "
+            f"timestamp={self.timestamp})>"
         )
+
+
+class TermMgr:
+    @staticmethod
+    def add_term(date, description):
+        term_record = (
+            DBSession.query(Term)
+            .filter(Term.date == date, Term.description == description)
+            .first()
+        )
+
+        if term_record is None:
+            term_record = Term(date=date, description=description)
+
+            DBSession.add(term_record)
+            DBSession.flush()
+            DBSession.commit()
+
+        return term_record
+
+
+class Term(Base):
+    __tablename__ = "Term"
+
+    date = Column("Date", Integer, primary_key=True)
+    description = Column("Description", String, primary_key=True)
+
+    def __repr__(self):
+        return f"<Term(date={self.date}, " f"description={self.description}, "
 
 
 def main():
     Base.metadata.create_all(engine)
     Course.__table__.drop(engine)
     Instructor.__table__.drop(engine)
+    ClassOffering.__table__.drop(engine)
 
 
 main()

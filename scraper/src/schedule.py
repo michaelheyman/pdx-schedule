@@ -6,7 +6,9 @@ from model import Base
 from model import engine
 from model import InstructorMgr
 from model import CourseMgr
+from model import ClassOfferingMgr
 from model import ConnectionMgr
+from model import TermMgr
 from crawler import crawl
 
 LOG = logging.getLogger(__name__)
@@ -26,19 +28,19 @@ class ScheduleScraper:
             LOG.error("No content found to scrape. Exiting.")
             return
 
-        for content in contents:
+        for content, term_name, term_date in contents:
             ScheduleScraper.soup = BeautifulSoup(content, "lxml")
             discipline = ScheduleScraper.soup.find("b").get_text()
 
             for elem in ScheduleScraper.soup.find_all(
                 "th", ScheduleScraper.TITLE_CLASS
             ):
-                ScheduleScraper.get_class_data(elem, discipline)
+                ScheduleScraper.get_class_data(elem, discipline, term_name, term_date)
 
         ConnectionMgr.commit()
 
     @staticmethod
-    def get_class_data(elem, discipline):
+    def get_class_data(elem, discipline, term_name, term_date):
         name, crn, number = ScheduleScraper.get_course(elem)
         credits = ScheduleScraper.get_credits(elem)
 
@@ -47,36 +49,32 @@ class ScheduleScraper:
         )
         if meeting_table_list:
             meeting_table = meeting_table_list[0]
-            instructor = ScheduleScraper.get_instructor(meeting_table)
+            instructor_name = ScheduleScraper.get_instructor(meeting_table)
             time, days = ScheduleScraper.get_schedule(meeting_table)
         else:
-            instructor = None
+            instructor_name = None
             time, days = (None, None)
             LOG.warning("No meeting table found for this class")
 
-        if instructor is None:
-            CourseMgr.add_course(
-                name=name,
-                crn=crn,
-                number=number,
-                discipline=discipline,
-                days=days,
-                time=time,
-                credits=credits,
-            )
+        if instructor_name is None:
+            CourseMgr.add_course(name=name, number=number, discipline=discipline)
             return
 
-        instructor_record = InstructorMgr.add_instructor(instructor)
-        CourseMgr.add_course(
-            name=name,
-            crn=crn,
-            number=number,
-            discipline=discipline,
+        InstructorMgr.add_instructor(instructor_name)
+        CourseMgr.add_course(name=name, number=number, discipline=discipline)
+
+        ClassOfferingMgr.add_class_offering(
+            course_name=name,
+            course_number=number,
+            instructor_name=instructor_name,
+            term=term_name,
+            credits=credits,
             days=days,
             time=time,
-            credits=credits,
-            instructor_id=instructor_record.id,
+            crn=crn,
         )
+
+        TermMgr.add_term(date=term_date, description=term_name)
 
     @staticmethod
     def get_discipline(elem):
@@ -102,6 +100,14 @@ class ScheduleScraper:
         if not time or not days:
             LOG.error("Invalid date and time information in page.")
             return None
+
+        format_time = time.split(" - ")
+        if len(format_time) is 2:
+            if len(format_time[0]) is 4:
+                format_time[0] = "0" + format_time[0]
+            if len(format_time[1]) is 4:
+                format_time[1] = "0" + format_time[1]
+            time = " - ".join(format_time)
 
         return time, days
 

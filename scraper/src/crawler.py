@@ -34,7 +34,9 @@ def crawl(local=False):
         return None
 
     latest_term = options[1]
-    latest_term_value = str(latest_term["value"])
+    latest_term_date = str(latest_term["value"])
+    latest_term_name = latest_term.get_text().split(" ")[0:2]
+    latest_term_name = " ".join(latest_term_name)
 
     persistence = init_page.cookies["persistence"]
     LOG.info(f"persistence: {persistence}")
@@ -45,7 +47,7 @@ def crawl(local=False):
         cookies={"persistence": persistence},
         data={
             "p_calling_proc": "bwckschd.p_disp_dyn_sched",
-            "p_term": latest_term_value,
+            "p_term": latest_term_date,
         },
     )
 
@@ -104,7 +106,7 @@ def crawl(local=False):
         if REDIRECT_STRING in term_page.text:
             LOG.error("Invalid request sent to scrape page")
 
-        yield scrape_page.content
+        yield scrape_page.content, latest_term_name, latest_term_date
 
 
 def open_local_file():
