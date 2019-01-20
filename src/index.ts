@@ -5,6 +5,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import { AppRoutes } from "./routes";
 
+require("dotenv").load();
 var PORT = process.env.PORT || 8080;
 
 // create connection with database
@@ -12,6 +13,11 @@ var PORT = process.env.PORT || 8080;
 // TypeORM creates connection pools and uses them for your requests
 createConnection()
     .then(async connection => {
+        // set up analytics
+        var ua = require("universal-analytics");
+        var visitor = ua(process.env.GA_TRACKING_ID);
+        visitor.pageview("/").send();
+
         // create express app
         const app = express();
         app.use(bodyParser.json());

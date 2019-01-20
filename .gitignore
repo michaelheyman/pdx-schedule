@@ -6,3 +6,4 @@ scraper/__pycache__
 scraper/src/__pycache__
 scraper/index.html
 .DS_Store
+.env
