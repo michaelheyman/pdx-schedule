@@ -64,7 +64,7 @@ renderPage model =
                     , Col.md2
                     , Col.attrs [ class "bd-accordion" ]
                     ]
-                    [--lazy viewAccordion model
+                    [ lazy viewAccordion model
                     ]
                 , Grid.col
                     [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
