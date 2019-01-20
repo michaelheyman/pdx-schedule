@@ -12,14 +12,14 @@ import {
     JoinTable,
     RelationId
 } from "typeorm";
-import { Course } from "./Course";
+import { ClassOffering } from "./ClassOffering";
 
 @Entity("Instructor")
 export class Instructor {
     @Column("integer", {
         nullable: false,
         primary: true,
-        name: "Id"
+        name: "InstructorId"
     })
     id: number;
 
@@ -53,13 +53,6 @@ export class Instructor {
     })
     url: string | null;
 
-    @Column("datetime", {
-        nullable: true,
-        name: "Timestamp"
-    })
-    timestamp: Date | null;
-
-    //@OneToMany(type => Course, Course => Course.instructor_)
-    @OneToMany(type => Course, Course => Course.instructor_id)
-    courses: Course[];
+    @OneToMany(type => ClassOffering, ClassOffering => ClassOffering.instructor)
+    classOfferings: ClassOffering[];
 }

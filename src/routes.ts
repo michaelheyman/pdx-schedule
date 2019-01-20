@@ -1,30 +1,12 @@
-import { instructorGetAllAction } from "./controller/InstructorGetAllAction";
-import { instructorGetByIdAction } from "./controller/InstructorGetByIdAction";
-import { courseGetAllAction } from "./controller/CourseGetAllAction";
-import { courseGetByIdAction } from "./controller/CourseGetByIdAction";
+import { classOfferingGetAllAction } from "./controller/ClassOfferingAction";
 
 /**
  * All application routes.
  */
 export const AppRoutes = [
     {
-        path: "/instructors",
+        path: "/classes",
         method: "get",
-        action: instructorGetAllAction
-    },
-    {
-        path: "/instructor/:id",
-        method: "get",
-        action: instructorGetByIdAction
-    },
-    {
-        path: "/courses",
-        method: "get",
-        action: courseGetAllAction
-    },
-    {
-        path: "/course/:id",
-        method: "get",
-        action: courseGetByIdAction
+        action: classOfferingGetAllAction
     }
 ];

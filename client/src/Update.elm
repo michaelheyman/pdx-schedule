@@ -10,17 +10,24 @@ import Task
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotCourseList result ->
+        GotClassList result ->
             case result of
                 Ok value ->
                     ( { model
                         | response = Success
-                        , courses = List.append model.courses value
+                        , classes = List.append model.classes value
                         , disciplines =
                             value
+                                |> List.map .course
                                 |> List.map .discipline
                                 |> unique
                                 |> List.append model.disciplines
+                        , term =
+                            value
+                                |> List.map .term
+                                |> List.map .description
+                                |> List.head
+                                |> Maybe.withDefault ""
                       }
                     , Cmd.none
                     )
@@ -28,7 +35,7 @@ update msg model =
                 Err error ->
                     ( { model
                         | response = Failure error
-                        , courses = []
+                        , classes = []
                         , disciplines = []
                       }
                     , Cmd.none

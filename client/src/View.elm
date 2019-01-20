@@ -21,7 +21,7 @@ import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, nav, p, spa
 import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
-import Model exposing (Course, Instructor, Model, Msg(..), Response(..))
+import Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
 
@@ -47,7 +47,7 @@ view model =
 renderPage : Model -> Html Msg
 renderPage model =
     div []
-        [ pageHeader
+        [ pageHeader model
         , Grid.containerFluid []
             [ Grid.row
                 [ Row.centerXs ]
@@ -64,7 +64,8 @@ renderPage model =
                     , Col.md2
                     , Col.attrs [ class "bd-accordion" ]
                     ]
-                    [ lazy viewAccordion model ]
+                    [--lazy viewAccordion model
+                    ]
                 , Grid.col
                     [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
                     [ main_
@@ -77,8 +78,8 @@ renderPage model =
         ]
 
 
-pageHeader : Html Msg
-pageHeader =
+pageHeader : Model -> Html Msg
+pageHeader model =
     div
         [ class "bd-pageheader"
         , style "background-color" "#563d7c"
@@ -97,7 +98,7 @@ pageHeader =
                     ]
                     [ div [ class "container" ]
                         [ h1 [] [ text "PSU Schedule" ]
-                        , h6 [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ] [ text "Winter 2019" ]
+                        , h6 [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ] [ text model.term ]
                         ]
                     ]
                 ]
@@ -216,32 +217,32 @@ mobileCourseTable model =
                     (List.map mobileCourseRow
                         (List.filter
                             (filterCourse model.search model.filter)
-                            model.courses
+                            model.classes
                         )
                     )
                 )
         }
 
 
-mobileCourseRow : Course -> List (Table.Row msg)
-mobileCourseRow course =
+mobileCourseRow : Class -> List (Table.Row msg)
+mobileCourseRow c =
     [ Table.tr
         [ Table.rowAttr Flex.col
         ]
         [ Table.th [ Table.cellDark ] [ text "Class" ]
-        , Table.td [ Table.cellDark ] [ text course.number ]
+        , Table.td [ Table.cellDark ] [ text c.course.number ]
         ]
     , Table.tr
         [ Table.rowAttr (style "word-wrap" "break-word")
         , Table.rowAttr (style "word-break" "break-all")
         ]
         [ Table.th [] [ text "Name" ]
-        , Table.td [ Table.cellAttr Flex.wrap ] [ text course.name ]
+        , Table.td [ Table.cellAttr Flex.wrap ] [ text c.course.name ]
         ]
     , Table.tr []
         [ Table.th [] [ text "Days" ]
         , Table.td []
-            [ Maybe.map (\days -> text days) course.days
+            [ Maybe.map (\days -> text days) c.days
                 |> Maybe.withDefault (text "")
             ]
         ]
@@ -249,7 +250,7 @@ mobileCourseRow course =
         [ Table.th [] [ text "Time" ]
         , Table.td
             []
-            [ Maybe.map (\time -> text time) course.time
+            [ Maybe.map (\time -> text time) c.time
                 |> Maybe.withDefault (text "")
             ]
         ]
@@ -257,7 +258,7 @@ mobileCourseRow course =
         [ Table.th [] [ text "Instructor" ]
         , Table.td
             [ Table.cellAttr Flex.wrap ]
-            [ Maybe.map viewName course.instructor
+            [ Maybe.map viewName c.instructor
                 |> Maybe.withDefault (text "")
             ]
         ]
@@ -265,7 +266,7 @@ mobileCourseRow course =
         [ Table.th [] [ text "Rating" ]
         , Table.td
             []
-            [ Maybe.map viewRating course.instructor
+            [ Maybe.map viewRating c.instructor
                 |> Maybe.withDefault (text "")
             ]
         ]
@@ -321,29 +322,29 @@ courseTable model =
                 (List.map courseRow
                     (List.filter
                         (filterCourse model.search model.filter)
-                        model.courses
+                        model.classes
                     )
                 )
         }
 
 
-filterCourse : String -> String -> Course -> Bool
+filterCourse : String -> String -> Class -> Bool
 filterCourse search filter c =
     let
         containsName =
-            String.contains (String.toLower search) (String.toLower c.name)
+            String.contains (String.toLower search) (String.toLower c.course.name)
 
         startsWithSearch =
-            String.startsWith (String.toLower search) (String.toLower c.number)
+            String.startsWith (String.toLower search) (String.toLower c.course.number)
 
         startsWithFilter =
-            String.startsWith (String.toLower filter) (String.toLower c.discipline)
+            String.startsWith (String.toLower filter) (String.toLower c.course.discipline)
     in
     startsWithFilter && (startsWithSearch || containsName)
 
 
-courseRow : Course -> Table.Row msg
-courseRow course =
+courseRow : Class -> Table.Row msg
+courseRow c =
     Table.tr
         [ Table.rowAttr Flex.col
         , Table.rowAttr Display.none
@@ -353,22 +354,22 @@ courseRow course =
             [ Table.cellAttr (style "display" "none")
             , Table.cellAttr (style "visibility" "hidden")
             ]
-            [ text (String.fromInt course.id) ]
+            [ text (String.fromInt c.course.id) ]
         , Table.td
             [ Table.cellAttr (class "text-nowrap")
             ]
-            [ text course.number ]
+            [ text c.course.number ]
         , Table.td
             [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellSm
             , Table.cellAttr Flex.nowrap
             ]
-            [ text course.name ]
+            [ text c.course.name ]
         , Table.td
             [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellLg
             ]
-            [ Maybe.map (\days -> text days) course.days
+            [ Maybe.map (\days -> text days) c.days
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
@@ -376,29 +377,29 @@ courseRow course =
             , Table.cellAttr Display.tableCellLg
             , Table.cellAttr (class "text-nowrap")
             ]
-            [ Maybe.map (\time -> text time) course.time
+            [ Maybe.map (\time -> text time) c.time
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
             [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellXl
             ]
-            [ text (String.fromInt course.credits) ]
+            [ text (String.fromInt c.credits) ]
         , Table.td
             [ Table.cellAttr (style "display" "none")
             , Table.cellAttr (style "visibility" "hidden")
             ]
-            [ text (String.fromInt course.crn) ]
+            [ text (String.fromInt c.crn) ]
         , Table.td
             [ Table.cellAttr Display.tableCellSm
             ]
-            [ Maybe.map viewName course.instructor
+            [ Maybe.map viewName c.instructor
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
             [ Table.cellAttr Display.tableCellSm
             ]
-            [ Maybe.map viewRating course.instructor
+            [ Maybe.map viewRating c.instructor
                 |> Maybe.withDefault (text "")
             ]
         ]
@@ -431,7 +432,7 @@ viewTimestamp model =
                     course.timestamp
                 )
     in
-    case List.head <| List.sortBy .timestamp model.courses of
+    case List.head <| List.sortBy .timestamp model.classes of
         Just course ->
             text (timeFormat course)
 

@@ -67,7 +67,7 @@ class ScheduleScraper:
             course_name=name,
             course_number=number,
             instructor_name=instructor_name,
-            term=term_name,
+            term=term_date,
             credits=credits,
             days=days,
             time=time,

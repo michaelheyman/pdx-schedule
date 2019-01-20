@@ -1,4 +1,4 @@
-module Model exposing (Course, Instructor, Model, Msg(..), Response(..))
+module Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..), Term)
 
 import Bootstrap.Accordion as Accordion
 import Http
@@ -13,8 +13,9 @@ type Response
 
 type alias Model =
     { response : Response
-    , courses : List Course
+    , classes : List Class
     , disciplines : List String
+    , term : String
     , loadingValue : Float
     , search : String
     , filter : String
@@ -23,7 +24,7 @@ type alias Model =
 
 
 type Msg
-    = GotCourseList (Result Http.Error (List Course))
+    = GotClassList (Result Http.Error (List Class))
     | IncrementProgressBar Time.Posix
     | Search String
     | Filter String
@@ -36,12 +37,6 @@ type alias Course =
     , name : String
     , number : String
     , discipline : String
-    , days : Maybe String
-    , time : Maybe String
-    , credits : Int
-    , crn : Int
-    , instructor : Maybe Instructor
-    , timestamp : String
     }
 
 
@@ -52,5 +47,23 @@ type alias Instructor =
     , lastName : Maybe String
     , rating : Maybe Float
     , url : Maybe String
+    }
+
+
+type alias Term =
+    { date : Int
+    , description : String
+    }
+
+
+type alias Class =
+    { id : Int
+    , credits : Int
+    , days : Maybe String
+    , time : Maybe String
+    , crn : Int
     , timestamp : String
+    , course : Course
+    , instructor : Maybe Instructor
+    , term : Term
     }

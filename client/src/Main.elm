@@ -2,7 +2,7 @@ module Main exposing (init, main)
 
 import Bootstrap.Accordion as Accordion
 import Browser
-import Decode exposing (getCourseList)
+import Decode exposing (getClassList)
 import Model exposing (Model, Msg(..), Response(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
@@ -22,12 +22,13 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { response = Loading
-      , courses = []
+      , classes = []
       , disciplines = []
+      , term = ""
       , loadingValue = 10
       , search = ""
       , filter = ""
       , accordionState = Accordion.initialState
       }
-    , getCourseList
+    , getClassList
     )

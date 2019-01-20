@@ -182,7 +182,7 @@ class ClassOffering(Base):
         "InstructorId", Integer, ForeignKey("Instructor.InstructorId")
     )
     instructor = relationship("Instructor")
-    term = Column("Term", String, ForeignKey("Term.Description"))
+    term = Column("Term", Integer, ForeignKey("Term.Description"))
     credits = Column("Credits", Integer, nullable=False)
     days = Column("Days", String)
     time = Column("Time", String)
