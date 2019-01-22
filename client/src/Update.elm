@@ -18,14 +18,12 @@ update msg model =
                         , classes = List.append model.classes value
                         , disciplines =
                             value
-                                |> List.map .course
-                                |> List.map .discipline
+                                |> List.map (.course >> .discipline)
                                 |> unique
                                 |> List.append model.disciplines
                         , term =
                             value
-                                |> List.map .term
-                                |> List.map .description
+                                |> List.map (.term >> .description)
                                 |> List.head
                                 |> Maybe.withDefault ""
                       }

@@ -214,11 +214,9 @@ mobileCourseTable model =
             Table.tbody [ Display.noneSm ]
                 (List.foldr (++)
                     []
-                    (List.map mobileCourseRow
-                        (List.filter
-                            (filterCourse model.search model.filter)
-                            model.classes
-                        )
+                    (model.classes
+                        |> List.filter (filterCourse model.search model.filter)
+                        |> List.map mobileCourseRow
                     )
                 )
         }
@@ -319,11 +317,9 @@ courseTable model =
                 ]
         , tbody =
             Table.tbody []
-                (List.map courseRow
-                    (List.filter
-                        (filterCourse model.search model.filter)
-                        model.classes
-                    )
+                (model.classes
+                    |> List.filter (filterCourse model.search model.filter)
+                    |> List.map courseRow
                 )
         }
 
