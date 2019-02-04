@@ -353,6 +353,7 @@ courseRow c =
             [ text (String.fromInt c.course.id) ]
         , Table.td
             [ Table.cellAttr (class "text-nowrap")
+            , Table.cellAttr Spacing.pr0
             ]
             [ text c.course.number ]
         , Table.td
@@ -364,6 +365,7 @@ courseRow c =
         , Table.td
             [ Table.cellAttr Display.none
             , Table.cellAttr Display.tableCellLg
+            , Table.cellAttr Spacing.pr0
             ]
             [ Maybe.map (\days -> text days) c.days
                 |> Maybe.withDefault (text "")
