@@ -36,6 +36,7 @@ instructorDecoder =
         |> Decode.andMap (Decode.maybe (Decode.field "lastName" Decode.string))
         |> Decode.andMap (Decode.maybe (Decode.field "rating" Decode.float))
         |> Decode.andMap (Decode.maybe (Decode.field "url" Decode.string))
+        |> Decode.andMap (Decode.field "timestamp" Decode.string)
 
 
 courseDecoder : Decode.Decoder Course

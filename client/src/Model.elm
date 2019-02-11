@@ -47,6 +47,7 @@ type alias Instructor =
     , lastName : Maybe String
     , rating : Maybe Float
     , url : Maybe String
+    , timestamp : String
     }
 
 

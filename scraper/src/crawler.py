@@ -19,8 +19,7 @@ def crawl(local=False):
     if local:
         return open_local_file()
 
-    session = requests.Session()
-    init_page = session.get(INIT_URL)
+    init_page = requests.get(INIT_URL)
 
     if not init_page.ok:
         LOG.error("Failed to access initial page")
@@ -39,9 +38,13 @@ def crawl(local=False):
     latest_term_name = latest_term.get_text().split(" ")[0:2]
     latest_term_name = " ".join(latest_term_name)
 
-    term_page = session.post(
+    persistence = init_page.cookies["persistence"]
+    LOG.info(f"persistence: {persistence}")
+
+    term_page = requests.post(
         TERM_URL,
         headers={"referer": INIT_URL},
+        cookies={"persistence": persistence},
         data={
             "p_calling_proc": "bwckschd.p_disp_dyn_sched",
             "p_term": latest_term_date,
@@ -63,9 +66,10 @@ def crawl(local=False):
         subject = term["value"]
         LOG.debug(subject)
 
-        scrape_page = session.post(
+        scrape_page = requests.post(
             SCHEDULE_URL,
             headers={"referer": TERM_URL},
+            cookies={"persistence": persistence},
             data=[
                 ("term_in", str(latest_term["value"])),
                 ("sel_subj", "dummy"),

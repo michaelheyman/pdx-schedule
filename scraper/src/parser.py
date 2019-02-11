@@ -3,11 +3,10 @@ import requests
 
 class RateMyProfessors:
     url = (
-        "http://search.mtvnservices.com/typeahead/suggest/?solrformat=true&"
-        "q={0}+AND+schoolid_s%3A775&"
-        "qf=teacherfirstname_t+teacherlastname_t+teacherfullname_t&"
-        "siteName=rmp&"
-        "fl=pk_id+teacherfirstname_t+teacherlastname_t+averageratingscore_rf&fq="
+        "https://search-production.ratemyprofessors.com/solr/rmp/select/?solrformat=true&"
+        "wt=json&q={0}&"
+        "qf=teacherfirstname_t%5E2000+teacherlastname_t%5E2000+teacherfullname_t&fq=schoolname_t"
+        "%3A%22Portland+State+University%22&fq=schoolid_s%3A775"
     )
 
     @staticmethod

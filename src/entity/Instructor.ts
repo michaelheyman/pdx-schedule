@@ -53,6 +53,12 @@ export class Instructor {
     })
     url: string | null;
 
+    @Column("datetime", {
+        nullable: true,
+        name: "Timestamp"
+    })
+    timestamp: Date | null;
+
     @OneToMany(type => ClassOffering, ClassOffering => ClassOffering.instructor)
     classOfferings: ClassOffering[];
 }

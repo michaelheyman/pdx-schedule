@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import create_engine
 from sqlalchemy import Column
@@ -41,30 +41,62 @@ class InstructorMgr:
         )
 
         if instructor_record is None:
-            try:
-                first_name, last_name, rating, rmp_id = RateMyProfessors.get_instructor(
-                    instructor
-                )
-            except ValueError:
-                LOG.debug(f"{instructor} not found")
-                instructor_record = Instructor(full_name=instructor)
-            else:
-                instructor_record = Instructor(
-                    full_name=instructor,
-                    first_name=first_name,
-                    last_name=last_name,
-                    rating=rating,
-                    url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
-                )
-                LOG.debug(f"{instructor} new")
+            instructor_record = InstructorMgr.create_instructor(instructor)
 
             DBSession.add(instructor_record)
             DBSession.flush()
         else:
-            LOG.debug(f"{instructor} was already in db!")
+            if instructor_record.timestamp < datetime.today() - timedelta(days=1):
+                instructor_record = InstructorMgr.update_instructor(instructor_record)
+
         DBSession.commit()
 
         return instructor_record
+
+    def create_instructor(instructor):
+        try:
+            first_name, last_name, rating, rmp_id = RateMyProfessors.get_instructor(
+                instructor
+            )
+        except ValueError:
+            LOG.debug(f"{instructor} not found")
+            instructor_record = Instructor(full_name=instructor)
+        else:
+            instructor_record = Instructor(
+                full_name=instructor,
+                first_name=first_name,
+                last_name=last_name,
+                rating=rating,
+                url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
+            )
+            LOG.debug(f"{instructor} new")
+
+        return instructor_record
+
+    @staticmethod
+    def update_instructor(instructor_record):
+        if instructor_record.timestamp < datetime.today() - timedelta(days=1):
+            try:
+                first_name, last_name, rating, rmp_id = RateMyProfessors.get_instructor(
+                    instructor_record.full_name
+                )
+            except ValueError:
+                LOG.debug(f"{instructor_record.full_name} in db update failed")
+            else:
+                if instructor_record.first_name and (
+                    first_name is not instructor_record.first
+                ):
+                    instructor_record.first_name = first_name
+
+                if instructor_record.rating and rating is not instructor_record.rating:
+                    instructor_record.rating = rating
+
+                url = (f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",)
+                if instructor_record.url and url is not instructor_record.url:
+                    instructor_record.url = url
+
+                instructor_record.timestamp = datetime.now()
+                LOG.debug(f"{instructor_record.full_name} in db updated")
 
 
 class Instructor(Base):
@@ -76,6 +108,7 @@ class Instructor(Base):
     last_name = Column("LastName", String)
     rating = Column("Rating", Float)
     url = Column("URL", String)
+    timestamp = Column("Timestamp", DateTime, default=datetime.now)
 
     def __repr__(self):
         return (
@@ -234,7 +267,6 @@ class Term(Base):
 def main():
     Base.metadata.create_all(engine)
     Course.__table__.drop(engine)
-    Instructor.__table__.drop(engine)
     ClassOffering.__table__.drop(engine)
 
 
