@@ -53,6 +53,7 @@ class InstructorMgr:
 
         return instructor_record
 
+    @staticmethod
     def create_instructor(instructor):
         try:
             first_name, last_name, rating, rmp_id = RateMyProfessors.get_instructor(
@@ -81,22 +82,25 @@ class InstructorMgr:
                     instructor_record.full_name
                 )
             except ValueError:
-                LOG.debug(f"{instructor_record.full_name} in db update failed")
+                instructor_record.timestamp = datetime.now()
+                LOG.debug(f"{instructor_record.full_name} not in RMP")
             else:
                 if instructor_record.first_name and (
-                    first_name is not instructor_record.first
+                    first_name != instructor_record.first_name
                 ):
                     instructor_record.first_name = first_name
 
-                if instructor_record.rating and rating is not instructor_record.rating:
+                if instructor_record.rating and rating != instructor_record.rating:
                     instructor_record.rating = rating
 
-                url = (f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",)
-                if instructor_record.url and url is not instructor_record.url:
+                url = f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}"
+                if instructor_record.url and url != instructor_record.url:
                     instructor_record.url = url
 
                 instructor_record.timestamp = datetime.now()
                 LOG.debug(f"{instructor_record.full_name} in db updated")
+
+        return instructor_record
 
 
 class Instructor(Base):
@@ -116,6 +120,7 @@ class Instructor(Base):
             f"name={self.full_name}, "
             f"rating={self.rating}, "
             f"url={self.url}, "
+            f"timestamp={self.timestamp}, "
         )
 
 
