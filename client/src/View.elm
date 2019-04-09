@@ -452,10 +452,22 @@ viewFooter model =
                 [ Grid.row
                     [ Row.centerSm ]
                     [ Grid.col [ Col.xs12, Col.md6 ]
-                        [ span
-                            [ class "bd-footer-links" ]
-                            [ i [ class "fa fa-github", attribute "aria-hidden" "true" ] []
-                            , externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source"
+                        [ ul
+                            [ class "bd-footer-links"
+                            , style "list-style-type" "none"
+                            , Spacing.pl0
+                            ]
+                            [ li
+                                [ style "display" "inline"
+                                , Spacing.mr2
+                                ]
+                                [ i [ class "fa fa-github", attribute "aria-hidden" "true" ] []
+                                , externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source"
+                                ]
+                            , li [ style "display" "inline" ]
+                                [ i [ class "fa fa-envelope", attribute "aria-hidden" "true" ] []
+                                , a [ href "mailto:contact@mheyman.com?subject=Site Feedback", target "_blank" ] [ text " Contact" ]
+                                ]
                             ]
                         ]
                     , Grid.col
