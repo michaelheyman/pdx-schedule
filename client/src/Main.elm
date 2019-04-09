@@ -27,7 +27,7 @@ init _ =
       , term = ""
       , loadingValue = 10
       , search = ""
-      , filter = ""
+      , filter = "Computer Science"
       , accordionState = Accordion.initialState
       }
     , getClassList
