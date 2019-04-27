@@ -20,8 +20,10 @@ class RateMyProfessors:
         if len(instructor_name.split()) == 3:
             split = instructor_name.split()
             del split[1]
+
             instructor_name = " ".join(split)
 
+        instructor_name = uncommon_alias(instructor_name)
         json = RateMyProfessors.get_instructor_json(instructor_name)
         first_name, last_name, rating, rmp_id = RateMyProfessors.parse_instructor_json(
             json
@@ -33,7 +35,7 @@ class RateMyProfessors:
     def parse_instructor_json(data):
         rating = None
 
-        if data["response"]["numFound"] is 0:
+        if data["response"]["numFound"] == 0:
             raise ValueError("RateMyProfessors could not find professor.")
 
         instructor_data = data["response"]["docs"][0]
@@ -46,3 +48,12 @@ class RateMyProfessors:
         rmp_id = instructor_data["pk_id"]
 
         return first_name, last_name, rating, rmp_id
+
+
+def uncommon_alias(instructor_name):
+    names = instructor_name.split()
+
+    if names[0] == "Barton":
+        names[0] = "Bart"
+
+    return " ".join(names)

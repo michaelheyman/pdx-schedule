@@ -1,5 +1,5 @@
+import logging
 from datetime import datetime, timedelta
-
 from sqlalchemy import create_engine
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -7,14 +7,10 @@ from sqlalchemy import Integer
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
-
 from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
 from parser import RateMyProfessors
-
-import logging
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)
@@ -41,11 +37,13 @@ class InstructorMgr:
         )
 
         if instructor_record is None:
+            print(f"{instructor} doesn't exist")
             instructor_record = InstructorMgr.create_instructor(instructor)
 
             DBSession.add(instructor_record)
             DBSession.flush()
         else:
+            print(f"{instructor} exists")
             if instructor_record.timestamp < datetime.today() - timedelta(days=1):
                 instructor_record = InstructorMgr.update_instructor(instructor_record)
 

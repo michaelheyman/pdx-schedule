@@ -1,118 +1,141 @@
 import requests
-from bs4 import BeautifulSoup
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from urllib.parse import urljoin
 
-import logging
 
-logging.basicConfig(level=logging.ERROR, format="%(levelname)s: \t%(message)s")
-LOG = logging.getLogger(__name__)
+BASE_URL = "https://app.banner.pdx.edu/StudentRegistrationSsb/ssb/"
+INIT_URL = urljoin(BASE_URL, "term/termSelection?mode=search")
+CLASS_URL = urljoin(BASE_URL, "classSearch/classSearch")
+TERMS_URL = urljoin(BASE_URL, "classSearch/getTerms")
+SEARCH_URL = urljoin(BASE_URL, "term/search?mode=search")
+SCHEDULE_URL = urljoin(BASE_URL, "searchResults/searchResults")
+SUBJECTS_URL = urljoin(BASE_URL, "classSearch/get_subject")
+MAX_TERMS = 1
+MAX_SUBJECTS = 100
 
 
-BASE_URL = "https://banweb.pdx.edu/pls/oprd/"
-INIT_URL = urljoin(BASE_URL, "bwckschd.p_disp_dyn_sched")
-TERM_URL = urljoin(BASE_URL, "bwckgens.p_proc_term_date")
-SCHEDULE_URL = urljoin(BASE_URL, "bwckschd.p_get_crse_unsec")
-REDIRECT_STRING = "You will be redirected"
+def get_tokens(driver):
+    driver.get(INIT_URL)
+    unique_session_id = driver.execute_script("return sessionStorage.getItem(STORAGE)")
+
+    cookies = driver.get_cookies()
+    cookies_dict = {}
+    for cookie in cookies:
+        cookies_dict[cookie["name"]] = cookie["value"]
+
+    session_id = cookies_dict["JSESSIONID"]
+
+    return session_id, unique_session_id
 
 
-def crawl(local=False):
-    if local:
-        return open_local_file()
+def get_latest_term(cookies, unique_session_id):
+    """Returns JSESSIONID and uniqueSessionId needed for receiving a
+    successful response from HTTP requests
+    """
+    payload = {
+        "uniqueSessionId": unique_session_id,
+        "dataType": "json",
+        "searchTerm": "",
+        "offset": "1",
+        "max": MAX_TERMS,
+    }
+    res = requests.get(TERMS_URL, cookies=cookies, params=payload)
 
-    init_page = requests.get(INIT_URL)
+    res_json = res.json()
 
-    if not init_page.ok:
-        LOG.error("Failed to access initial page")
-        return None
+    term_name = res_json[0]["description"]
+    term_name = term_name.split(" ")[0:2]
+    term_name = " ".join(term_name)
 
-    soup = BeautifulSoup(init_page.content, "html.parser")
+    term_date = res_json[0]["code"]
 
-    options = soup.find_all("option")
+    return term_date, term_name
 
-    if len(options) < 2:
-        LOG.error(f"Not enough options ({len(options)} on initial page")
-        return None
 
-    latest_term = options[1]
-    latest_term_date = str(latest_term["value"])
-    latest_term_name = latest_term.get_text().split(" ")[0:2]
-    latest_term_name = " ".join(latest_term_name)
+def get_subjects(cookies, unique_session_id, term_date):
+    payload = {
+        "uniqueSessionId": unique_session_id,
+        "dataType": "json",
+        "searchTerm": "",
+        "term": term_date,
+        "offset": "1",
+        "max": MAX_SUBJECTS,
+        # Query string params expect a timestamp with extra 3 digits
+        "_:": str(int(time.time() * 1000)),
+    }
+    res = requests.get(SUBJECTS_URL, cookies=cookies, params=payload)
 
-    persistence = init_page.cookies["persistence"]
-    LOG.info(f"persistence: {persistence}")
+    return res.json()
 
-    term_page = requests.post(
-        TERM_URL,
-        headers={"referer": INIT_URL},
-        cookies={"persistence": persistence},
-        data={
-            "p_calling_proc": "bwckschd.p_disp_dyn_sched",
-            "p_term": latest_term_date,
-        },
-    )
 
-    if not term_page.ok:
-        LOG.error("Failed to access term page")
-        return None
-    if REDIRECT_STRING in term_page.text:
-        LOG.error("Invalid request sent to term page")
-        return None
+def initialize_driver():
+    options = Options()
+    options.add_argument("--headless")
+    prefs = {
+        # Load without images
+        "profile.managed_default_content_settings.images": 2,
+        # Load with disk cache to prevent requesting repeated assets
+        "disk-cache-size": 4096,
+    }
+    options.add_experimental_option("prefs", prefs)
 
-    term_soup = BeautifulSoup(term_page.content, "html.parser")
-    term_list = term_soup.find("select", {"id": "subj_id"})
-    term_list = term_list.find_all("option")
+    driver = webdriver.Chrome(options=options)
 
-    for term in term_list:
-        subject = term["value"]
-        LOG.debug(subject)
+    return driver
 
-        scrape_page = requests.post(
-            SCHEDULE_URL,
-            headers={"referer": TERM_URL},
-            cookies={"persistence": persistence},
-            data=[
-                ("term_in", str(latest_term["value"])),
-                ("sel_subj", "dummy"),
-                ("sel_subj", subject),
-                ("sel_day", "dummy"),
-                ("sel_schd", "dummy"),
-                ("sel_insm", "dummy"),
-                ("sel_insm", "%"),
-                ("sel_camp", "dummy"),
-                ("sel_levl", "dummy"),
-                ("sel_levl", "%"),
-                ("sel_sess", "dummy"),
-                ("sel_instr", "dummy"),
-                ("sel_instr", "%"),
-                ("sel_ptrm", "dummy"),
-                ("sel_attr", "dummy"),
-                ("sel_attr", "%"),
-                ("sel_crse", ""),
-                ("sel_title", ""),
-                ("sel_from_cred", ""),
-                ("sel_to_cred", ""),
-                ("begin_hh", "0"),
-                ("begin_mi", "0"),
-                ("begin_ap", "a"),
-                ("end_hh", "0"),
-                ("end_mi", "0"),
-                ("end_ap", "a"),
-            ],
+
+def crawl():
+    driver = initialize_driver()
+
+    session_id, unique_session_id = get_tokens(driver)
+    cookies = dict(JSESSIONID=session_id)
+
+    term_date, term_name = get_latest_term(cookies, unique_session_id)
+
+    subjects = get_subjects(cookies, unique_session_id, term_date)
+    for subject in subjects:
+        payload = {
+            "dataType": "json",
+            "endDatepicker": "",
+            "startDatepicker": "",
+            "studyPath": "",
+            "studyPathText": "",
+            "term": term_date,
+            "uniqueSessionId": unique_session_id,
+        }
+        # Make a POST request that will authenticate the user with this JSESSIONID
+        # and uniqueSessionId and enable the sched_page GET request to return JSON
+        requests.post(
+            SEARCH_URL, headers={"referer": INIT_URL}, cookies=cookies, params=payload
         )
 
-        if not scrape_page.ok:
-            LOG.error(f"Failed to access {subject} schedule page")
+        payload = {
+            "txt_subject": subject["code"],
+            "txt_term": term_date,
+            "startDatepicker": "",
+            "endDatepicker": "",
+            "uniqueSessionId": unique_session_id,
+            "pageOffset": "0",
+            "pageMaxSize": "100",
+            "sortColumn": "subjectDescription",
+            "sortDirection": "asc",
+        }
+        sched_page = requests.get(
+            SCHEDULE_URL,
+            headers={"referer": CLASS_URL},
+            cookies=cookies,
+            params=payload,
+        )
 
-        if REDIRECT_STRING in term_page.text:
-            LOG.error("Invalid request sent to scrape page")
+        # New JSESSIONID and uniqueSessionId is needed for every subject
+        session_id, unique_session_id = get_tokens(driver)
 
-        yield scrape_page.content, latest_term_name, latest_term_date
+        yield sched_page.json()["data"]
+
+    driver.close()
 
 
-def open_local_file():
-    try:
-        with open("index.html") as fp:
-            soup = BeautifulSoup(fp, "html.parser")
-            return soup
-    except IOError:
-        LOG.error("Problem opening index.html file")
+if __name__ == "__main__":
+    crawl()
