@@ -18,6 +18,8 @@ Install required python packages:
 
 `pip install -r requirements.txt`
 
+## Create the database
+
 Run the scraper and populate the database:
 
 `python src/schedule.py`
