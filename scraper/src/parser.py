@@ -50,10 +50,14 @@ class RateMyProfessors:
         return first_name, last_name, rating, rmp_id
 
 
+aliases = {"Barton": "Bart"}
+
+
 def uncommon_alias(instructor_name):
     names = instructor_name.split()
+    first_name = names[0]
 
-    if names[0] == "Barton":
-        names[0] = "Bart"
+    if first_name in aliases:
+        names[0] = aliases[first_name]
 
     return " ".join(names)
