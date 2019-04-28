@@ -37,13 +37,11 @@ class InstructorMgr:
         )
 
         if instructor_record is None:
-            print(f"{instructor} doesn't exist")
             instructor_record = InstructorMgr.create_instructor(instructor)
 
             DBSession.add(instructor_record)
             DBSession.flush()
         else:
-            print(f"{instructor} exists")
             if instructor_record.timestamp < datetime.today() - timedelta(days=1):
                 instructor_record = InstructorMgr.update_instructor(instructor_record)
 
