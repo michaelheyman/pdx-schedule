@@ -17,6 +17,9 @@ MAX_SUBJECTS = 100
 
 
 def get_tokens(driver):
+    """Returns JSESSIONID and uniqueSessionId needed for receiving a
+    successful response from HTTP requests
+    """
     driver.get(INIT_URL)
     unique_session_id = driver.execute_script("return sessionStorage.getItem(STORAGE)")
 
@@ -31,9 +34,8 @@ def get_tokens(driver):
 
 
 def get_latest_term(cookies, unique_session_id):
-    """Returns JSESSIONID and uniqueSessionId needed for receiving a
-    successful response from HTTP requests
-    """
+    """Gets latest term date as a string in the format YYYYMMDD"""
+
     payload = {
         "uniqueSessionId": unique_session_id,
         "dataType": "json",
@@ -45,16 +47,14 @@ def get_latest_term(cookies, unique_session_id):
 
     res_json = res.json()
 
-    term_name = res_json[0]["description"]
-    term_name = term_name.split(" ")[0:2]
-    term_name = " ".join(term_name)
-
     term_date = res_json[0]["code"]
 
-    return term_date, term_name
+    return term_date
 
 
 def get_subjects(cookies, unique_session_id, term_date):
+    """Returns JSON with list of subjects"""
+
     payload = {
         "uniqueSessionId": unique_session_id,
         "dataType": "json",
@@ -71,6 +71,10 @@ def get_subjects(cookies, unique_session_id, term_date):
 
 
 def initialize_driver():
+    """Initializes Selenium driver with options. Doesn't open or close driver,
+    that responsibility is left to the caller.
+    """
+
     options = Options()
     options.add_argument("--headless")
     prefs = {
@@ -92,7 +96,7 @@ def crawl():
     session_id, unique_session_id = get_tokens(driver)
     cookies = dict(JSESSIONID=session_id)
 
-    term_date, term_name = get_latest_term(cookies, unique_session_id)
+    term_date = get_latest_term(cookies, unique_session_id)
 
     subjects = get_subjects(cookies, unique_session_id, term_date)
     for subject in subjects:
@@ -135,7 +139,3 @@ def crawl():
         yield sched_page.json()["data"]
 
     driver.close()
-
-
-if __name__ == "__main__":
-    crawl()
