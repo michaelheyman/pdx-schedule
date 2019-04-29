@@ -58,10 +58,10 @@ termListDecoder =
     Decode.list termDecoder
 
 
-getClassList : Cmd Msg
-getClassList =
+getClassList : String -> Cmd Msg
+getClassList param =
     Http.get
-        { url = "/api/classes/latest"
+        { url = "/api/classes/" ++ param
         , expect = Http.expectJson GotClassList classListDecoder
         }
 

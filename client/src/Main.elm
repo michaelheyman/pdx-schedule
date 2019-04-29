@@ -1,6 +1,7 @@
 module Main exposing (init, main)
 
 import Bootstrap.Accordion as Accordion
+import Bootstrap.Dropdown as Dropdown
 import Browser
 import Decode exposing (getClassList, getTermList)
 import Model exposing (Model, Msg(..), Response(..))
@@ -30,6 +31,8 @@ init _ =
       , search = ""
       , filter = "Computer Science"
       , accordionState = Accordion.initialState
+      , dropdownState = Dropdown.initialState
+      , termSearch = "latest"
       }
-    , Cmd.batch [ getClassList, getTermList ]
+    , Cmd.batch [ getClassList "latest", getTermList ]
     )

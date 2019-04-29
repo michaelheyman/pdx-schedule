@@ -2,6 +2,7 @@ module Update exposing (update)
 
 import Bootstrap.Accordion as Accordion
 import Browser.Dom as Dom
+import Decode exposing (getClassList)
 import List.Extra exposing (unique)
 import Model exposing (Model, Msg(..), Response(..))
 import Task
@@ -15,7 +16,7 @@ update msg model =
                 Ok value ->
                     ( { model
                         | response = Success
-                        , classes = List.append model.classes value
+                        , classes = value
                         , disciplines =
                             value
                                 |> List.map (.course >> .discipline)
@@ -47,6 +48,13 @@ update msg model =
                 Err error ->
                     ( { model | terms = [] }, Cmd.none )
 
+        MakeApiRequest param ->
+            ( { model
+                | termSearch = param
+              }
+            , getClassList param
+            )
+
         IncrementProgressBar _ ->
             ( { model | loadingValue = model.loadingValue + 75 }, Cmd.none )
 
@@ -63,6 +71,9 @@ update msg model =
 
         AccordionMsg state ->
             ( { model | accordionState = state }, Cmd.none )
+
+        DropdownMsg state ->
+            ( { model | dropdownState = state }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )

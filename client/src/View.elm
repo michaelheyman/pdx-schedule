@@ -2,7 +2,9 @@ module View exposing (view)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Alert as Alert
+import Bootstrap.Button as Button
 import Bootstrap.Card as Card
+import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
@@ -100,7 +102,28 @@ pageHeader model =
                         [ h1 [] [ text "PSU Schedule" ]
                         , h6
                             [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ]
-                            [ text model.term ]
+                            [ Dropdown.dropdown
+                                model.dropdownState
+                                { options = []
+                                , toggleMsg = DropdownMsg
+                                , toggleButton =
+                                    Dropdown.toggle
+                                        [ Button.light
+                                        , Button.small
+                                        , Button.outlineLight
+                                        ]
+                                        [ text model.term ]
+                                , items =
+                                    model.terms
+                                        |> List.reverse
+                                        |> List.map
+                                            (\term ->
+                                                Dropdown.buttonItem
+                                                    [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
+                                                    [ text (.description term) ]
+                                            )
+                                }
+                            ]
                         ]
                     ]
                 ]

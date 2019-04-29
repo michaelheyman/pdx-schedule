@@ -1,6 +1,7 @@
 module Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..), Term)
 
 import Bootstrap.Accordion as Accordion
+import Bootstrap.Dropdown as Dropdown
 import Http
 import Time
 
@@ -21,16 +22,20 @@ type alias Model =
     , search : String
     , filter : String
     , accordionState : Accordion.State
+    , dropdownState : Dropdown.State
+    , termSearch : String
     }
 
 
 type Msg
     = GotClassList (Result Http.Error (List Class))
     | GotTermList (Result Http.Error (List Term))
+    | MakeApiRequest String
     | IncrementProgressBar Time.Posix
     | Search String
     | Filter String
     | AccordionMsg Accordion.State
+    | DropdownMsg Dropdown.State
     | NoOp
 
 
