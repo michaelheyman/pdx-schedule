@@ -16,6 +16,7 @@ type alias Model =
     , classes : List Class
     , disciplines : List String
     , term : String
+    , terms : List Term
     , loadingValue : Float
     , search : String
     , filter : String
@@ -25,6 +26,7 @@ type alias Model =
 
 type Msg
     = GotClassList (Result Http.Error (List Class))
+    | GotTermList (Result Http.Error (List Term))
     | IncrementProgressBar Time.Posix
     | Search String
     | Filter String

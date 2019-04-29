@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { getManager } from "typeorm";
 import { ClassOffering } from "../entity/ClassOffering";
-import { Instructor } from "../entity/Instructor";
-import { Course } from "../entity/Course";
 import { Term } from "../entity/Term";
 
 /**
@@ -12,10 +10,25 @@ export async function classOfferingGetAllAction(
     request: Request,
     response: Response
 ) {
-    // get a course repository to perform operations with course
     const classOfferingRepository = getManager().getRepository(ClassOffering);
+    const termRepository = getManager().getRepository(Term);
 
-    // load all courses with instructor information
+    let param: String = request.params["term"];
+
+    if (param == "latest") {
+        var term: String = await termRepository
+            .createQueryBuilder("term")
+            .select("MAX(Date) as term_Date")
+            .getRawOne();
+    } else {
+        var term: String = await termRepository
+            .createQueryBuilder("term")
+            .where("term.date = :date", { date: param })
+            .getRawOne();
+    }
+
+    let termDate = term ? term["term_Date"] : "";
+
     let classes = await classOfferingRepository
         .createQueryBuilder("classOffering")
         .innerJoinAndSelect("classOffering.course", "course.CourseId")
@@ -24,8 +37,8 @@ export async function classOfferingGetAllAction(
             "instructor.InstructorId"
         )
         .innerJoinAndSelect("classOffering.term", "term.date")
+        .where("classOffering.term = :termDate", { termDate: termDate })
         .getMany();
 
-    // return loaded courses
     response.send(classes);
 }

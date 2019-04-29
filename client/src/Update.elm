@@ -39,6 +39,14 @@ update msg model =
                     , Cmd.none
                     )
 
+        GotTermList result ->
+            case result of
+                Ok value ->
+                    ( { model | terms = value }, Cmd.none )
+
+                Err error ->
+                    ( { model | terms = [] }, Cmd.none )
+
         IncrementProgressBar _ ->
             ( { model | loadingValue = model.loadingValue + 75 }, Cmd.none )
 

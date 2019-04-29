@@ -2,7 +2,7 @@ module Main exposing (init, main)
 
 import Bootstrap.Accordion as Accordion
 import Browser
-import Decode exposing (getClassList)
+import Decode exposing (getClassList, getTermList)
 import Model exposing (Model, Msg(..), Response(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
@@ -25,10 +25,11 @@ init _ =
       , classes = []
       , disciplines = []
       , term = ""
+      , terms = []
       , loadingValue = 10
       , search = ""
       , filter = "Computer Science"
       , accordionState = Accordion.initialState
       }
-    , getClassList
+    , Cmd.batch [ getClassList, getTermList ]
     )

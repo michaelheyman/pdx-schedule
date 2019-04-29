@@ -98,7 +98,9 @@ pageHeader model =
                     ]
                     [ div [ class "container" ]
                         [ h1 [] [ text "PSU Schedule" ]
-                        , h6 [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ] [ text model.term ]
+                        , h6
+                            [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ]
+                            [ text model.term ]
                         ]
                     ]
                 ]
@@ -126,6 +128,7 @@ viewSidebar model =
                     ]
                     [ if model.filter == "" then
                         b [] [ text "All" ]
+
                       else
                         text "All"
                     ]
@@ -424,6 +427,7 @@ viewTimestamp model =
                     (\x ->
                         if Char.isAlpha x then
                             ' '
+
                         else
                             x
                     )
@@ -526,6 +530,7 @@ sidebarLink model string =
         disciplineText =
             if model.filter == string then
                 b [] [ text string ]
+
             else
                 text string
     in
@@ -544,8 +549,10 @@ accordionLink model string =
         disciplineText =
             if model.filter == string then
                 b [] [ text string ]
+
             else if model.filter == "" && string == "All" then
                 b [] [ text string ]
+
             else
                 text string
     in
@@ -556,6 +563,7 @@ accordionLink model string =
                 value =
                     if string == "All" then
                         ""
+
                     else
                         string
               in

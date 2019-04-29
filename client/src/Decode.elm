@@ -1,4 +1,4 @@
-module Decode exposing (getClassList)
+module Decode exposing (getClassList, getTermList)
 
 import Http
 import Json.Decode as Decode
@@ -53,9 +53,22 @@ classListDecoder =
     Decode.list classDecoder
 
 
+termListDecoder : Decode.Decoder (List Term)
+termListDecoder =
+    Decode.list termDecoder
+
+
 getClassList : Cmd Msg
 getClassList =
     Http.get
-        { url = "/classes/"
+        { url = "/api/classes/latest"
         , expect = Http.expectJson GotClassList classListDecoder
+        }
+
+
+getTermList : Cmd Msg
+getTermList =
+    Http.get
+        { url = "/api/terms"
+        , expect = Http.expectJson GotTermList termListDecoder
         }
