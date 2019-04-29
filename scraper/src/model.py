@@ -1,5 +1,5 @@
-import logging
 from datetime import datetime, timedelta
+from logger import LOG
 from sqlalchemy import create_engine
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -10,10 +10,8 @@ from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import func
 from parser import RateMyProfessors
-
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
-LOG = logging.getLogger(__name__)
 
 engine = create_engine("sqlite:///app.db", echo=False)
 Base = declarative_base()
@@ -56,7 +54,7 @@ class InstructorMgr:
                 instructor
             )
         except ValueError:
-            LOG.debug(f"{instructor} not found")
+            LOG.info(f"{instructor} not found")
             instructor_record = Instructor(full_name=instructor)
         else:
             instructor_record = Instructor(
@@ -66,7 +64,7 @@ class InstructorMgr:
                 rating=rating,
                 url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
             )
-            LOG.debug(f"{instructor} new")
+            LOG.info(f"{instructor} new")
 
         return instructor_record
 
@@ -79,7 +77,7 @@ class InstructorMgr:
                 )
             except ValueError:
                 instructor_record.timestamp = datetime.now()
-                LOG.debug(f"{instructor_record.full_name} not in RMP")
+                LOG.info(f"{instructor_record.full_name} not in RMP")
             else:
                 if instructor_record.first_name and (
                     first_name != instructor_record.first_name
@@ -94,7 +92,7 @@ class InstructorMgr:
                     instructor_record.url = url
 
                 instructor_record.timestamp = datetime.now()
-                LOG.debug(f"{instructor_record.full_name} in db updated")
+                LOG.info(f"{instructor_record.full_name} in db updated")
 
         return instructor_record
 
@@ -198,7 +196,8 @@ class ClassOfferingMgr:
             DBSession.add(class_offering_record)
             DBSession.flush()
         else:
-            LOG.error(f"{class_offering_record} was already in db!")
+            class_offering_record.timestamp = datetime.now()
+
         DBSession.commit()
 
         return class_offering_record
@@ -265,10 +264,20 @@ class Term(Base):
         return f"<Term(date={self.date}, " f"description={self.description}, "
 
 
+def table_exists(name):
+    return engine.dialect.has_table(engine, name)
+
+
 def main():
     Base.metadata.create_all(engine)
-    Course.__table__.drop(engine)
-    ClassOffering.__table__.drop(engine)
+
+    if table_exists("ClassOffering"):
+        latest_term = DBSession.query(func.max(ClassOffering.term)).one()
+        latest_term = latest_term[0]
+
+        DBSession.query(ClassOffering).filter(
+            ClassOffering.term == latest_term
+        ).delete()
 
 
 main()

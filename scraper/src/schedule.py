@@ -1,5 +1,5 @@
-import logging
 from crawler import crawl
+from logger import LOG
 from model import Base
 from model import engine
 from model import InstructorMgr
@@ -7,9 +7,6 @@ from model import CourseMgr
 from model import ClassOfferingMgr
 from model import ConnectionMgr
 from model import TermMgr
-
-logging.basicConfig(level=logging.ERROR, format="%(levelname)s: \t%(message)s")
-LOG = logging.getLogger(__name__)
 
 
 def run():
@@ -27,7 +24,7 @@ def run():
             crn = int(course["courseReferenceNumber"])
             discipline = course["subjectDescription"].replace("&amp;", "&")
             days = get_days(course)
-            credits = int(course["creditHours"])
+            credits = int(course["creditHours"]) if course["creditHours"] else 0
             time = get_time(course)
             instructor = get_instructor(course)
             term_description = get_term_description(course)
@@ -83,6 +80,9 @@ def save_to_database(
 
 
 def get_time(record):
+    if not record["meetingsFaculty"]:
+        return None
+
     meeting_time = record["meetingsFaculty"][0]["meetingTime"]
 
     begin_time = meeting_time["beginTime"]
@@ -97,7 +97,11 @@ def get_time(record):
 
 
 def get_days(record):
+    if not record["meetingsFaculty"]:
+        return None
+
     meeting_time = record["meetingsFaculty"][0]["meetingTime"]
+
     days = ""
 
     if meeting_time["monday"]:

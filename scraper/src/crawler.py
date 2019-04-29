@@ -33,8 +33,8 @@ def get_tokens(driver):
     return session_id, unique_session_id
 
 
-def get_latest_term(cookies, unique_session_id):
-    """Gets latest term date as a string in the format YYYYMMDD"""
+def get_term_dates(cookies, unique_session_id):
+    """Gets list of term dates as a strings in the format YYYYMMDD"""
 
     payload = {
         "uniqueSessionId": unique_session_id,
@@ -45,11 +45,13 @@ def get_latest_term(cookies, unique_session_id):
     }
     res = requests.get(TERMS_URL, cookies=cookies, params=payload)
 
-    res_json = res.json()
+    terms_dict = res.json()
+    term_dates = []
 
-    term_date = res_json[0]["code"]
+    for term in terms_dict:
+        term_dates.append(term["code"])
 
-    return term_date
+    return term_dates
 
 
 def get_subjects(cookies, unique_session_id, term_date):
@@ -96,46 +98,51 @@ def crawl():
     session_id, unique_session_id = get_tokens(driver)
     cookies = dict(JSESSIONID=session_id)
 
-    term_date = get_latest_term(cookies, unique_session_id)
+    term_dates = get_term_dates(cookies, unique_session_id)
 
-    subjects = get_subjects(cookies, unique_session_id, term_date)
-    for subject in subjects:
-        payload = {
-            "dataType": "json",
-            "endDatepicker": "",
-            "startDatepicker": "",
-            "studyPath": "",
-            "studyPathText": "",
-            "term": term_date,
-            "uniqueSessionId": unique_session_id,
-        }
-        # Make a POST request that will authenticate the user with this JSESSIONID
-        # and uniqueSessionId and enable the sched_page GET request to return JSON
-        requests.post(
-            SEARCH_URL, headers={"referer": INIT_URL}, cookies=cookies, params=payload
-        )
+    for term_date in term_dates:
+        subjects = get_subjects(cookies, unique_session_id, term_date)
 
-        payload = {
-            "txt_subject": subject["code"],
-            "txt_term": term_date,
-            "startDatepicker": "",
-            "endDatepicker": "",
-            "uniqueSessionId": unique_session_id,
-            "pageOffset": "0",
-            "pageMaxSize": "100",
-            "sortColumn": "subjectDescription",
-            "sortDirection": "asc",
-        }
-        sched_page = requests.get(
-            SCHEDULE_URL,
-            headers={"referer": CLASS_URL},
-            cookies=cookies,
-            params=payload,
-        )
+        for subject in subjects:
+            payload = {
+                "dataType": "json",
+                "endDatepicker": "",
+                "startDatepicker": "",
+                "studyPath": "",
+                "studyPathText": "",
+                "term": term_date,
+                "uniqueSessionId": unique_session_id,
+            }
+            # Make a POST request that will authenticate the user with this JSESSIONID
+            # and uniqueSessionId and enable the sched_page GET request to return JSON
+            requests.post(
+                SEARCH_URL,
+                headers={"referer": INIT_URL},
+                cookies=cookies,
+                params=payload,
+            )
 
-        # New JSESSIONID and uniqueSessionId is needed for every subject
-        session_id, unique_session_id = get_tokens(driver)
+            payload = {
+                "txt_subject": subject["code"],
+                "txt_term": term_date,
+                "startDatepicker": "",
+                "endDatepicker": "",
+                "uniqueSessionId": unique_session_id,
+                "pageOffset": "0",
+                "pageMaxSize": "100",
+                "sortColumn": "subjectDescription",
+                "sortDirection": "asc",
+            }
+            sched_page = requests.get(
+                SCHEDULE_URL,
+                headers={"referer": CLASS_URL},
+                cookies=cookies,
+                params=payload,
+            )
 
-        yield sched_page.json()["data"]
+            # New JSESSIONID and uniqueSessionId is needed for every subject
+            session_id, unique_session_id = get_tokens(driver)
+
+            yield sched_page.json()["data"]
 
     driver.close()
