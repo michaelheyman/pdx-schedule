@@ -1,6 +1,7 @@
 module Subscriptions exposing (subscriptions)
 
 import Bootstrap.Accordion as Accordion
+import Bootstrap.Navbar as Navbar
 import Model exposing (Model, Msg(..), Response(..))
 import Time exposing (every)
 
@@ -15,4 +16,5 @@ subscriptions model =
 
             _ ->
                 Sub.none
+        , Navbar.subscriptions model.navbarState NavbarMsg
         ]

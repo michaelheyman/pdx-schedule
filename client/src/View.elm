@@ -8,6 +8,7 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Navbar as Navbar
 import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
 import Bootstrap.Text as Text
@@ -16,12 +17,14 @@ import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
-import Color exposing (rgba)
+import Color exposing (rgb255, rgba, toCssString)
+import Decode exposing (getClassList)
+import Dict exposing (Dict)
 import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
-import Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..))
+import Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..), Term)
 import Round exposing (round)
 
 
@@ -44,10 +47,72 @@ view model =
     }
 
 
+termListToDict : List Term -> Dict String Int
+termListToDict list =
+    Dict.fromList (List.map (\term -> ( term.description, term.date )) list)
+
+
+viewNavbar : Model -> Html Msg
+viewNavbar model =
+    Navbar.config NavbarMsg
+        |> Navbar.container
+        |> Navbar.collapseSmall
+        |> Navbar.withAnimation
+        |> Navbar.lightCustom (rgb255 255 255 255)
+        |> Navbar.brand
+            [ href "#" ]
+            [ text "PSU Schedule"
+            ]
+        |> Navbar.items
+            [ Navbar.dropdown
+                { id = "termDropdown"
+                , toggle = Navbar.dropdownToggle [] [ text model.term ]
+                , items =
+                    [ Navbar.dropdownHeader [ text "Term" ]
+                    ]
+                        ++ List.map
+                            (\term ->
+                                Navbar.dropdownItem
+                                    [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
+                                    [ text (.description term) ]
+                            )
+                            (List.reverse model.terms)
+                }
+            ]
+        |> Navbar.view model.navbarState
+
+
+
+-- Navbar.config NavbarMsg
+--     |> Navbar.withAnimation
+--     |> Navbar.brand [ href "#" ] [ text "PSU Schedule" ]
+--     |> Navbar.info
+--     |> Navbar.light
+--     |> Navbar.items
+--         [ Navbar.itemLink [ href "#" ] [ text "Item 1" ]
+--         , Navbar.dropdown
+--             { id = "termDropdown"
+--             , toggle = Navbar.dropdownToggle [] [ text model.term ]
+--             , items =
+--                 [ Navbar.dropdownHeader [ text "Term" ]
+--                 ]
+--                     ++ List.map
+--                         (\term ->
+--                             Navbar.dropdownItem
+--                                 [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
+--                                 [ text (.description term) ]
+--                         )
+--                         (List.reverse model.terms)
+--             }
+--         ]
+--     |> Navbar.view model.navbarState
+
+
 renderPage : Model -> Html Msg
 renderPage model =
     div []
-        [ pageHeader model
+        [ viewNavbar model
+        , xpageHeader model
         , Grid.containerFluid []
             [ Grid.row
                 [ Row.centerXs ]
@@ -75,6 +140,45 @@ renderPage model =
                 ]
             ]
         , viewFooter model
+        ]
+
+
+xpageHeader : Model -> Html Msg
+xpageHeader model =
+    div
+        [ class "bd-pageheader"
+        , style "background-color" "#563d7c"
+        , style "color" "white"
+        , style "height" "30vh"
+
+        -- , style "position" "relative"
+        , Spacing.pt5
+        , Spacing.pb5
+        , Spacing.mb3
+        , Spacing.mb5Md
+        ]
+        [ Grid.containerFluid []
+            [ Grid.row []
+                [ Grid.col
+                    [ Col.offsetXs1
+                    , Col.offsetMd2
+                    , Col.offsetXl0
+                    ]
+                    [ div [ class "container" ]
+                        [ h1
+                            [ style "font-size" "4rem"
+
+                            -- , style "position" "absolute"
+                            -- , style "top" "50%"
+                            -- , style "-ms-transform" "translateY(-50%)"
+                            -- , style "transform" "translateY(-50%)"
+                            -- , style "margin" "0"
+                            ]
+                            [ text model.term ]
+                        ]
+                    ]
+                ]
+            ]
         ]
 
 

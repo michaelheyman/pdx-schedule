@@ -1,6 +1,7 @@
 module Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..), Term)
 
 import Bootstrap.Accordion as Accordion
+import Bootstrap.Navbar as Navbar
 import Http
 import Time
 
@@ -21,16 +22,20 @@ type alias Model =
     , search : String
     , filter : String
     , accordionState : Accordion.State
+    , navbarState : Navbar.State
+    , termSearch : String
     }
 
 
 type Msg
     = GotClassList (Result Http.Error (List Class))
     | GotTermList (Result Http.Error (List Term))
+    | MakeApiRequest String
     | IncrementProgressBar Time.Posix
     | Search String
     | Filter String
     | AccordionMsg Accordion.State
+    | NavbarMsg Navbar.State
     | NoOp
 
 
@@ -70,3 +75,7 @@ type alias Class =
     , instructor : Maybe Instructor
     , term : Term
     }
+
+
+type alias State =
+    { basicState : Navbar.State }
