@@ -54,7 +54,7 @@ class InstructorMgr:
                 instructor
             )
         except ValueError:
-            LOG.info(f"{instructor} not found")
+            LOG.debug(f"{instructor} not found")
             instructor_record = Instructor(full_name=instructor)
         else:
             instructor_record = Instructor(
@@ -64,7 +64,7 @@ class InstructorMgr:
                 rating=rating,
                 url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
             )
-            LOG.info(f"{instructor} new")
+            LOG.debug(f"{instructor} new")
 
         return instructor_record
 
@@ -77,7 +77,7 @@ class InstructorMgr:
                 )
             except ValueError:
                 instructor_record.timestamp = datetime.now()
-                LOG.info(f"{instructor_record.full_name} not in RMP")
+                LOG.debug(f"{instructor_record.full_name} not in RMP")
             else:
                 if instructor_record.first_name and (
                     first_name != instructor_record.first_name
@@ -92,7 +92,7 @@ class InstructorMgr:
                     instructor_record.url = url
 
                 instructor_record.timestamp = datetime.now()
-                LOG.info(f"{instructor_record.full_name} in db updated")
+                LOG.debug(f"{instructor_record.full_name} in db updated")
 
         return instructor_record
 
