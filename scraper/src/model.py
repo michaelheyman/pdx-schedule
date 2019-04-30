@@ -1,3 +1,4 @@
+from crawler import MAX_TERMS
 from datetime import datetime, timedelta
 from logger import LOG
 from sqlalchemy import create_engine
@@ -10,7 +11,6 @@ from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.expression import func
 from parser import RateMyProfessors
 
 engine = create_engine("sqlite:///app.db", echo=False)
@@ -261,7 +261,7 @@ class Term(Base):
     description = Column("Description", String, primary_key=True)
 
     def __repr__(self):
-        return f"<Term(date={self.date}, " f"description={self.description}, "
+        return f"<Term(date={self.date}, " f"description={self.description}>"
 
 
 def table_exists(name):
@@ -272,12 +272,14 @@ def main():
     Base.metadata.create_all(engine)
 
     if table_exists("ClassOffering"):
-        latest_term = DBSession.query(func.max(ClassOffering.term)).one()
-        latest_term = latest_term[0]
+        refreshed_terms = (
+            DBSession.query(Term).order_by(Term.date.desc()).limit(MAX_TERMS).all()
+        )
 
-        DBSession.query(ClassOffering).filter(
-            ClassOffering.term == latest_term
-        ).delete()
+        for term in refreshed_terms:
+            DBSession.query(ClassOffering).filter(
+                ClassOffering.term == term.date
+            ).delete()
 
 
 main()

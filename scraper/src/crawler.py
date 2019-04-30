@@ -12,8 +12,8 @@ TERMS_URL = urljoin(BASE_URL, "classSearch/getTerms")
 SEARCH_URL = urljoin(BASE_URL, "term/search?mode=search")
 SCHEDULE_URL = urljoin(BASE_URL, "searchResults/searchResults")
 SUBJECTS_URL = urljoin(BASE_URL, "classSearch/get_subject")
-MAX_TERMS = 1
-MAX_SUBJECTS = 100
+MAX_TERMS = 2
+MAX_SUBJECTS = 200
 
 
 def get_tokens(driver):
@@ -140,7 +140,7 @@ def crawl():
                 params=payload,
             )
 
-            # New JSESSIONID and uniqueSessionId is needed for every subject
+            # New JSESSIONID and uniqueSessionId are needed for each subject
             session_id, unique_session_id = get_tokens(driver)
 
             yield sched_page.json()["data"]

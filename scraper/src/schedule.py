@@ -10,7 +10,7 @@ from model import TermMgr
 
 
 def run():
-    print("RUNNING")
+    LOG.info("RUNNING")
     disciplines = crawl()
 
     if disciplines is None:
