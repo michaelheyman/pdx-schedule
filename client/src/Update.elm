@@ -18,10 +18,8 @@ update msg model =
                         | response = Success
                         , classes = value
                         , disciplines =
-                            value
-                                |> List.map (.course >> .discipline)
-                                |> unique
-                                |> List.append model.disciplines
+                            unique <|
+                                List.map (.course >> .discipline) value
                         , term =
                             value
                                 |> List.map (.term >> .description)
