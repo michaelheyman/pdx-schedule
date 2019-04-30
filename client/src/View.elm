@@ -102,33 +102,42 @@ pageHeader model =
                         [ h1 [] [ text "PSU Schedule" ]
                         , h6
                             [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ]
-                            [ Dropdown.dropdown
-                                model.dropdownState
-                                { options = []
-                                , toggleMsg = DropdownMsg
-                                , toggleButton =
-                                    Dropdown.toggle
-                                        [ Button.light
-                                        , Button.small
-                                        , Button.outlineLight
-                                        ]
-                                        [ text model.term ]
-                                , items =
-                                    model.terms
-                                        |> List.reverse
-                                        |> List.map
-                                            (\term ->
-                                                Dropdown.buttonItem
-                                                    [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
-                                                    [ text (.description term) ]
-                                            )
-                                }
-                            ]
+                            [ termDropdown model ]
                         ]
                     ]
                 ]
             ]
         ]
+
+
+termDropdown : Model -> Html Msg
+termDropdown model =
+    Dropdown.dropdown
+        model.dropdownState
+        { options = []
+        , toggleMsg = DropdownMsg
+        , toggleButton =
+            Dropdown.toggle
+                [ Button.light
+                , Button.small
+                , Button.outlineLight
+                ]
+                [ text model.term ]
+        , items =
+            model.terms
+                |> List.reverse
+                |> List.map
+                    (\term ->
+                        Dropdown.buttonItem
+                            [ href "#"
+                            , onClick <|
+                                MakeApiRequest <|
+                                    String.fromInt <|
+                                        term.date
+                            ]
+                            [ text term.description ]
+                    )
+        }
 
 
 viewSidebar : Model -> Html Msg
