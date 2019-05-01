@@ -1,7 +1,7 @@
 module Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..), Term)
 
-import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
+import Bootstrap.Navbar as Navbar
 import Http
 import Time
 
@@ -20,9 +20,9 @@ type alias Model =
     , terms : List Term
     , loadingValue : Float
     , search : String
-    , filter : String
-    , accordionState : Accordion.State
+    , currentDiscipline : String
     , dropdownState : Dropdown.State
+    , navbarState : Navbar.State
     , termSearch : String
     }
 
@@ -33,8 +33,8 @@ type Msg
     | MakeApiRequest String
     | IncrementProgressBar Time.Posix
     | Search String
-    | Filter String
-    | AccordionMsg Accordion.State
+    | DisciplineFilter String
+    | NavbarMsg Navbar.State
     | DropdownMsg Dropdown.State
     | NoOp
 

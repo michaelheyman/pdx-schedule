@@ -1,6 +1,5 @@
 module Update exposing (update)
 
-import Bootstrap.Accordion as Accordion
 import Browser.Dom as Dom
 import Decode exposing (getClassList)
 import List.Extra exposing (unique)
@@ -43,7 +42,7 @@ update msg model =
                 Ok value ->
                     ( { model | terms = value }, Cmd.none )
 
-                Err error ->
+                Err _ ->
                     ( { model | terms = [] }, Cmd.none )
 
         MakeApiRequest param ->
@@ -59,16 +58,15 @@ update msg model =
         Search str ->
             ( { model | search = str }, Cmd.none )
 
-        Filter str ->
+        DisciplineFilter discipline ->
             ( { model
-                | filter = str
-                , accordionState = Accordion.initialState
+                | currentDiscipline = discipline
               }
             , resetViewport
             )
 
-        AccordionMsg state ->
-            ( { model | accordionState = state }, Cmd.none )
+        NavbarMsg state ->
+            ( { model | navbarState = state }, Cmd.none )
 
         DropdownMsg state ->
             ( { model | dropdownState = state }, Cmd.none )

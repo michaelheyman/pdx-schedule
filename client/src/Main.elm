@@ -1,7 +1,7 @@
 module Main exposing (init, main)
 
-import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
+import Bootstrap.Navbar as Navbar
 import Browser
 import Decode exposing (getClassList, getTermList)
 import Model exposing (Model, Msg(..), Response(..))
@@ -22,6 +22,10 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
+    let
+        ( navbarState, _ ) =
+            Navbar.initialState NavbarMsg
+    in
     ( { response = Loading
       , classes = []
       , disciplines = []
@@ -29,9 +33,9 @@ init _ =
       , terms = []
       , loadingValue = 10
       , search = ""
-      , filter = "Computer Science"
-      , accordionState = Accordion.initialState
+      , currentDiscipline = "Computer Science"
       , dropdownState = Dropdown.initialState
+      , navbarState = navbarState
       , termSearch = "latest"
       }
     , Cmd.batch [ getClassList "latest", getTermList ]
