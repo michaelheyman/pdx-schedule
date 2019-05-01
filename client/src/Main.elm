@@ -1,6 +1,5 @@
 module Main exposing (init, main)
 
-import Bootstrap.Accordion as Accordion
 import Bootstrap.Navbar as Navbar
 import Browser
 import Decode exposing (getClassList, getTermList)
@@ -23,7 +22,7 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
-        ( navbarState, navbarCmd ) =
+        ( navbarState, _ ) =
             Navbar.initialState NavbarMsg
     in
     ( { response = Loading
@@ -34,7 +33,6 @@ init _ =
       , loadingValue = 10
       , search = ""
       , currentDiscipline = "Computer Science"
-      , accordionState = Accordion.initialState
       , navbarState = navbarState
       , termSearch = "latest"
       }

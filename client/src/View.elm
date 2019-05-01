@@ -1,30 +1,23 @@
 module View exposing (view)
 
-import Bootstrap.Accordion as Accordion
 import Bootstrap.Alert as Alert
-import Bootstrap.Card as Card
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
-import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Navbar as Navbar
 import Bootstrap.Progress as Progress
 import Bootstrap.Table as Table
-import Bootstrap.Text as Text
-import Bootstrap.Utilities.Border as Border
 import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
 import Color exposing (rgb255, rgba, toCssString)
-import Decode exposing (getClassList)
-import Dict exposing (Dict)
 import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy)
-import Model exposing (Class, Course, Instructor, Model, Msg(..), Response(..), Term)
+import Model exposing (Class, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
 
@@ -47,11 +40,6 @@ view model =
     }
 
 
-termListToDict : List Term -> Dict String Int
-termListToDict list =
-    Dict.fromList (List.map (\term -> ( term.description, term.date )) list)
-
-
 viewNavbar : Model -> Html Msg
 viewNavbar model =
     div [ Display.noneMd ]
@@ -69,9 +57,8 @@ viewNavbar model =
                     { id = "termDropdown"
                     , toggle = Navbar.dropdownToggle [] [ text model.term ]
                     , items =
-                        [ Navbar.dropdownHeader [ text "Term" ]
-                        ]
-                            ++ List.map
+                        Navbar.dropdownHeader [ text "Term" ]
+                            :: List.map
                                 (\term ->
                                     Navbar.dropdownItem
                                         [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
@@ -90,15 +77,13 @@ viewNavbar model =
                                 text model.currentDiscipline
                             ]
                     , items =
-                        [ Navbar.dropdownHeader [ text "Discipline" ]
-                        ]
-                            ++ [ Navbar.dropdownItem
-                                    [ href "#"
-                                    , onClick (DisciplineFilter "")
-                                    ]
-                                    [ text "All" ]
-                               ]
-                            ++ List.map
+                        Navbar.dropdownHeader [ text "Discipline" ]
+                            :: Navbar.dropdownItem
+                                [ href "#"
+                                , onClick (DisciplineFilter "")
+                                ]
+                                [ text "All" ]
+                            :: List.map
                                 (\discipline ->
                                     Navbar.dropdownItem
                                         [ href "#"
@@ -113,37 +98,11 @@ viewNavbar model =
         ]
 
 
-
--- Navbar.config NavbarMsg
---     |> Navbar.withAnimation
---     |> Navbar.brand [ href "#" ] [ text "PSU Schedule" ]
---     |> Navbar.info
---     |> Navbar.light
---     |> Navbar.items
---         [ Navbar.itemLink [ href "#" ] [ text "Item 1" ]
---         , Navbar.dropdown
---             { id = "termDropdown"
---             , toggle = Navbar.dropdownToggle [] [ text model.term ]
---             , items =
---                 [ Navbar.dropdownHeader [ text "Term" ]
---                 ]
---                     ++ List.map
---                         (\term ->
---                             Navbar.dropdownItem
---                                 [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
---                                 [ text (.description term) ]
---                         )
---                         (List.reverse model.terms)
---             }
---         ]
---     |> Navbar.view model.navbarState
-
-
 renderPage : Model -> Html Msg
 renderPage model =
     div []
         [ viewNavbar model
-        , xpageHeader model
+        , pageHeader model
         , Grid.containerFluid []
             [ Grid.row
                 [ Row.centerXs ]
@@ -154,15 +113,6 @@ renderPage model =
                     , Col.attrs [ class "bd-sidebar" ]
                     ]
                     [ lazy viewSidebar model ]
-
-                -- , Grid.col
-                --     [ Col.attrs [ Display.noneMd ]
-                --     , Col.xs12
-                --     , Col.md2
-                --     , Col.attrs [ class "bd-accordion" ]
-                --     ]
-                --     [ lazy viewAccordion model
-                --     ]
                 , Grid.col
                     [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
                     [ main_
@@ -172,45 +122,6 @@ renderPage model =
                 ]
             ]
         , viewFooter model
-        ]
-
-
-xpageHeader : Model -> Html Msg
-xpageHeader model =
-    div
-        [ class "bd-pageheader"
-        , style "background-color" "#563d7c"
-        , style "color" "white"
-        , style "height" "30vh"
-
-        -- , style "position" "relative"
-        , Spacing.pt5
-        , Spacing.pb5
-        , Spacing.mb3
-        , Spacing.mb5Md
-        ]
-        [ Grid.containerFluid []
-            [ Grid.row []
-                [ Grid.col
-                    [ Col.offsetXs1
-                    , Col.offsetMd2
-                    , Col.offsetXl0
-                    ]
-                    [ div [ class "container" ]
-                        [ h1
-                            [ style "font-size" "4rem"
-
-                            -- , style "position" "absolute"
-                            -- , style "top" "50%"
-                            -- , style "-ms-transform" "translateY(-50%)"
-                            -- , style "transform" "translateY(-50%)"
-                            -- , style "margin" "0"
-                            ]
-                            [ text model.term ]
-                        ]
-                    ]
-                ]
-            ]
         ]
 
 
@@ -296,33 +207,6 @@ viewInput =
             , autocomplete False
             ]
         ]
-
-
-viewAccordion : Model -> Html Msg
-viewAccordion model =
-    Accordion.config AccordionMsg
-        |> Accordion.withAnimation
-        |> Accordion.cards
-            [ Accordion.card
-                { id = "disciplineCard"
-                , options =
-                    [ Card.light
-                    , Card.outlineLight
-                    , Card.textColor Text.secondary
-                    , Card.attrs [ Spacing.mb4 ]
-                    , Card.align Text.alignXsLeft
-                    ]
-                , header =
-                    Accordion.header [ Spacing.pl0 ] <| Accordion.toggle [] [ text "Disciplines" ]
-                , blocks =
-                    [ Accordion.listGroup
-                        (accordionLink model "All"
-                            :: List.map (accordionLink model) model.disciplines
-                        )
-                    ]
-                }
-            ]
-        |> Accordion.view model.accordionState
 
 
 viewProgressBar : Float -> Html Msg
@@ -675,39 +559,5 @@ sidebarLink model string =
         , style "color" "#99979c"
         , onClick (DisciplineFilter string)
         , style "cursor" "pointer"
-        ]
-        [ disciplineText ]
-
-
-accordionLink : Model -> String -> ListGroup.Item Msg
-accordionLink model string =
-    let
-        disciplineText =
-            if model.currentDiscipline == string then
-                b [] [ text string ]
-
-            else if model.currentDiscipline == "" && string == "All" then
-                b [] [ text string ]
-
-            else
-                text string
-    in
-    ListGroup.li
-        [ ListGroup.attrs
-            [ style "font-size" "0.8em"
-            , let
-                value =
-                    if string == "All" then
-                        ""
-
-                    else
-                        string
-              in
-              onClick (DisciplineFilter value)
-            , style "cursor" "pointer"
-            , Border.topNone
-            , Spacing.pt1
-            ]
-        , ListGroup.light
         ]
         [ disciplineText ]
