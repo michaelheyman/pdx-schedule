@@ -145,11 +145,20 @@ pageHeader model =
                     , Col.offsetMd2
                     , Col.offsetXl0
                     ]
-                    [ div [ class "container" ]
+                    [ div
+                        [ class "container" ]
                         [ h1 [] [ text "PSU Schedule" ]
                         , h6
-                            [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75)) ]
+                            [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75))
+                            , Display.none
+                            , Display.blockMd
+                            ]
                             [ termDropdown model ]
+                        , h6
+                            [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75))
+                            , Display.noneMd
+                            ]
+                            [ text model.term ]
                         ]
                     ]
                 ]
