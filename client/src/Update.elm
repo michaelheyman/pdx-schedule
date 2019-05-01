@@ -61,10 +61,11 @@ update msg model =
         Search str ->
             ( { model | search = str }, Cmd.none )
 
-        Filter str ->
+        DisciplineFilter discipline ->
             ( { model
-                | filter = str
-                , accordionState = Accordion.initialState
+                | currentDiscipline = discipline
+
+                -- , accordionState = Accordion.initialState
               }
             , resetViewport
             )

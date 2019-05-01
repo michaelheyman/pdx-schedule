@@ -20,7 +20,7 @@ type alias Model =
     , terms : List Term
     , loadingValue : Float
     , search : String
-    , filter : String
+    , currentDiscipline : String
     , accordionState : Accordion.State
     , navbarState : Navbar.State
     , termSearch : String
@@ -33,7 +33,7 @@ type Msg
     | MakeApiRequest String
     | IncrementProgressBar Time.Posix
     | Search String
-    | Filter String
+    | DisciplineFilter String
     | AccordionMsg Accordion.State
     | NavbarMsg Navbar.State
     | NoOp
