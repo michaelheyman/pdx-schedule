@@ -1,15 +1,15 @@
 repos:
     - repo: https://github.com/ambv/black
-      rev: stable
+      rev: 19.3b0
       hooks:
           - id: black
             language_version: python3.7
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v1.2.3
+      rev: v2.2.1
       hooks:
           - id: flake8
     - repo: https://github.com/prettier/prettier
-      rev: 1.15.3
+      rev: 1.17.0
       hooks:
           - id: prettier
             args: [--tab-width=4]
