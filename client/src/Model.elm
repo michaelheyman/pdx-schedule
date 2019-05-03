@@ -19,7 +19,7 @@ type alias Model =
     , term : String
     , terms : List Term
     , loadingValue : Float
-    , search : String
+    , searchFilter : String
     , currentDiscipline : String
     , dropdownState : Dropdown.State
     , navbarState : Navbar.State
@@ -32,7 +32,7 @@ type Msg
     | GotTermList (Result Http.Error (List Term))
     | MakeApiRequest String
     | IncrementProgressBar Time.Posix
-    | Search String
+    | FilterRecords String
     | DisciplineFilter String
     | NavbarMsg Navbar.State
     | DropdownMsg Dropdown.State
