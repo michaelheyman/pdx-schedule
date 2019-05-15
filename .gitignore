@@ -4,6 +4,6 @@ src/**/*.js.map
 client/elm-stuff
 scraper/__pycache__
 scraper/src/__pycache__
-scraper/index.html
+scraper/app.db
 .DS_Store
 .env
