@@ -1,4 +1,4 @@
-from crawler import MAX_TERMS
+import config
 from datetime import datetime, timedelta
 from logger import LOG
 from sqlalchemy import create_engine
@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
 from parser import RateMyProfessors
 
-engine = create_engine("sqlite:///app.db", echo=False)
+engine = create_engine(f"sqlite:///{config.DATABASE_PATH}", echo=False)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 DBSession = Session()
@@ -273,7 +273,10 @@ def main():
 
     if table_exists("ClassOffering"):
         refreshed_terms = (
-            DBSession.query(Term).order_by(Term.date.desc()).limit(MAX_TERMS).all()
+            DBSession.query(Term)
+            .order_by(Term.date.desc())
+            .limit(config.MAX_TERMS)
+            .all()
         )
 
         for term in refreshed_terms:

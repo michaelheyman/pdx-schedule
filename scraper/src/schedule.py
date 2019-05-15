@@ -11,37 +11,38 @@ from model import TermMgr
 
 def run():
     LOG.info("RUNNING")
-    disciplines = crawl()
+    terms = crawl()
 
-    if disciplines is None:
-        LOG.error("No JSON found to parse. Exiting.")
+    if terms is None:
+        LOG.error("No JSON returned from the crawler. Exiting.")
         return
 
-    for discipline in disciplines:
-        for course in discipline:
-            number = f"{course['subject']} {course['courseNumber']}"
-            name = course["courseTitle"].replace("&amp;", "&")
-            crn = int(course["courseReferenceNumber"])
-            discipline = course["subjectDescription"].replace("&amp;", "&")
-            days = get_days(course)
-            credits = int(course["creditHours"]) if course["creditHours"] else 0
-            time = get_time(course)
-            instructor = get_instructor(course)
-            term_description = get_term_description(course)
-            term_date = int(course["term"])
+    for term in terms:
+        for discipline in term:
+            for course in discipline:
+                number = f"{course['subject']} {course['courseNumber']}"
+                name = course["courseTitle"].replace("&amp;", "&")
+                crn = int(course["courseReferenceNumber"])
+                discipline = course["subjectDescription"].replace("&amp;", "&")
+                days = get_days(course)
+                credits = int(course["creditHours"]) if course["creditHours"] else 0
+                time = get_time(course)
+                instructor = get_instructor(course)
+                term_description = get_term_description(course)
+                term_date = int(course["term"])
 
-            save_to_database(
-                name,
-                number,
-                discipline,
-                instructor,
-                term_date,
-                term_description,
-                credits,
-                days,
-                time,
-                crn,
-            )
+                save_to_database(
+                    name,
+                    number,
+                    discipline,
+                    instructor,
+                    term_date,
+                    term_description,
+                    credits,
+                    days,
+                    time,
+                    crn,
+                )
 
     ConnectionMgr.commit()
 
