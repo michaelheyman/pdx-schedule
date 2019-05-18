@@ -1,4 +1,8 @@
+import config
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+for module in ["requests", "selenium", "urllib3"]:
+    logging.getLogger(module).setLevel(logging.WARNING)
+
+logging.basicConfig(level=config.LOGGING_LEVEL, format="%(levelname)s: %(message)s")
 LOG = logging.getLogger(__name__)

@@ -141,20 +141,6 @@ def get_instructor(rec):
         return "TBD"
 
 
-def print_class(rec):
-    print(f"Number: {rec['subject']} {rec['courseNumber']}")
-    print(f"Title: {rec['courseTitle'].replace('&amp;', '&')}")
-    print(f"CRN: {int(rec['courseReferenceNumber'])}")
-    print(f"Discipline: {rec['subjectDescription'].replace('&amp;', '&')}")
-    print(f"Days: {get_days(rec)}")
-    print(f"Credits: {int(rec['creditHours'])}")
-    print(f"Time: {get_time(rec)}")
-    print(f"Instructor: {get_instructor(rec)}")
-    print(f"Term description: {get_term_description(rec)}")
-    print(f"Term date: {int(rec['term'])}")
-    print("\n")
-
-
 def main():
     Base.metadata.create_all(engine)
     run()

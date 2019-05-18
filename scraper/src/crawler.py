@@ -123,12 +123,10 @@ def crawl():
         subjects = get_subjects(cookies, unique_session_id, term["code"])
 
         for idx, subject in enumerate(subjects):
-            print(
+            LOG.debug(
                 f"{term['description']}: "
                 f"crawling {idx + 1}/{len(subjects)} subjects "
-                f"({subject['description']})",
-                end=("\n" if idx == len(subjects) - 1 else "\r"),
-                flush=True,
+                f"({subject['description']})"
             )
 
             authenticate_current_session(term, unique_session_id, cookies)
@@ -138,7 +136,7 @@ def crawl():
             if sched_json["data"]:
                 subjects_json.append(sched_json["data"])
             else:
-                LOG.error(
+                LOG.warning(
                     f"No course data found for subject '{subject['description']}'."
                 )
 
