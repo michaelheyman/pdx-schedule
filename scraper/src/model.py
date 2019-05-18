@@ -35,7 +35,7 @@ class InstructorMgr:
         )
 
         if instructor_record is None:
-            LOG.debug(f"Instructor not found in database: {instructor}")
+            LOG.debug(f"Creating new instructor record for: {instructor}")
             instructor_record = InstructorMgr.create_instructor(instructor)
 
             DBSession.add(instructor_record)
@@ -56,7 +56,7 @@ class InstructorMgr:
                 instructor
             )
         except ValueError:
-            LOG.debug(f"{instructor} not found")
+            LOG.info(f"RateMyProfessors found no record of instructor {instructor}.")
             instructor_record = Instructor(full_name=instructor)
         else:
             instructor_record = Instructor(
@@ -66,7 +66,6 @@ class InstructorMgr:
                 rating=rating,
                 url=f"http://www.ratemyprofessors.com/ShowRatings.jsp?tid={rmp_id}",
             )
-            LOG.debug(f"{instructor} new")
 
         return instructor_record
 

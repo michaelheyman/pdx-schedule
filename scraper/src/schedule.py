@@ -1,3 +1,4 @@
+import asyncio
 from crawler import crawl
 from logger import LOG
 from model import Base
@@ -9,7 +10,7 @@ from model import ConnectionMgr
 from model import TermMgr
 
 
-def run():
+async def run():
     LOG.info("RUNNING")
     terms = crawl()
 
@@ -17,9 +18,10 @@ def run():
         LOG.error("No JSON returned from the crawler. Exiting.")
         return
 
-    for term in terms:
+    async for term in crawl():
         for discipline in term:
             for course in discipline:
+                pass
                 number = f"{course['subject']} {course['courseNumber']}"
                 name = course["courseTitle"].replace("&amp;", "&")
                 crn = int(course["courseReferenceNumber"])
@@ -143,7 +145,7 @@ def get_instructor(rec):
 
 def main():
     Base.metadata.create_all(engine)
-    run()
+    asyncio.get_event_loop().run_until_complete(run())
 
 
 if __name__ == "__main__":

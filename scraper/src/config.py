@@ -13,5 +13,5 @@ def map_level(level):
 MAX_TERMS = int(os.environ.get("MAX_TERMS", "1"))
 MAX_SUBJECTS = int(os.environ.get("MAX_SUBJECTS", "200"))
 DATABASE_PATH = os.environ.get("DATABASE_PATH", "app.db")
-LOGGING_LEVEL = map_level(os.environ.get("LOGGING_LEVEL", "10"))
+LOGGING_LEVEL = map_level(os.environ.get("LOGGING_LEVEL", "debug"))
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")

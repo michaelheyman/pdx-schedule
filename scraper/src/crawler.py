@@ -2,8 +2,7 @@ import requests
 import time
 import config
 from logger import LOG
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from pyppeteer import launch
 from urllib.parse import urljoin
 
 
@@ -16,28 +15,31 @@ SCHEDULE_URL = urljoin(BASE_URL, "searchResults/searchResults")
 SUBJECTS_URL = urljoin(BASE_URL, "classSearch/get_subject")
 
 
-def get_tokens(driver):
+async def get_tokens(browser):
     """Returns JSESSIONID and uniqueSessionId needed for receiving a
-    successful response from HTTP requests
+    successful response from HTTP requests.
 
-    :param driver: Instantiated selenium driver
+    :param browser: Instantiated pyppeteer browser
     :returns: The JSESSIONID and uniqueSessionId
     """
-    session_id = get_jsession_id(driver)
-    unique_session_id = get_unique_session_id(driver)
+    page = await browser.newPage()
+    await page.goto(INIT_URL)
+
+    session_id = await get_jsession_id(page)
+    unique_session_id = await get_unique_session_id(page)
 
     return session_id, unique_session_id
 
 
-def get_jsession_id(driver):
-    driver.get(INIT_URL)
-    cookies = {cookie["name"]: cookie["value"] for cookie in driver.get_cookies()}
+async def get_jsession_id(page):
+    cookies = await page.cookies(INIT_URL)
+    cookies = {cookie["name"]: cookie["value"] for cookie in cookies}
 
     return cookies["JSESSIONID"]
 
 
-def get_unique_session_id(driver):
-    unique_session_id = driver.execute_script("return sessionStorage.getItem(STORAGE)")
+async def get_unique_session_id(page):
+    unique_session_id = await page.evaluate("sessionStorage.getItem(STORAGE)")
 
     return unique_session_id
 
@@ -86,34 +88,32 @@ def get_subjects(cookies, unique_session_id, term_date):
     return res.json()
 
 
-def initialize_driver():
-    """Initializes Selenium driver with options. Doesn't open or close driver,
+async def initialize_browser():
+    """Initializes pyppeteer browser with options. Doesn't open or close browser,
     that responsibility is left to the caller.
     """
+    args = ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"]
+    browser = await launch(args=args, headless=True)
 
-    options = Options()
-    options.add_argument("--headless")
-    prefs = {
-        # Load without images
-        "profile.managed_default_content_settings.images": 2,
-        # Load with disk cache to prevent requesting repeated assets
-        "disk-cache-size": 4096,
-    }
-    options.add_experimental_option("prefs", prefs)
-
-    driver = webdriver.Chrome(options=options)
-
-    return driver
+    return browser
 
 
-def crawl():
-    driver = initialize_driver()
+async def get_page(browser):
+    page = await browser.newPage()
+    await page.goto(INIT_URL)
+    return page
 
-    session_id, unique_session_id = get_tokens(driver)
+
+async def crawl():
+    browser = await initialize_browser()
+
+    page = await get_page(browser)
+    session_id, unique_session_id = await get_tokens(browser)
 
     if None in (session_id, unique_session_id):
-        driver.close()
-        return None
+        browser.close()
+        yield None
+        return
 
     cookies = dict(JSESSIONID=session_id)
     terms = get_terms(cookies, unique_session_id)
@@ -141,15 +141,16 @@ def crawl():
                 )
 
             # New uniqueSessionId is needed for each subject
-            unique_session_id = get_unique_session_id(driver)
+            unique_session_id = await get_unique_session_id(page)
 
             if None in (session_id, unique_session_id):
-                driver.close()
-                return None
+                browser.close()
+                yield None
+                return
 
         yield subjects_json
 
-    driver.close()
+    await browser.close()
 
 
 def get_schedule_json(subject, term, unique_session_id, cookies):

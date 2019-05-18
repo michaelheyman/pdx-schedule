@@ -1,7 +1,9 @@
 import config
 import logging
 
-for module in ["requests", "selenium", "urllib3"]:
+modules = ["requests", "selenium", "urllib3", "pyppeteer", "websockets", "asyncio"]
+
+for module in modules:
     logging.getLogger(module).setLevel(logging.WARNING)
 
 logging.basicConfig(level=config.LOGGING_LEVEL, format="%(levelname)s: %(message)s")
