@@ -1,13 +1,16 @@
 import asyncio
 from crawler import crawl
 from logger import LOG
-from model import Base
-from model import engine
-from model import InstructorMgr
-from model import CourseMgr
-from model import ClassOfferingMgr
-from model import ConnectionMgr
-from model import TermMgr
+from model import (
+    Base,
+    ClassOfferingMgr,
+    ConnectionMgr,
+    CourseMgr,
+    engine,
+    initialize_database,
+    InstructorMgr,
+    TermMgr,
+)
 
 
 async def run():
@@ -21,65 +24,53 @@ async def run():
     async for term in crawl():
         for discipline in term:
             for course in discipline:
-                pass
-                number = f"{course['subject']} {course['courseNumber']}"
-                name = course["courseTitle"].replace("&amp;", "&")
-                crn = int(course["courseReferenceNumber"])
-                discipline = course["subjectDescription"].replace("&amp;", "&")
-                days = get_days(course)
-                credits = int(course["creditHours"]) if course["creditHours"] else 0
-                time = get_time(course)
-                instructor = get_instructor(course)
-                term_description = get_term_description(course)
-                term_date = int(course["term"])
-
-                save_to_database(
-                    name,
-                    number,
-                    discipline,
-                    instructor,
-                    term_date,
-                    term_description,
-                    credits,
-                    days,
-                    time,
-                    crn,
-                )
-
-    ConnectionMgr.commit()
+                course = get_course_data(course)
+                save_to_database(course)
 
 
-def save_to_database(
-    name,
-    number,
-    discipline,
-    instructor,
-    term_date,
-    term_description,
-    credits,
-    days,
-    time,
-    crn,
-):
-    if instructor is None:
-        CourseMgr.add_course(name=name, number=number, discipline=discipline)
+def get_course_data(course):
+    course_data = dict()
+
+    course_data["number"] = f"{course['subject']} {course['courseNumber']}"
+    course_data["name"] = course["courseTitle"].replace("&amp;", "&")
+    course_data["crn"] = int(course["courseReferenceNumber"])
+    course_data["discipline"] = course["subjectDescription"].replace("&amp;", "&")
+    course_data["days"] = get_days(course)
+    course_data["credits"] = int(course["creditHours"]) if course["creditHours"] else 0
+    course_data["time"] = get_time(course)
+    course_data["instructor"] = get_instructor(course)
+    course_data["term_description"] = get_term_description(course)
+    course_data["term_date"] = int(course["term"])
+
+    return course_data
+
+
+def save_to_database(course):
+    if course["instructor"] is None:
+        CourseMgr.add_course(
+            name=course["name"],
+            number=course["number"],
+            discipline=course["discipline"],
+        )
         return
 
-    InstructorMgr.add_instructor(instructor)
-    CourseMgr.add_course(name=name, number=number, discipline=discipline)
-
-    ClassOfferingMgr.add_class_offering(
-        course_name=name,
-        course_number=number,
-        instructor_name=instructor,
-        term=term_date,
-        credits=credits,
-        days=days,
-        time=time,
-        crn=crn,
+    InstructorMgr.add_instructor(course["instructor"])
+    CourseMgr.add_course(
+        name=course["name"], number=course["number"], discipline=course["discipline"]
     )
 
-    TermMgr.add_term(date=term_date, description=term_description)
+    ClassOfferingMgr.add_class_offering(
+        course_name=course["name"],
+        course_number=course["number"],
+        instructor_name=course["instructor"],
+        term=course["term_date"],
+        credits=course["credits"],
+        days=course["days"],
+        time=course["time"],
+        crn=course["crn"],
+    )
+
+    TermMgr.add_term(date=course["term_date"], description=course["term_description"])
 
 
 def get_time(record):
@@ -145,7 +136,9 @@ def get_instructor(rec):
 
 def main():
     Base.metadata.create_all(engine)
+    initialize_database()
     asyncio.get_event_loop().run_until_complete(run())
+    ConnectionMgr.commit()
 
 
 if __name__ == "__main__":

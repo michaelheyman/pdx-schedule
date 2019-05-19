@@ -269,7 +269,7 @@ def table_exists(name):
     return engine.dialect.has_table(engine, name)
 
 
-def main():
+def initialize_database():
     Base.metadata.create_all(engine)
 
     if table_exists("ClassOffering"):
@@ -284,6 +284,3 @@ def main():
             DBSession.query(ClassOffering).filter(
                 ClassOffering.term == term.date
             ).delete()
-
-
-main()
