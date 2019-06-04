@@ -4,6 +4,7 @@ import config
 from logger import LOG
 from pyppeteer import launch
 from urllib.parse import urljoin
+import json
 
 
 BASE_URL = "https://app.banner.pdx.edu/StudentRegistrationSsb/ssb/"
@@ -92,7 +93,16 @@ async def initialize_browser():
     """Initializes pyppeteer browser with options. Doesn't open or close browser,
     that responsibility is left to the caller.
     """
-    args = ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"]
+    args = [
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-setuid-sandbox",
+        "--ignore-certificate-errors",
+        "--no-first-run",
+        "--no-sandbox",
+        "--no-zygote",
+        "--single-process",
+    ]
     browser = await launch(args=args, headless=True)
 
     return browser
@@ -123,6 +133,9 @@ async def crawl():
         subjects = get_subjects(cookies, unique_session_id, term["code"])
 
         for idx, subject in enumerate(subjects):
+            # if idx > 2:
+            #     continue
+
             LOG.debug(
                 f"{term['description']}: "
                 f"crawling {idx + 1}/{len(subjects)} subjects "
@@ -203,3 +216,21 @@ def authenticate_current_session(term, unique_session_id, cookies):
     requests.post(
         SEARCH_URL, headers={"referer": INIT_URL}, cookies=cookies, params=payload
     )
+
+
+def write_json(data):
+    print("PRINTING TO FILE")
+    with open("data.json", "a") as outfile:
+        json.dump(data, outfile)
+
+
+def read_json(filename):
+    lst = []
+    # with open("../data.json", "r") as file:
+    with open(filename, "r") as file:
+        content = file.read()
+        print(f"type: {content}")
+        # print(f"contents: {content}")
+        lst = json.loads(content)
+
+    print(lst)

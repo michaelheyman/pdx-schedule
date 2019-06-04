@@ -1,31 +1,47 @@
 import asyncio
+import json
+
+
 from crawler import crawl
 from logger import LOG
-from model import (
-    Base,
-    ClassOfferingMgr,
-    ConnectionMgr,
-    CourseMgr,
-    engine,
-    initialize_database,
-    InstructorMgr,
-    TermMgr,
-)
+from firestore import Firestore
+from fmodel import ClassOfferingMgr, Course, Term
+
+
+def offline_crawl():
+    lst = []
+    with open("./tests/fall2019.json", "r") as file:
+        content = file.read()
+        lst = json.loads(content)
+
+    return lst
 
 
 async def run():
     LOG.info("RUNNING")
     terms = crawl()
+    # terms = offline_crawl()
 
     if terms is None:
         LOG.error("No JSON returned from the crawler. Exiting.")
         return
 
     async for term in crawl():
-        for discipline in term:
+        # for term in terms:
+        for idx, discipline in enumerate(term):
+            # if idx > 1:
+            #     continue
             for course in discipline:
                 course = get_course_data(course)
                 save_to_database(course)
+
+    # print(f"length of instructor list: {len(Firestore.instructor_list)}")
+    # instructor_doc = Firestore.instructors().document()
+    # print(instructor_doc)
+    # print(instructor_doc.id)
+    # instructor_doc.set({"fullName": "Testructor2"})
+    # print(f"length of instructor list: {len(Firestore.instructor_list)}")
+    Firestore.commit()
 
 
 def get_course_data(course):
@@ -35,42 +51,35 @@ def get_course_data(course):
     course_data["name"] = course["courseTitle"].replace("&amp;", "&")
     course_data["crn"] = int(course["courseReferenceNumber"])
     course_data["discipline"] = course["subjectDescription"].replace("&amp;", "&")
+    course_data["subject"] = course["subject"]
     course_data["days"] = get_days(course)
     course_data["credits"] = int(course["creditHours"]) if course["creditHours"] else 0
     course_data["time"] = get_time(course)
-    course_data["instructor"] = get_instructor(course)
+    course_data["instructor"] = get_instructor_name(course)
     course_data["term_description"] = get_term_description(course)
     course_data["term_date"] = int(course["term"])
 
     return course_data
 
 
-def save_to_database(course):
-    if course["instructor"] is None:
-        CourseMgr.add_course(
-            name=course["name"],
-            number=course["number"],
-            discipline=course["discipline"],
-        )
-        return
+def save_to_database(data):
+    # InstructorMgr.add_instructor(data["instructor"])
 
-    InstructorMgr.add_instructor(course["instructor"])
-    CourseMgr.add_course(
-        name=course["name"], number=course["number"], discipline=course["discipline"]
-    )
+    # if data["instructor"]:
+    #     InstructorMgr.add_instructor(data["instructor"])
+
+    course = Course(data["name"], data["number"], data["discipline"])
+    term = Term(str(data["term_date"]), data["subject"], data["term_description"])
 
     ClassOfferingMgr.add_class_offering(
-        course_name=course["name"],
-        course_number=course["number"],
-        instructor_name=course["instructor"],
-        term=course["term_date"],
-        credits=course["credits"],
-        days=course["days"],
-        time=course["time"],
-        crn=course["crn"],
+        course=course,
+        crn=data["crn"],
+        instructor_name=data["instructor"],
+        term=term,
+        credits=data["credits"],
+        days=data["days"],
+        time=data["time"],
     )
-
-    TermMgr.add_term(date=course["term_date"], description=course["term_description"])
 
 
 def get_time(record):
@@ -122,7 +131,7 @@ def get_term_description(record):
     return " ".join(term.split(" ")[0:2])
 
 
-def get_instructor(rec):
+def get_instructor_name(rec):
     if rec["faculty"] and len(rec["faculty"]):
         instructor_name = rec["faculty"][0]["displayName"]
         instructor_name = instructor_name.split(", ", maxsplit=1)
@@ -135,10 +144,8 @@ def get_instructor(rec):
 
 
 def main():
-    Base.metadata.create_all(engine)
-    initialize_database()
+    Firestore.initialize()
     asyncio.get_event_loop().run_until_complete(run())
-    ConnectionMgr.commit()
 
 
 if __name__ == "__main__":

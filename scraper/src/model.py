@@ -2,16 +2,17 @@ import config
 from datetime import datetime, timedelta
 from logger import LOG
 from ratemyprofessors import RateMyProfessors
-from sqlalchemy import create_engine
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Integer
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
+from sqlalchemy import (
+    create_engine,
+    Column,
+    DateTime,
+    Integer,
+    Float,
+    ForeignKey,
+    String,
+)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import sessionmaker, relationship
 
 engine = create_engine(f"sqlite:///{config.DATABASE_PATH}", echo=False)
 Base = declarative_base()
@@ -78,7 +79,6 @@ class InstructorMgr:
                 )
             except ValueError:
                 instructor_record.timestamp = datetime.now()
-                LOG.debug(f"{instructor_record.full_name} not in RMP")
             else:
                 if instructor_record.first_name and (
                     first_name != instructor_record.first_name
@@ -93,7 +93,6 @@ class InstructorMgr:
                     instructor_record.url = url
 
                 instructor_record.timestamp = datetime.now()
-                LOG.debug(f"{instructor_record.full_name} in db updated")
 
         return instructor_record
 

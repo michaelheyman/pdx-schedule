@@ -1,4 +1,5 @@
 import requests
+from logger import LOG
 
 
 class RateMyProfessors:
@@ -12,7 +13,12 @@ class RateMyProfessors:
     @staticmethod
     def get_instructor_json(instructor_name):
         url = RateMyProfessors.url.format(instructor_name.replace(" ", "+"))
-        response = requests.get(url)
+
+        try:
+            response = requests.get(url)
+        except requests.exceptions.ConnectionError as err:
+            LOG.error(f"RMP request failed: {err}")
+            return None
         return response.json()
 
     @staticmethod
