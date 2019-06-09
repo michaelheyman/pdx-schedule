@@ -1,6 +1,6 @@
 import config
 from datetime import datetime, timedelta
-from logger import LOG
+from logger import logger
 from ratemyprofessors import RateMyProfessors
 from sqlalchemy import create_engine
 from sqlalchemy import Column
@@ -35,14 +35,16 @@ class InstructorMgr:
         )
 
         if instructor_record is None:
-            LOG.debug(f"Creating new instructor record for: {instructor}")
+            logger.debug("Creating new instructor.", extra={"instructor": instructor})
             instructor_record = InstructorMgr.create_instructor(instructor)
 
             DBSession.add(instructor_record)
             DBSession.flush()
         else:
             if instructor_record.timestamp < datetime.today() - timedelta(days=1):
-                LOG.debug(f"Updating instructor information for: {instructor}")
+                logger.debug(
+                    "Updating instructor information.", extra={"instructor": instructor}
+                )
                 instructor_record = InstructorMgr.update_instructor(instructor_record)
 
         DBSession.commit()
@@ -56,7 +58,10 @@ class InstructorMgr:
                 instructor
             )
         except ValueError:
-            LOG.info(f"RateMyProfessors found no record of instructor {instructor}.")
+            logger.info(
+                "RateMyProfessors found no record of instructor.",
+                extra={"instructor": instructor},
+            )
             instructor_record = Instructor(full_name=instructor)
         else:
             instructor_record = Instructor(
@@ -78,7 +83,10 @@ class InstructorMgr:
                 )
             except ValueError:
                 instructor_record.timestamp = datetime.now()
-                LOG.debug(f"{instructor_record.full_name} not in RMP")
+                logger.debug(
+                    "Instructor not listed in RateMyProfessors.",
+                    extra={"instructor": instructor_record.full_name},
+                )
             else:
                 if instructor_record.first_name and (
                     first_name != instructor_record.first_name
@@ -93,7 +101,10 @@ class InstructorMgr:
                     instructor_record.url = url
 
                 instructor_record.timestamp = datetime.now()
-                LOG.debug(f"{instructor_record.full_name} in db updated")
+                logger.debug(
+                    "Updated instructor in datastore.",
+                    extra={"instructor": instructor_record.full_name},
+                )
 
         return instructor_record
 

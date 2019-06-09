@@ -1,7 +1,7 @@
 import requests
 import time
 import config
-from logger import LOG
+from logger import logger
 from pyppeteer import launch
 from urllib.parse import urljoin
 
@@ -123,10 +123,14 @@ async def crawl():
         subjects = get_subjects(cookies, unique_session_id, term["code"])
 
         for idx, subject in enumerate(subjects):
-            LOG.debug(
-                f"{term['description']}: "
-                f"crawling {idx + 1}/{len(subjects)} subjects "
-                f"({subject['description']})"
+            logger.debug(
+                "Crawling subject",
+                extra={
+                    "subjectIndex": idx + 1,
+                    "totalSubjects": len(subjects),
+                    "term": term["description"],
+                    "subject": subject["description"],
+                },
             )
 
             authenticate_current_session(term, unique_session_id, cookies)
@@ -136,8 +140,8 @@ async def crawl():
             if sched_json["data"]:
                 subjects_json.append(sched_json["data"])
             else:
-                LOG.warning(
-                    f"No course data found for subject '{subject['description']}'."
+                logger.warning(
+                    "No course data found.", extra={"subject": subject["description"]}
                 )
 
             # New uniqueSessionId is needed for each subject

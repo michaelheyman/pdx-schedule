@@ -1,6 +1,6 @@
 import asyncio
 from crawler import crawl
-from logger import LOG
+from logger import logger
 from model import (
     Base,
     ClassOfferingMgr,
@@ -14,11 +14,11 @@ from model import (
 
 
 async def run():
-    LOG.info("RUNNING")
+    logger.info("RUNNING")
     terms = crawl()
 
     if terms is None:
-        LOG.error("No JSON returned from the crawler. Exiting.")
+        logger.error("No JSON returned from the crawler. Exiting.")
         return
 
     async for term in crawl():
