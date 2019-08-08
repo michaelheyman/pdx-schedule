@@ -42,9 +42,7 @@ class InstructorMgr:
             DBSession.flush()
         else:
             if instructor_record.timestamp < datetime.today() - timedelta(days=1):
-                logger.debug(
-                    "Updating instructor information.", extra={"instructor": instructor}
-                )
+                logger.debug("Updating instructor.", extra={"instructor": instructor})
                 instructor_record = InstructorMgr.update_instructor(instructor_record)
 
         DBSession.commit()
@@ -101,10 +99,6 @@ class InstructorMgr:
                     instructor_record.url = url
 
                 instructor_record.timestamp = datetime.now()
-                logger.debug(
-                    "Updated instructor in datastore.",
-                    extra={"instructor": instructor_record.full_name},
-                )
 
         return instructor_record
 

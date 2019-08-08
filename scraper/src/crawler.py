@@ -126,10 +126,10 @@ async def crawl():
             logger.debug(
                 "Crawling subject",
                 extra={
+                    "subject": subject["description"],
                     "subjectIndex": idx + 1,
                     "totalSubjects": len(subjects),
                     "term": term["description"],
-                    "subject": subject["description"],
                 },
             )
 
