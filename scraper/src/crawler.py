@@ -133,8 +133,9 @@ async def crawl():
         subjects = get_subjects(cookies, unique_session_id, term["code"])
 
         for idx, subject in enumerate(subjects):
-            # if idx > 2:
-            #     continue
+            # Short circuit the loop
+            if idx > 2:
+                continue
 
             LOG.debug(
                 f"{term['description']}: "

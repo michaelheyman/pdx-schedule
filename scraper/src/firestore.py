@@ -16,10 +16,11 @@ class Firestore:
     def __init__(self):
         def on_snapshot(docs, changes, read_time):
             # collection = docs[0].reference.parent # this fails if collections are empty
+            instructor_name = None
             for change in changes:
                 try:
-                    # print(f"change.document: {change.document}")
-                    # print(f"change.document.dict: {change.document.to_dict()}") # this is printing {}
+                    print(f"change.document: {change.document}")
+                    # print(f"change.document.dict: {change.document.to_dict()}")  # this is printing {}
                     instructor_name = change.document.get("fullName")
                 except KeyError:
                     # pdb.set_trace()
@@ -37,7 +38,7 @@ class Firestore:
                 """
 
                 if change.type.name == "ADDED":
-                    if instructor_name:
+                    if instructor_name is not None:
                         Firestore.add_instructor(instructor_name)
                     # print("Added: {}".format(change.document.id))
                 elif change.type.name == "MODIFIED":

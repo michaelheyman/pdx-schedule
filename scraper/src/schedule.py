@@ -9,18 +9,42 @@ from fmodel import ClassOfferingMgr, Course, Term
 
 
 def offline_crawl():
+    filename = "./tests/min-fall2019.json"
+    # filename = "./tests/single.json"
     lst = []
-    with open("./tests/fall2019.json", "r") as file:
+    with open(filename, "r") as file:
         content = file.read()
         lst = json.loads(content)
 
     return lst
 
 
+async def run_offline():
+    terms = offline_crawl()
+    if terms is None:
+        LOG.error("No JSON returned from the crawler. Exiting.")
+        return
+
+    for term in terms:
+        for idx, discipline in enumerate(term):
+            if idx > 4:
+                continue
+            for course in discipline:
+                course = get_course_data(course)
+                save_to_database(course)
+
+    # print(f"length of instructor list: {len(Firestore.instructor_list)}")
+    # instructor_doc = Firestore.instructors().document()
+    # print(instructor_doc)
+    # print(instructor_doc.id)
+    # instructor_doc.set({"fullName": "Testructor2"})
+    # print(f"length of instructor list: {len(Firestore.instructor_list)}")
+    Firestore.commit()
+
+
 async def run():
     LOG.info("RUNNING")
     terms = crawl()
-    # terms = offline_crawl()
 
     if terms is None:
         LOG.error("No JSON returned from the crawler. Exiting.")
@@ -29,8 +53,8 @@ async def run():
     async for term in crawl():
         # for term in terms:
         for idx, discipline in enumerate(term):
-            # if idx > 1:
-            #     continue
+            if idx > 4:
+                continue
             for course in discipline:
                 course = get_course_data(course)
                 save_to_database(course)
@@ -145,7 +169,8 @@ def get_instructor_name(rec):
 
 def main():
     Firestore.initialize()
-    asyncio.get_event_loop().run_until_complete(run())
+    asyncio.get_event_loop().run_until_complete(run_offline())
+    # asyncio.get_event_loop().run_until_complete(run())
 
 
 if __name__ == "__main__":
