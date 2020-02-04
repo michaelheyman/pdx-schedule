@@ -35,9 +35,3 @@ If running locallly, go to http://localhost:49160.
 Executes a GET request to receive data from Node and renders the UI accordingly.
 
 See `client/README.md` for instructions on how to use and build.
-
-## Scraper
-
-Crawls and scrapes the pages to gather schedule and rating data.
-
-See `scraper/README.md` for instructions on how to use and build.
