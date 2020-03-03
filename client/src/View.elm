@@ -242,7 +242,7 @@ viewInput =
     Input.search
         [ Input.id "searchInput"
         , Input.placeholder "Search for class.."
-        , Input.onInput Search
+        , Input.onInput FilterRecords
         , Input.attrs
             [ Spacing.mb4
             , autocomplete False
@@ -279,7 +279,7 @@ mobileCourseTable model =
                 (List.foldr (++)
                     []
                     (model.classes
-                        |> List.filter (filterCourse model.search model.currentDiscipline)
+                        |> List.filter (filterCourse model.searchFilter model.currentDiscipline)
                         |> List.map mobileCourseRow
                     )
                 )
@@ -320,7 +320,7 @@ mobileCourseRow c =
         [ Table.th [] [ text "Instructor" ]
         , Table.td
             [ Table.cellAttr Flex.wrap ]
-            [ Maybe.map viewName c.instructor
+            [ Maybe.map (\inst -> text (instructorName inst)) c.instructor
                 |> Maybe.withDefault (text "")
             ]
         ]
@@ -382,7 +382,7 @@ courseTable model =
         , tbody =
             Table.tbody []
                 (model.classes
-                    |> List.filter (filterCourse model.search model.currentDiscipline)
+                    |> List.filter (filterCourse model.searchFilter model.currentDiscipline)
                     |> List.map courseRow
                 )
         }
@@ -391,8 +391,16 @@ courseTable model =
 filterCourse : String -> String -> Class -> Bool
 filterCourse search filter c =
     let
-        containsName =
+        containsCourseName =
             String.contains (String.toLower search) (String.toLower c.course.name)
+
+        containsInstructorName =
+            case c.instructor of
+                Just instructor ->
+                    String.contains (String.toLower search) (String.toLower (instructorName instructor))
+
+                Nothing ->
+                    True
 
         startsWithSearch =
             String.startsWith (String.toLower search) (String.toLower c.course.number)
@@ -400,7 +408,7 @@ filterCourse search filter c =
         startsWithFilter =
             String.startsWith (String.toLower filter) (String.toLower c.course.discipline)
     in
-    startsWithFilter && (startsWithSearch || containsName)
+    startsWithFilter && (startsWithSearch || containsCourseName || containsInstructorName)
 
 
 courseRow : Class -> Table.Row msg
@@ -455,7 +463,7 @@ courseRow c =
         , Table.td
             [ Table.cellAttr Display.tableCellSm
             ]
-            [ Maybe.map viewName c.instructor
+            [ Maybe.map (\inst -> text (instructorName inst)) c.instructor
                 |> Maybe.withDefault (text "")
             ]
         , Table.td
@@ -467,10 +475,10 @@ courseRow c =
         ]
 
 
-viewName : Instructor -> Html msg
-viewName instructor =
-    Maybe.map2 (\a b -> text <| a ++ " " ++ b) instructor.firstName instructor.lastName
-        |> Maybe.withDefault (text instructor.fullName)
+instructorName : Instructor -> String
+instructorName instructor =
+    Maybe.map2 (\a b -> a ++ " " ++ b) instructor.firstName instructor.lastName
+        |> Maybe.withDefault instructor.fullName
 
 
 viewRating : Instructor -> Html msg

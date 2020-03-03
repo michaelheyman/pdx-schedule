@@ -1,9 +1,8 @@
 node_modules
+dist
 src/**/*.js
 src/**/*.js.map
 client/elm-stuff
-scraper/__pycache__
-scraper/src/__pycache__
-scraper/index.html
 .DS_Store
 .env
+.gcloudignore
