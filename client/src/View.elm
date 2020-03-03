@@ -101,8 +101,7 @@ viewNavbar model =
 renderPage : Model -> Html Msg
 renderPage model =
     div []
-        [ viewNavbar model
-        , pageHeader model
+        [ Element.layout [] (pageHeader model)
         , Grid.containerFluid []
             [ Grid.row
                 [ Row.centerXs ]
@@ -125,73 +124,10 @@ renderPage model =
         ]
 
 
-pageHeader : Model -> Html Msg
+pageHeader : Model -> Element Msg
 pageHeader model =
-    div
-        [ class "bd-pageheader"
-        , style "background-color" "#563d7c"
-        , style "color" "white"
-        , Spacing.pt5
-        , Spacing.pb5
-        , Spacing.mb3
-        , Spacing.mb5Md
-        ]
-        [ Grid.containerFluid []
-            [ Grid.row []
-                [ Grid.col
-                    [ Col.offsetXs1
-                    , Col.offsetMd2
-                    , Col.offsetXl0
-                    ]
-                    [ div
-                        [ class "container" ]
-                        [ h1 [] [ text "PSU Schedule" ]
-                        , h6
-                            [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75))
-                            , Display.none
-                            , Display.blockMd
-                            ]
-                            [ termDropdown model ]
-                        , h6
-                            [ style "color" (Color.toCssString (Color.rgba 255 255 255 0.75))
-                            , Display.noneMd
-                            ]
-                            [ text model.term ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-
-
-termDropdown : Model -> Html Msg
-termDropdown model =
-    Dropdown.dropdown
-        model.dropdownState
-        { options = []
-        , toggleMsg = DropdownMsg
-        , toggleButton =
-            Dropdown.toggle
-                [ Button.light
-                , Button.small
-                , Button.outlineLight
-                ]
-                [ text model.term ]
-        , items =
-            model.terms
-                |> List.reverse
-                |> List.map
-                    (\term ->
-                        Dropdown.buttonItem
-                            [ href "#"
-                            , onClick <|
-                                MakeApiRequest <|
-                                    String.fromInt <|
-                                        term.date
-                            ]
-                            [ text term.description ]
-                    )
-        }
+    Element.row []
+        [ Element.text "PSU Schedule" ]
 
 
 viewSidebar : Model -> Element Msg
