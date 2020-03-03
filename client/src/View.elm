@@ -119,7 +119,7 @@ renderPage model =
                     [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
                     [ main_
                         []
-                        [ viewPage model ]
+                        [ Element.layout [] (viewPage model) ]
                     ]
                 ]
             ]
@@ -228,25 +228,9 @@ viewSidebar model =
         ]
 
 
-viewPage : Model -> Html Msg
+viewPage : Model -> Element Msg
 viewPage model =
-    div []
-        [ viewInput
-        , Element.layout [] (courseTable model)
-        ]
-
-
-viewInput : Html Msg
-viewInput =
-    Input.search
-        [ Input.id "searchInput"
-        , Input.placeholder "Search for class.."
-        , Input.onInput FilterRecords
-        , Input.attrs
-            [ Spacing.mb4
-            , autocomplete False
-            ]
-        ]
+    courseTable model
 
 
 viewProgressBar : Float -> Html Msg
