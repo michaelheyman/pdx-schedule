@@ -16423,88 +16423,33 @@ var author$project$View$courseTable = function (model) {
 var author$project$View$viewPage = function (model) {
 	return author$project$View$courseTable(model);
 };
-var elm$html$Html$b = _VirtualDom_node('b');
-var author$project$View$sidebarLink = F2(
-	function (model, string) {
-		var disciplineText = _Utils_eq(model.eY, string) ? A2(
-			elm$html$Html$b,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text(string)
-				])) : elm$html$Html$text(string);
-		return A2(
-			elm$html$Html$li,
-			_List_fromArray(
-				[
-					A2(elm$html$Html$Attributes$style, 'font-size', '0.8em'),
-					A2(elm$html$Html$Attributes$style, 'color', '#99979c'),
-					elm$html$Html$Events$onClick(
-					author$project$Model$DisciplineFilter(string)),
-					A2(elm$html$Html$Attributes$style, 'cursor', 'pointer')
-				]),
-			_List_fromArray(
-				[disciplineText]));
+var mdgriffith$elm_ui$Internal$Model$AsColumn = 1;
+var mdgriffith$elm_ui$Internal$Model$asColumn = 1;
+var mdgriffith$elm_ui$Element$column = F2(
+	function (attrs, children) {
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asColumn,
+			mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.eT + (' ' + mdgriffith$elm_ui$Internal$Style$classes.aH)),
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl2 = elm$html$Html$Attributes$class('pl-2');
 var author$project$View$viewSidebar = function (model) {
 	return A2(
-		elm$html$Html$nav,
-		_List_fromArray(
-			[
-				elm$html$Html$Attributes$class('bd-links')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('bd-toc-item active')
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text('Disciplines'),
-						A2(
-						elm$html$Html$ul,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$class('bd-sidenav'),
-								A2(elm$html$Html$Attributes$style, 'list-style-type', 'none'),
-								rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl2
-							]),
-						A2(
-							elm$core$List$cons,
-							A2(
-								elm$html$Html$li,
-								_List_fromArray(
-									[
-										A2(elm$html$Html$Attributes$style, 'font-size', '0.8em'),
-										A2(elm$html$Html$Attributes$style, 'color', '#99979c'),
-										elm$html$Html$Events$onClick(
-										author$project$Model$DisciplineFilter('')),
-										A2(elm$html$Html$Attributes$style, 'cursor', 'pointer')
-									]),
-								_List_fromArray(
-									[
-										(model.eY === '') ? A2(
-										elm$html$Html$b,
-										_List_Nil,
-										_List_fromArray(
-											[
-												elm$html$Html$text('All')
-											])) : elm$html$Html$text('All')
-									])),
-							A2(
-								elm$core$List$map,
-								author$project$View$sidebarLink(model),
-								model.e5)))
-					]))
-			]));
+		mdgriffith$elm_ui$Element$column,
+		_List_Nil,
+		A2(elm$core$List$map, mdgriffith$elm_ui$Element$text, model.e5));
 };
 var elm$html$Html$main_ = _VirtualDom_node('main');
-var elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
-var elm$html$Html$Lazy$lazy = elm$virtual_dom$VirtualDom$lazy;
 var rundis$elm_bootstrap$Bootstrap$Grid$Internal$Col10 = 10;
 var rundis$elm_bootstrap$Bootstrap$Grid$Col$md10 = A2(rundis$elm_bootstrap$Bootstrap$Grid$Internal$width, 2, 10);
 var rundis$elm_bootstrap$Bootstrap$Grid$Internal$Col2 = 2;
@@ -16548,7 +16493,10 @@ var author$project$View$renderPage = function (model) {
 									]),
 								_List_fromArray(
 									[
-										A2(elm$html$Html$Lazy$lazy, author$project$View$viewSidebar, model)
+										A2(
+										mdgriffith$elm_ui$Element$layout,
+										_List_Nil,
+										author$project$View$viewSidebar(model))
 									])),
 								A2(
 								rundis$elm_bootstrap$Bootstrap$Grid$col,

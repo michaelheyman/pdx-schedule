@@ -3,7 +3,6 @@ module View exposing (view)
 import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Dropdown as Dropdown
-import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
@@ -15,10 +14,9 @@ import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
 import Color exposing (rgb255, rgba, toCssString)
 import Element exposing (..)
-import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, nav, p, span, text, ul)
-import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
+import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, p, span, text, ul)
+import Html.Attributes exposing (attribute, class, href, style, target)
 import Html.Events exposing (onClick)
-import Html.Lazy exposing (lazy)
 import Model exposing (Class, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
@@ -114,7 +112,7 @@ renderPage model =
                     , Col.md2
                     , Col.attrs [ class "bd-sidebar" ]
                     ]
-                    [ lazy viewSidebar model ]
+                    [ Element.layout [] (viewSidebar model) ]
                 , Grid.col
                     [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
                     [ main_
@@ -196,36 +194,9 @@ termDropdown model =
         }
 
 
-viewSidebar : Model -> Html Msg
+viewSidebar : Model -> Element Msg
 viewSidebar model =
-    nav
-        [ class "bd-links"
-        ]
-        [ div [ class "bd-toc-item active" ]
-            [ text "Disciplines"
-            , ul
-                [ class "bd-sidenav"
-                , style "list-style-type" "none"
-                , Spacing.pl2
-                ]
-                (li
-                    [ style "font-size" "0.8em"
-                    , style "color" "#99979c"
-                    , onClick (DisciplineFilter "")
-                    , style "cursor" "pointer"
-                    ]
-                    [ if model.currentDiscipline == "" then
-                        b [] [ text "All" ]
-
-                      else
-                        text "All"
-                    ]
-                    :: List.map
-                        (sidebarLink model)
-                        model.disciplines
-                )
-            ]
-        ]
+    Element.column [] (List.map Element.text model.disciplines)
 
 
 viewPage : Model -> Element Msg
