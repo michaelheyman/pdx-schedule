@@ -9,12 +9,12 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Navbar as Navbar
 import Bootstrap.Progress as Progress
-import Bootstrap.Table as Table
 import Bootstrap.Utilities.Display as Display
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
 import Color exposing (rgb255, rgba, toCssString)
+import Element exposing (..)
 import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (attribute, autocomplete, class, href, style, target)
 import Html.Events exposing (onClick)
@@ -49,7 +49,7 @@ viewNavbar model =
             |> Navbar.container
             |> Navbar.collapseSmall
             |> Navbar.withAnimation
-            |> Navbar.lightCustom (rgb255 255 255 255)
+            |> Navbar.lightCustom (Color.rgb255 255 255 255)
             |> Navbar.brand
                 [ href "#" ]
                 [ text "PSU Schedule"
@@ -232,8 +232,7 @@ viewPage : Model -> Html Msg
 viewPage model =
     div []
         [ viewInput
-        , lazy mobileCourseTable model
-        , lazy courseTable model
+        , Element.layout [] (courseTable model)
         ]
 
 
@@ -267,124 +266,60 @@ viewError =
         ]
 
 
-mobileCourseTable : Model -> Html Msg
-mobileCourseTable model =
-    Table.table
-        { options = []
-        , thead =
-            Table.thead []
-                []
-        , tbody =
-            Table.tbody [ Display.noneSm ]
-                (List.foldr (++)
-                    []
-                    (model.classes
-                        |> List.filter (filterCourse model.searchFilter model.currentDiscipline)
-                        |> List.map mobileCourseRow
-                    )
-                )
-        }
-
-
-mobileCourseRow : Class -> List (Table.Row msg)
-mobileCourseRow c =
-    [ Table.tr
-        [ Table.rowAttr Flex.col
-        ]
-        [ Table.th [ Table.cellDark ] [ text "Class" ]
-        , Table.td [ Table.cellDark ] [ text c.course.number ]
-        ]
-    , Table.tr
-        [ Table.rowAttr (style "word-wrap" "break-word")
-        , Table.rowAttr (style "word-break" "break-all")
-        ]
-        [ Table.th [] [ text "Name" ]
-        , Table.td [ Table.cellAttr Flex.wrap ] [ text c.course.name ]
-        ]
-    , Table.tr []
-        [ Table.th [] [ text "Days" ]
-        , Table.td []
-            [ Maybe.map (\days -> text days) c.days
-                |> Maybe.withDefault (text "")
-            ]
-        ]
-    , Table.tr []
-        [ Table.th [] [ text "Time" ]
-        , Table.td
-            []
-            [ Maybe.map (\time -> text time) c.time
-                |> Maybe.withDefault (text "")
-            ]
-        ]
-    , Table.tr []
-        [ Table.th [] [ text "Instructor" ]
-        , Table.td
-            [ Table.cellAttr Flex.wrap ]
-            [ Maybe.map (\inst -> text (instructorName inst)) c.instructor
-                |> Maybe.withDefault (text "")
-            ]
-        ]
-    , Table.tr []
-        [ Table.th [] [ text "Rating" ]
-        , Table.td
-            []
-            [ Maybe.map viewRating c.instructor
-                |> Maybe.withDefault (text "")
-            ]
-        ]
-    , Table.tr []
-        [ Table.th [] []
-        , Table.td [] []
-        ]
-    ]
-
-
-courseTable : Model -> Html Msg
+courseTable : Model -> Element Msg
 courseTable model =
-    Table.table
-        { options = [ Table.hover, Table.responsive, Table.striped ]
-        , thead =
-            Table.thead [ Table.headAttr (class "thead-dark") ]
-                [ Table.tr
-                    [ Table.rowAttr Display.none
-                    , Table.rowAttr Display.tableRowSm
-                    ]
-                    [ Table.th
-                        [ Table.cellAttr (style "display" "none")
-                        , Table.cellAttr (style "visibility" "hidden")
-                        ]
-                        [ text "Id" ]
-                    , Table.th [] [ text "Class" ]
-                    , Table.th
-                        [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellSm
-                        ]
-                        [ text "Name" ]
-                    , Table.th
-                        [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellLg
-                        ]
-                        [ text "Days" ]
-                    , Table.th
-                        [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellLg
-                        ]
-                        [ text "Time" ]
-                    , Table.th
-                        [ Table.cellAttr Display.none
-                        , Table.cellAttr Display.tableCellXl
-                        ]
-                        [ text "Credits" ]
-                    , Table.th [] [ text "Instructor" ]
-                    , Table.th [] [ text "Rating" ]
-                    ]
-                ]
-        , tbody =
-            Table.tbody []
-                (model.classes
-                    |> List.filter (filterCourse model.searchFilter model.currentDiscipline)
-                    |> List.map courseRow
-                )
+    let
+        data =
+            List.filter (filterCourse model.searchFilter model.currentDiscipline) model.classes
+    in
+    Element.table []
+        { data = data
+        , columns =
+            [ { header = Element.text "Class"
+              , width = fill
+              , view =
+                    \class ->
+                        Element.text class.course.number
+              }
+            , { header = Element.text "Name"
+              , width = fill
+              , view =
+                    \class ->
+                        Element.text class.course.name
+              }
+            , { header = Element.text "Days"
+              , width = fill
+              , view =
+                    \class ->
+                        Element.text (Maybe.withDefault "" class.days)
+              }
+            , { header = Element.text "Time"
+              , width = fill
+              , view =
+                    \class ->
+                        Element.text (Maybe.withDefault "" class.time)
+              }
+            , { header = Element.text "Credits"
+              , width = fill
+              , view =
+                    \class ->
+                        Element.text (String.fromInt class.credits)
+              }
+            , { header = Element.text "Instructor"
+              , width = fill
+              , view =
+                    \class ->
+                        Maybe.map (\inst -> Element.text (instructorName inst)) class.instructor
+                            |> Maybe.withDefault (Element.text "")
+              }
+            , { header = Element.text "Rating"
+              , width = fill
+              , view =
+                    \class ->
+                        Maybe.map viewRating class.instructor
+                            |> Maybe.withDefault (Element.text "")
+              }
+            ]
         }
 
 
@@ -411,80 +346,16 @@ filterCourse search filter c =
     startsWithFilter && (startsWithSearch || containsCourseName || containsInstructorName)
 
 
-courseRow : Class -> Table.Row msg
-courseRow c =
-    Table.tr
-        [ Table.rowAttr Flex.col
-        , Table.rowAttr Display.none
-        , Table.rowAttr Display.tableRowSm
-        ]
-        [ Table.td
-            [ Table.cellAttr (style "display" "none")
-            , Table.cellAttr (style "visibility" "hidden")
-            ]
-            [ text (String.fromInt c.course.id) ]
-        , Table.td
-            [ Table.cellAttr (class "text-nowrap")
-            , Table.cellAttr Spacing.pr0
-            ]
-            [ text c.course.number ]
-        , Table.td
-            [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellSm
-            , Table.cellAttr Flex.nowrap
-            ]
-            [ text c.course.name ]
-        , Table.td
-            [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellLg
-            , Table.cellAttr Spacing.pr0
-            ]
-            [ Maybe.map (\days -> text days) c.days
-                |> Maybe.withDefault (text "")
-            ]
-        , Table.td
-            [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellLg
-            , Table.cellAttr (class "text-nowrap")
-            ]
-            [ Maybe.map (\time -> text time) c.time
-                |> Maybe.withDefault (text "")
-            ]
-        , Table.td
-            [ Table.cellAttr Display.none
-            , Table.cellAttr Display.tableCellXl
-            ]
-            [ text (String.fromInt c.credits) ]
-        , Table.td
-            [ Table.cellAttr (style "display" "none")
-            , Table.cellAttr (style "visibility" "hidden")
-            ]
-            [ text (String.fromInt c.crn) ]
-        , Table.td
-            [ Table.cellAttr Display.tableCellSm
-            ]
-            [ Maybe.map (\inst -> text (instructorName inst)) c.instructor
-                |> Maybe.withDefault (text "")
-            ]
-        , Table.td
-            [ Table.cellAttr Display.tableCellSm
-            ]
-            [ Maybe.map viewRating c.instructor
-                |> Maybe.withDefault (text "")
-            ]
-        ]
-
-
 instructorName : Instructor -> String
 instructorName instructor =
     Maybe.map2 (\a b -> a ++ " " ++ b) instructor.firstName instructor.lastName
         |> Maybe.withDefault instructor.fullName
 
 
-viewRating : Instructor -> Html msg
+viewRating : Instructor -> Element Msg
 viewRating instructor =
     Maybe.map2 (\r u -> externalLink u (round 1 r)) instructor.rating instructor.url
-        |> Maybe.withDefault (text "")
+        |> Maybe.withDefault (Element.text "")
 
 
 viewTimestamp : Model -> Html Msg
@@ -535,7 +406,7 @@ viewFooter model =
                                 , Spacing.mr2
                                 ]
                                 [ i [ class "fa fa-github", attribute "aria-hidden" "true" ] []
-                                , externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source"
+                                , Element.layout [] (externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source")
                                 ]
                             , li [ style "display" "inline" ]
                                 [ i [ class "fa fa-envelope", attribute "aria-hidden" "true" ] []
@@ -587,10 +458,13 @@ viewFooter model =
         ]
 
 
-externalLink : String -> String -> Html msg
+externalLink : String -> String -> Element Msg
 externalLink url label =
-    a [ href url, target "_blank" ]
-        [ text label ]
+    Element.link
+        []
+        { url = url
+        , label = Element.text label
+        }
 
 
 sidebarLink : Model -> String -> Html Msg
