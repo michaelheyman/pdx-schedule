@@ -1,22 +1,10 @@
 module View exposing (view)
 
 import Bootstrap.Alert as Alert
-import Bootstrap.Button as Button
-import Bootstrap.Dropdown as Dropdown
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
-import Bootstrap.Navbar as Navbar
 import Bootstrap.Progress as Progress
-import Bootstrap.Utilities.Display as Display
-import Bootstrap.Utilities.Flex as Flex
-import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
-import Color exposing (rgb255, rgba, toCssString)
 import Element exposing (..)
-import Html exposing (Html, a, b, div, footer, h1, h6, i, li, main_, p, span, text, ul)
-import Html.Attributes exposing (attribute, class, href, style, target)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, text)
 import Model exposing (Class, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
@@ -31,7 +19,7 @@ view model =
                     viewProgressBar model.loadingValue
 
                 Success ->
-                    renderPage model
+                    Element.layout [] (renderPage model)
 
                 Failure _ ->
                     viewError
@@ -40,86 +28,11 @@ view model =
     }
 
 
-viewNavbar : Model -> Html Msg
-viewNavbar model =
-    div [ Display.noneMd ]
-        [ Navbar.config NavbarMsg
-            |> Navbar.container
-            |> Navbar.collapseSmall
-            |> Navbar.withAnimation
-            |> Navbar.lightCustom (Color.rgb255 255 255 255)
-            |> Navbar.brand
-                [ href "#" ]
-                [ text "PSU Schedule"
-                ]
-            |> Navbar.items
-                [ Navbar.dropdown
-                    { id = "termDropdown"
-                    , toggle = Navbar.dropdownToggle [] [ text model.term ]
-                    , items =
-                        Navbar.dropdownHeader [ text "Term" ]
-                            :: List.map
-                                (\term ->
-                                    Navbar.dropdownItem
-                                        [ href "#", onClick (MakeApiRequest (String.fromInt (.date term))) ]
-                                        [ text (.description term) ]
-                                )
-                                (List.reverse model.terms)
-                    }
-                , Navbar.dropdown
-                    { id = "disciplineDropdown"
-                    , toggle =
-                        Navbar.dropdownToggle []
-                            [ if model.currentDiscipline == "" then
-                                text "All"
-
-                              else
-                                text model.currentDiscipline
-                            ]
-                    , items =
-                        Navbar.dropdownHeader [ text "Discipline" ]
-                            :: Navbar.dropdownItem
-                                [ href "#"
-                                , onClick (DisciplineFilter "")
-                                ]
-                                [ text "All" ]
-                            :: List.map
-                                (\discipline ->
-                                    Navbar.dropdownItem
-                                        [ href "#"
-                                        , onClick (DisciplineFilter discipline)
-                                        ]
-                                        [ text discipline ]
-                                )
-                                model.disciplines
-                    }
-                ]
-            |> Navbar.view model.navbarState
-        ]
-
-
-renderPage : Model -> Html Msg
+renderPage : Model -> Element Msg
 renderPage model =
-    div []
-        [ Element.layout [] (pageHeader model)
-        , Grid.containerFluid []
-            [ Grid.row
-                [ Row.centerXs ]
-                [ Grid.col
-                    [ Col.attrs [ Display.none, Display.blockMd ]
-                    , Col.xs12
-                    , Col.md2
-                    , Col.attrs [ class "bd-sidebar" ]
-                    ]
-                    [ Element.layout [] (viewSidebar model) ]
-                , Grid.col
-                    [ Col.xs12, Col.md10, Col.xl8, Col.attrs [ class "bd-content" ] ]
-                    [ main_
-                        []
-                        [ Element.layout [] (viewPage model) ]
-                    ]
-                ]
-            ]
+    Element.column []
+        [ pageHeader model
+        , Element.row [] [ viewSidebar model, viewPage model ]
         , viewFooter model
         ]
 
@@ -249,7 +162,7 @@ viewRating instructor =
         |> Maybe.withDefault (Element.text "")
 
 
-viewTimestamp : Model -> Html Msg
+viewTimestamp : Model -> Element Msg
 viewTimestamp model =
     let
         timeFormat course =
@@ -267,111 +180,33 @@ viewTimestamp model =
     in
     case List.head <| List.sortBy .timestamp model.classes of
         Just course ->
-            text (timeFormat course)
+            Element.text (timeFormat course)
 
         Nothing ->
-            text ""
+            Element.text ""
 
 
-viewFooter : Model -> Html Msg
+viewFooter : Model -> Element Msg
 viewFooter model =
-    footer
-        [ class "bd-footer text-muted"
-        , style "background-color" "#f7f7f7"
-        , Spacing.py5
-        , Spacing.px2
-        ]
-        [ div [ class "container" ]
-            [ Grid.container
+    Element.column []
+        [ Element.row []
+            [ externalLink "https://github.com/michaelheyman/pdx-schedule/" "Source"
+            , Element.newTabLink
                 []
-                [ Grid.row
-                    [ Row.centerSm ]
-                    [ Grid.col [ Col.xs12, Col.md6 ]
-                        [ ul
-                            [ class "bd-footer-links"
-                            , style "list-style-type" "none"
-                            , Spacing.pl0
-                            ]
-                            [ li
-                                [ style "display" "inline"
-                                , Spacing.mr2
-                                ]
-                                [ i [ class "fa fa-github", attribute "aria-hidden" "true" ] []
-                                , Element.layout [] (externalLink "https://github.com/michaelheyman/pdx-schedule/" " Source")
-                                ]
-                            , li [ style "display" "inline" ]
-                                [ i [ class "fa fa-envelope", attribute "aria-hidden" "true" ] []
-                                , a [ href "mailto:contact@mheyman.com?subject=Site Feedback", target "_blank" ] [ text " Contact" ]
-                                ]
-                            ]
-                        ]
-                    , Grid.col
-                        [ Col.xs12
-                        , Col.md6
-                        , Col.attrs
-                            [ Flex.row
-                            , Flex.alignItemsEnd
-
-                            -- NOTE: remove the following when elm-boostrap supports Text.align in things other than Cards
-                            , class "text-right"
-                            , Display.none
-                            , Display.blockMd
-                            ]
-                        ]
-                        [ span
-                            []
-                            [ text "Last Updated: "
-                            , viewTimestamp model
-                            ]
-                        ]
-                    , Grid.col
-                        [ Col.xs12
-                        , Col.attrs
-                            [ Flex.row
-                            , Display.noneMd
-                            , Spacing.mt2
-                            ]
-                        ]
-                        [ span
-                            []
-                            [ text "Last Updated: "
-                            , viewTimestamp model
-                            ]
-                        ]
-                    , Grid.col
-                        [ Col.attrs [ Spacing.mt5, Spacing.mt4Md ] ]
-                        [ p []
-                            [ text "The contents of this page are not sanctioned by Portland State University." ]
-                        ]
-                    ]
-                ]
+                { url = "mailto:contact@mheyman.com?subject=Site Feedback"
+                , label = Element.text "Contact"
+                }
+            , Element.text "Last Updated"
+            , viewTimestamp model
             ]
+        , Element.text "The contents of this page are not sanctioned by Portland State University."
         ]
 
 
 externalLink : String -> String -> Element Msg
 externalLink url label =
-    Element.link
+    Element.newTabLink
         []
         { url = url
         , label = Element.text label
         }
-
-
-sidebarLink : Model -> String -> Html Msg
-sidebarLink model string =
-    let
-        disciplineText =
-            if model.currentDiscipline == string then
-                b [] [ text string ]
-
-            else
-                text string
-    in
-    li
-        [ style "font-size" "0.8em"
-        , style "color" "#99979c"
-        , onClick (DisciplineFilter string)
-        , style "cursor" "pointer"
-        ]
-        [ disciplineText ]
