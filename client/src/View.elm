@@ -10,29 +10,29 @@ view : Model -> Document Msg
 view model =
     { title = "PSU Schedule"
     , body =
-        [ Element.layout [] (renderPage model)
+        [ layout [] (renderPage model)
         ]
     }
 
 
 renderPage : Model -> Element Msg
 renderPage model =
-    Element.column []
+    column []
         [ pageHeader model
-        , Element.row [] [ viewSidebar model, viewPage model ]
+        , row [] [ viewSidebar model, viewPage model ]
         , viewFooter model
         ]
 
 
 pageHeader : Model -> Element Msg
 pageHeader model =
-    Element.row []
-        [ Element.text "PSU Schedule" ]
+    row []
+        [ text "PSU Schedule" ]
 
 
 viewSidebar : Model -> Element Msg
 viewSidebar model =
-    Element.column [] (List.map Element.text model.disciplines)
+    column [] (List.map text model.disciplines)
 
 
 viewPage : Model -> Element Msg
@@ -46,52 +46,52 @@ courseTable model =
         data =
             List.filter (filterCourse model.searchFilter model.currentDiscipline) model.classes
     in
-    Element.table []
+    table []
         { data = data
         , columns =
-            [ { header = Element.text "Class"
+            [ { header = text "Class"
               , width = fill
               , view =
                     \class ->
-                        Element.text class.course.number
+                        text class.course.number
               }
-            , { header = Element.text "Name"
+            , { header = text "Name"
               , width = fill
               , view =
                     \class ->
-                        Element.text class.course.name
+                        text class.course.name
               }
-            , { header = Element.text "Days"
+            , { header = text "Days"
               , width = fill
               , view =
                     \class ->
-                        Element.text (Maybe.withDefault "" class.days)
+                        text (Maybe.withDefault "" class.days)
               }
-            , { header = Element.text "Time"
+            , { header = text "Time"
               , width = fill
               , view =
                     \class ->
-                        Element.text (Maybe.withDefault "" class.time)
+                        text (Maybe.withDefault "" class.time)
               }
-            , { header = Element.text "Credits"
+            , { header = text "Credits"
               , width = fill
               , view =
                     \class ->
-                        Element.text (String.fromInt class.credits)
+                        text (String.fromInt class.credits)
               }
-            , { header = Element.text "Instructor"
+            , { header = text "Instructor"
               , width = fill
               , view =
                     \class ->
-                        Maybe.map (\inst -> Element.text (instructorName inst)) class.instructor
-                            |> Maybe.withDefault (Element.text "")
+                        Maybe.map (\inst -> text (instructorName inst)) class.instructor
+                            |> Maybe.withDefault (text "")
               }
-            , { header = Element.text "Rating"
+            , { header = text "Rating"
               , width = fill
               , view =
                     \class ->
                         Maybe.map viewRating class.instructor
-                            |> Maybe.withDefault (Element.text "")
+                            |> Maybe.withDefault (text "")
               }
             ]
         }
@@ -129,7 +129,7 @@ instructorName instructor =
 viewRating : Instructor -> Element Msg
 viewRating instructor =
     Maybe.map2 (\r u -> externalLink u (round 1 r)) instructor.rating instructor.url
-        |> Maybe.withDefault (Element.text "")
+        |> Maybe.withDefault (text "")
 
 
 viewTimestamp : Model -> Element Msg
@@ -150,33 +150,33 @@ viewTimestamp model =
     in
     case List.head <| List.sortBy .timestamp model.classes of
         Just course ->
-            Element.text (timeFormat course)
+            text (timeFormat course)
 
         Nothing ->
-            Element.text ""
+            text ""
 
 
 viewFooter : Model -> Element Msg
 viewFooter model =
-    Element.column []
-        [ Element.row []
+    column []
+        [ row []
             [ externalLink "https://github.com/michaelheyman/pdx-schedule/" "Source"
-            , Element.newTabLink
+            , newTabLink
                 []
                 { url = "mailto:contact@mheyman.com?subject=Site Feedback"
-                , label = Element.text "Contact"
+                , label = text "Contact"
                 }
-            , Element.text "Last Updated"
+            , text "Last Updated"
             , viewTimestamp model
             ]
-        , Element.text "The contents of this page are not sanctioned by Portland State University."
+        , text "The contents of this page are not sanctioned by Portland State University."
         ]
 
 
 externalLink : String -> String -> Element Msg
 externalLink url label =
-    Element.newTabLink
+    newTabLink
         []
         { url = url
-        , label = Element.text label
+        , label = text label
         }
