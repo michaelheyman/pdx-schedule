@@ -1,10 +1,7 @@
 module View exposing (view)
 
-import Bootstrap.Alert as Alert
-import Bootstrap.Progress as Progress
 import Browser exposing (Document)
 import Element exposing (..)
-import Html exposing (Html, div, text)
 import Model exposing (Class, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
@@ -13,17 +10,7 @@ view : Model -> Document Msg
 view model =
     { title = "PSU Schedule"
     , body =
-        [ div []
-            [ case model.response of
-                Loading ->
-                    viewProgressBar model.loadingValue
-
-                Success ->
-                    Element.layout [] (renderPage model)
-
-                Failure _ ->
-                    viewError
-            ]
+        [ Element.layout [] (renderPage model)
         ]
     }
 
@@ -51,23 +38,6 @@ viewSidebar model =
 viewPage : Model -> Element Msg
 viewPage model =
     courseTable model
-
-
-viewProgressBar : Float -> Html Msg
-viewProgressBar value =
-    Progress.progress
-        [ Progress.value value
-        , Progress.striped
-        , Progress.label "loading"
-        ]
-
-
-viewError : Html Msg
-viewError =
-    Alert.simpleDanger []
-        [ Html.strong [] [ text "Oh snap! " ]
-        , text "There was a problem loading the page."
-        ]
 
 
 courseTable : Model -> Element Msg
