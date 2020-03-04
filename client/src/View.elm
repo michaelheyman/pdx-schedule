@@ -2,6 +2,8 @@ module View exposing (view)
 
 import Browser exposing (Document)
 import Element exposing (..)
+import Element.Events exposing (..)
+import Element.Font as Font
 import Model exposing (Class, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
@@ -19,7 +21,7 @@ renderPage : Model -> Element Msg
 renderPage model =
     column []
         [ viewHeader model
-        , row []
+        , row [ paddingXY 0 32 ]
             [ Element.el [ width (fillPortion 1) ] (viewSidebar model)
             , Element.el [ alignTop, width (fillPortion 5) ] (viewPage model)
             ]
@@ -29,13 +31,30 @@ renderPage model =
 
 viewHeader : Model -> Element Msg
 viewHeader model =
-    row [ paddingXY 0 32 ]
+    row []
         [ text "PSU Schedule" ]
 
 
 viewSidebar : Model -> Element Msg
 viewSidebar model =
-    column [ width (fillPortion 1) ] (List.map text model.disciplines)
+    column [ width (fillPortion 1) ] (List.map (sidebarLink model) model.disciplines)
+
+
+sidebarLink : Model -> String -> Element Msg
+sidebarLink model string =
+    let
+        disciplineText =
+            if model.currentDiscipline == string then
+                el [ Font.bold ] (text string)
+
+            else
+                el [] (text string)
+    in
+    el
+        [ onClick (DisciplineFilter string)
+        , pointer
+        ]
+        disciplineText
 
 
 viewPage : Model -> Element Msg
