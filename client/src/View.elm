@@ -4,6 +4,7 @@ import Browser exposing (Document)
 import Element exposing (..)
 import Element.Events exposing (..)
 import Element.Font as Font
+import Element.Input as Input
 import Model exposing (Class, Instructor, Model, Msg(..), Response(..))
 import Round exposing (round)
 
@@ -23,7 +24,10 @@ renderPage model =
         [ viewHeader model
         , row [ paddingXY 0 32 ]
             [ Element.el [ width (fillPortion 1) ] (viewSidebar model)
-            , Element.el [ alignTop, width (fillPortion 5) ] (viewPage model)
+            , column [ alignTop, width (fillPortion 5) ]
+                [ viewInput model
+                , Element.el [ paddingXY 0 16 ] (viewPage model)
+                ]
             ]
         , viewFooter model
         ]
@@ -33,6 +37,17 @@ viewHeader : Model -> Element Msg
 viewHeader model =
     row []
         [ text "PSU Schedule" ]
+
+
+viewInput : Model -> Element Msg
+viewInput model =
+    Input.text
+        []
+        { onChange = FilterRecords
+        , text = model.searchFilter
+        , placeholder = Just (Input.placeholder [] (text "Search for a class"))
+        , label = Input.labelHidden "searchInput"
+        }
 
 
 viewSidebar : Model -> Element Msg
@@ -67,10 +82,8 @@ courseTable model =
     let
         data =
             List.filter (filterCourse model.searchFilter model.currentDiscipline) model.classes
-    in
-    table []
-        { data = data
-        , columns =
+
+        columns =
             [ { header = text "Class"
               , width = fill
               , view =
@@ -116,6 +129,10 @@ courseTable model =
                             |> Maybe.withDefault (text "")
               }
             ]
+    in
+    table []
+        { data = data
+        , columns = columns
         }
 
 
