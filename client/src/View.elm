@@ -18,21 +18,24 @@ view model =
 renderPage : Model -> Element Msg
 renderPage model =
     column []
-        [ pageHeader model
-        , row [] [ viewSidebar model, viewPage model ]
+        [ viewHeader model
+        , row []
+            [ Element.el [ width (fillPortion 1) ] (viewSidebar model)
+            , Element.el [ alignTop, width (fillPortion 5) ] (viewPage model)
+            ]
         , viewFooter model
         ]
 
 
-pageHeader : Model -> Element Msg
-pageHeader model =
-    row []
+viewHeader : Model -> Element Msg
+viewHeader model =
+    row [ paddingXY 0 32 ]
         [ text "PSU Schedule" ]
 
 
 viewSidebar : Model -> Element Msg
 viewSidebar model =
-    column [] (List.map text model.disciplines)
+    column [ width (fillPortion 1) ] (List.map text model.disciplines)
 
 
 viewPage : Model -> Element Msg
@@ -158,16 +161,20 @@ viewTimestamp model =
 
 viewFooter : Model -> Element Msg
 viewFooter model =
-    column []
-        [ row []
+    column
+        [ spacing 16
+        , paddingXY 0 32
+        , width fill
+        ]
+        [ row [ spacing 32, width fill ]
             [ externalLink "https://github.com/michaelheyman/pdx-schedule/" "Source"
             , newTabLink
                 []
                 { url = "mailto:contact@mheyman.com?subject=Site Feedback"
                 , label = text "Contact"
                 }
-            , text "Last Updated"
-            , viewTimestamp model
+            , el [ alignRight ] (text "Last Updated")
+            , el [ alignRight ] (viewTimestamp model)
             ]
         , text "The contents of this page are not sanctioned by Portland State University."
         ]
