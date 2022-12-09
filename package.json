@@ -17,7 +17,7 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "dotenv": "^6.2.0",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "mysql": "^2.15.0",
     "sqlite3": "^4.0.7",
     "ts-node": "^7.0.1",
